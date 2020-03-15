@@ -41,9 +41,9 @@ build/bin:
 
 build/android:
 	go get -u -v github.com/msmith491/go-cowsay || true
-	cd $(HOME)/go/src/github.com/msmith491/go-cowsay; \
+	cd $(GOPATH)/src/github.com/msmith491/go-cowsay; \
 		make
-	cp -v $(HOME)/go/src/github.com/msmith491/go-cowsay/cowsay .
+	cp -v $(GOPATH)/src/github.com/msmith491/go-cowsay/cowsay .
 
 install:
 	@./install.sh
