@@ -39,6 +39,12 @@ build/bin:
 	@docker cp pokebuilder:/tmp/cowsay .
 	@docker rm -f pokebuilder
 
+build/android:
+	go get -u -v github.com/msmith491/go-cowsay || true
+	cd $(HOME)/go/src/github.com/msmith491/go-cowsay; \
+		make
+	cp -v $(HOME)/go/src/github.com/msmith491/go-cowsay/cowsay .
+
 install:
 	@./install.sh
 
