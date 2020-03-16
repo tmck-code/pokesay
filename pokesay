@@ -1,0 +1,154 @@
+#!/bin/bash
+
+N_POKEMON=3229
+POKEDEX_PATH=$HOME/.pokesay/cows/
+
+usage() {
+  echo "
+  Description: Prints a Pokémon with a message.
+  Usage:
+  $(basename $0) [-p POKÉMON] [-f COWFILE] [-w COLUMN] [-lnNt] [-h] [MESSAGE]
+
+  Options:
+    -p, --pokemon POKÉMON_NAME
+      CHOOSE a Pokémon by name.
+    -c --category
+      Filter matching Pokémon by category.
+    -f, --file COWFILE
+      CHOOSE a Pokémon cowfile.
+    -w, --word-wrap COLUMN
+      Specifies roughly where the message should be wrapped.
+    -n, --no-wrap
+      Do not wrap the message.
+    -l, --list
+      List all the Pokémon available.
+    -L, --list-categories
+      List all the Pokémon categories available.
+    -N, --no-name
+      Do not print the name of the Pokémon.
+    -v, --verbose
+      Print information about how the Pokémon is chosen.
+    -h, --help
+      Display this usage message.
+    message
+      The message for chosen Pokémon to say. If this is not provided the Pokémon will read from STDIN
+"
+  exit 0
+}
+
+list_pokemon() {
+  echo -e "Pokémon available in ${POKEDEX_PATH}:\n"
+  find $POKEDEX_PATH -iname "*.cow" -printf '%f\n' | sed 's/\.cow$//g' | tr '\n' ' '
+  echo
+  exit 0
+}
+
+find_categories() {
+  find $POKEDEX_PATH/* -type d -printf '%f\n' | tr '\n' ' '
+}
+
+list_categories() {
+  echo -e "Pokémon categories available in ${POKEDEX_PATH}:\n"
+  find_categories
+  echo
+  exit 0
+}
+
+# Helper function, echos a message based on the value of the -v/--verbose flag
+function print_message() {
+  [ "$VERBOSE" == "true" ]  && echo -e "$1"
+}
+
+# Default values
+WORD_WRAP=""       # Disable wrapping
+DISABLE_NAME=false # Print the pokemon name
+VERBOSE=false      # Non-verbose mode off
+
+while getopts ":p:f:c:wnNlLhv" Option ; do
+  case $Option in
+    l ) list_pokemon           ;;
+    L ) list_categories        ;;
+    h ) usage                  ;;
+    f ) COWFILE="$OPTARG"      ;;
+    p ) I_CHOOSE="$OPTARG"     ;;
+    c ) CATEGORY="$OPTARG"     ;;
+    w ) WORD_WRAP="-W $OPTARG" ;;
+    n ) WORD_WRAP="-n"         ;;
+    N ) DISABLE_NAME=true      ;;
+    v ) VERBOSE=true           ;;
+    * ) echo "Unimplemented option chosen." && usage ;;
+  esac
+done
+shift $(($OPTIND - 1))
+
+MESSAGE="${1}"
+CHANCE_OF_ITEM=8
+CHANCE_OF_SHINY=20
+
+if [ -z "${CATEGORY}" ] && [ -z "${I_CHOOSE}" ]; then
+  if [ $[ $RANDOM % $CHANCE_OF_ITEM ] == 0 ]; then
+    CATEGORY=$(find_categories | grep -v pokemon | shuf -n 1)
+  else
+    if [ $[ $RANDOM % $CHANCE_OF_SHINY ] == 0 ]; then
+      CATEGORY="shiny"
+    else
+      CATEGORY="pokemon"
+    fi
+  fi
+fi
+
+# Define which pokemon should be displayed, then call cowsay or cowthink
+# TODO: restore cowthink after fine-tuning cowsay
+if [ -n "$I_CHOOSE" ]; then
+	FPATHS=$(find $POKEDEX_PATH -type f -wholename "$POKEDEX_PATH*$CATEGORY*/*$I_CHOOSE*.cow")
+	FPATH=$(echo "$FPATHS" | shuf -n 1)
+
+  if [ -z "${FPATH:-}" ]; then
+    echo "Unable to find Pokémon matching name '$I_CHOOSE' and category '$CATEGORY' in $POKEDEX_PATH"
+    exit 1
+  else
+    I_CHOOSE="$(basename "${FPATH%%.cow}")"
+
+#     print_message "
+# Randomly chose '$I_CHOOSE' ('${FPATH##*$POKEDEX_PATH}') from $(echo "${FPATHS}" | wc -l) available cowfiles in ${POKEDEX_PATH}:
+# "
+  fi
+
+  category="$(dirname ${FPATH##*$POKEDEX_PATH})"
+  if [ -n "$CATEGORY" ] && ! [[ "$category" =~ "$CATEGORY" ]]; then
+    echo "Pokémon category of $I_CHOOSE '$category' does not match chosen category '$CATEGORY'"
+    exit 1
+  else
+    CATEGORY="$category"
+    print_message "category: $CATEGORY"
+  fi
+
+  cowsay -f "$FPATH" $WORD_WRAP "$MESSAGE"
+
+elif [ -n "$COWFILE" ]; then
+
+  cowsay -f "$COWFILE" $WORD_WRAP "$MESSAGE"
+else
+  FPATHS=$(find $POKEDEX_PATH -type f -wholename "$POKEDEX_PATH*$CATEGORY*/*.cow")
+  FPATH=$(echo "$FPATHS" | shuf -n 1)
+
+#   print_message "
+# Randomly chose '${FPATH##*$POKEDEX_PATH}' from $(echo "${FPATHS}" | wc -l) available cowfiles for the '$CATEGORY' category
+# "
+
+  I_CHOOSE=$(basename $FPATH)
+  I_CHOOSE=${I_CHOOSE%.cow}
+
+  cowsay -f "$FPATH" $WORD_WRAP "$MESSAGE"
+fi
+
+# Write the pokemon name, unless requested otherwise.
+$DISABLE_NAME || echo -e "\
+Pokémon:\t${I_CHOOSE}
+"
+
+print_message "\
+Category:\t$CATEGORY
+Cowfile:\t$FPATH
+"
+
