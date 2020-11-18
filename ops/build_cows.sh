@@ -8,8 +8,7 @@ if [ -z "${DOCKER_BUILD_DIR:-}" ] || [ -z "${DOCKER_OUTPUT_DIR:-}" ]; then
 fi
 
 function generateCowfile() {
-  local worker_n="${1}"
-  local f="${2}"
+  local f="${1}"
 
   local ofpath="${DOCKER_OUTPUT_DIR}${f%.png}.cow"
   local local_path=${ofpath##*icons/}
@@ -35,17 +34,29 @@ EOF
 
   [ -d "${dir_path}" ] || mkdir -p "${dir_path}"
   mv ${ofpath} /tmp/cows/${local_path}
-  echo -n '.'
-  # printf "%9s %s\n" "${worker_n}" "Generated cowfile: ${f}"
 }
 export -f generateCowfile
 
 find ${DOCKER_BUILD_DIR} -type d | parallel -I {} mkdir -p "${DOCKER_OUTPUT_DIR}{}"
 total=$(find ${DOCKER_BUILD_DIR} -type f -iname *.png | wc -l)
 
+
+BAR='▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇' # this is full bar
+EMP='                             ' # This is an empty bar
+
+for i in {1..20}; do
+    sleep .1                 # wait 100ms between "frames"
+done
+
 i=0
+sp='/-\|'
 for f in $(find ${DOCKER_BUILD_DIR} -type f -name *.png); do
-  generateCowfile "${i}/${total}" "${f}" &
+  generateCowfile "${f}" &
+  if ! (( i % 10 )); then
+    index=$[ i / 100 ]
+    end=$[ 30 - $[ i / 100 ] ]
+    echo -ne "\r${BAR:0:$index}${EMP:0:$end}" # print $i chars of $BAR from 0 position
+  fi
   ((i=i+1))
 done
 

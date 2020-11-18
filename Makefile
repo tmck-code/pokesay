@@ -1,10 +1,10 @@
-TARGET_GOOS 				?= "darwin"
-TARGET_GOARCH 			?= "amd64"
+TARGET_GOOS       ?= "darwin"
+TARGET_GOARCH     ?= "amd64"
 DOCKER_BUILD_DIR  ?= "/usr/local/src"
 DOCKER_OUTPUT_DIR ?= "/tmp"
+COWFILE_BUILD_DIR ?= "/cows"
 
-
-all: clean build/docker build/cows build/bin install
+all: clean build/docker build/cows build/bin
 
 clean:
 	rm -rf cows/
@@ -35,8 +35,8 @@ build/bin:
 		-e TARGET_GOOS=$(TARGET_GOOS) \
 		-e TARGET_GOARCH=$(TARGET_GOARCH) \
 		pokesay-go:latest \
-		bash -c "/usr/local/src/build_bin.sh"
-	@docker cp pokebuilder:/tmp/cowsay .
+		bash -c "$(DOCKER_BUILD_DIR)/build_bin.sh"
+	@docker cp pokebuilder:$(DOCKER_OUTPUT_DIR)/cowsay .
 	@docker rm -f pokebuilder
 
 build/android:
