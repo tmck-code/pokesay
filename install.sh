@@ -6,15 +6,15 @@ install_path="$HOME/.${pokesay_bin}"
 bin_path="$HOME/bin"
 
 # Make sure the install paths exist
-mkdir -p ${install_path}/cows/ ${bin_path}
+mkdir -p "${install_path}/cows/" "${bin_path}"
 # Remove any previously installed cowfiles and binaries
-rm -rf ${install_path}/cows/* ${bin_path}/cowsay
+rm -rf "${install_path}/cows/*" "${bin_path}/cowsay"
 
 # Copy the cows and the main script to the install path.
-tar xzf cows.tar.gz -C ${install_path}/
-N_POKEMON=$(find ${install_path}/ -type f -name *.cow | wc -l)
+tar xzf cows.tar.gz -C "${install_path}/"
+N_POKEMON=$(find "${install_path}/" -type f -name "*.cow" | wc -l)
 # Copy the executable to the install path and ensure it has +x permissions
-cp -v ${pokesay_bin} cowsay ${bin_path}/
+cp -v ${pokesay_bin} cowsay "${bin_path}/"
 chmod +x "${bin_path}/${pokesay_bin}"
 
 cat <<EOF
