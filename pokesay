@@ -84,7 +84,6 @@ shift $(($OPTIND - 1))
 MESSAGE=""
 while read -r line
 do
-  echo "$line"
   MESSAGE+="${line}"
 done < "${1:-/dev/stdin}"
 
