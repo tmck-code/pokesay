@@ -81,11 +81,17 @@ while getopts ":p:f:c:wnNlLhv" Option ; do
 done
 shift $(($OPTIND - 1))
 
-MESSAGE="${1}"
+MESSAGE=""
+while read -r line
+do
+  echo "$line"
+  MESSAGE+="${line}"
+done < "${1:-/dev/stdin}"
+
 CHANCE_OF_ITEM=8
 CHANCE_OF_SHINY=20
 
-if [ -z "${CATEGORY}" ] && [ -z "${I_CHOOSE}" ]; then
+if [ -z "${CATEGORY:-}" ] && [ -z "${I_CHOOSE:-}" ]; then
   if [ $[ $RANDOM % $CHANCE_OF_ITEM ] == 0 ]; then
     CATEGORY=$(find_categories | grep -v pokemon | shuf -n 1)
   else
@@ -99,7 +105,7 @@ fi
 
 # Define which pokemon should be displayed, then call cowsay or cowthink
 # TODO: restore cowthink after fine-tuning cowsay
-if [ -n "$I_CHOOSE" ]; then
+if [ -n "${I_CHOOSE:-}" ]; then
 	FPATHS=$(find $POKEDEX_PATH -type f -wholename "$POKEDEX_PATH*$CATEGORY*/*$I_CHOOSE*.cow")
 	FPATH=$(echo "$FPATHS" | shuf -n 1)
 
