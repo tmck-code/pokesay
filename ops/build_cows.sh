@@ -68,4 +68,5 @@ shopt -s extglob
 mv ${DOCKER_BUILD_DIR}/icons/pokemon ${DOCKER_OUTPUT_DIR}/pokemon/
 mkdir ${DOCKER_OUTPUT_DIR}/items/
 mv ${DOCKER_BUILD_DIR}/icons/* ${DOCKER_OUTPUT_DIR}/items/
+echo "- Finished building cowfiles"
 
