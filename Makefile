@@ -21,6 +21,7 @@ build/cows:
 		-e DOCKER_OUTPUT_DIR=$(DOCKER_OUTPUT_DIR) \
 		pokesay-go:latest \
 		bash -c "/usr/local/src/build_cows.sh"
+	@rm -rf cows/
 	@docker cp pokebuilder:/tmp/cows/ .
 	@tar czf cows.tar.gz cows/
 	@rm -rf cows/
@@ -36,6 +37,7 @@ build/bin:
 		-e TARGET_GOARCH=$(TARGET_GOARCH) \
 		pokesay-go:latest \
 		bash -c "/usr/local/src/build_bin.sh"
+	rm -rf cowsay cows
 	@docker cp pokebuilder:/tmp/cowsay .
 	@docker rm -f pokebuilder
 
@@ -48,4 +50,4 @@ build/android:
 install:
 	@./install.sh
 
-.PHONY: all clean build/docker build/cows build/bin install
+.PHONY: all clean build/docker build/cows build/bin build/android install
