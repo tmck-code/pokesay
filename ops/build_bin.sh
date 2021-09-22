@@ -19,6 +19,8 @@ done
 
 cd ${DOCKER_BUILD_DIR}
 
+go env -w GO111MODULE=off
+
 GOPATH=$PWD go get -u -v github.com/jteeuwen/go-bindata/...
 GOPATH=$PWD bin/go-bindata -o src/go-cowsay/bindata.go src/go-cowsay/cows
 GOPATH=$PWD GOOS=$TARGET_GOOS GOARCH=$TARGET_GOARCH \
