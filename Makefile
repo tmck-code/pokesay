@@ -28,24 +28,10 @@ build/cows:
 	@docker rm -f pokebuilder
 	@du -sh cows.tar.gz
 
-build/bindata: build/docker build/cows
-	go-bindata cows/...
-	go build pokesay.go bindata.go
-	time fortune | ./pokesay
-
-build/bin:
-	docker run -it \
-		-v $(PWD)/cows/:/cows \
-		--name pokebuilder \
-		-e DOCKER_BUILD_DIR=$(DOCKER_BUILD_DIR)/go-cowsay \
-		-e DOCKER_OUTPUT_DIR=$(DOCKER_OUTPUT_DIR) \
-		-e TARGET_GOOS=$(TARGET_GOOS) \
-		-e TARGET_GOARCH=$(TARGET_GOARCH) \
-		pokesay-go:latest \
-		bash -c "$(DOCKER_BUILD_DIR)/build_bin.sh"
-	@rm -rf cowsay cows
-	@docker cp pokebuilder:$(DOCKER_OUTPUT_DIR)/cowsay .
-	@docker rm -f pokebuilder
+build/bin: build/docker
+	docker create --name pokesay pokesay-go:latest
+	docker cp pokesay:/usr/local/src/pokesay .
+	docker rm pokesay
 
 build/android:
 	go get -u -v github.com/msmith491/go-cowsay || true
@@ -56,4 +42,4 @@ build/android:
 install:
 	@./install.sh
 
-.PHONY: all clean build/docker build/cows build/bindata build/bin build/android install
+.PHONY: all clean build/docker build/cows build/bin build/android install
