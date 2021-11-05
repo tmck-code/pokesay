@@ -2,12 +2,12 @@ package main
 
 import (
 	// "io/ioutil"
-	"encoding/binary"
+	// "encoding/binary"
 	"fmt"
-	"log"
+	// "log"
 	"math/rand"
 	"os"
-	"path/filepath"
+	// "path/filepath"
 	"time"
 )
 
@@ -18,26 +18,36 @@ func main() {
 func walk(dirPath string) {
 	count := 0
 	choice := rand.New(rand.NewSource(time.Now().UnixNano())).Intn(len(_bindata))
-	fmt.Println(choice)
+	fmt.Println(len(_bindata), choice)
 
-	err := filepath.Walk(dirPath,
-		func(path string, info os.FileInfo, err error) error {
-			if err != nil {
-				return err
-			}
-			// fmt.Println(path, info.Size())
-			if count == choice {
-				data, err := Asset(path)
-				if err != nil {
-					return err
-				}
-				binary.Write(os.Stdout, binary.LittleEndian, data)
-			}
-			count += 1
-			return nil
-		})
-	fmt.Println(count)
-	if err != nil {
-		log.Println(err)
+	for key, value := range _bindata {
+		count += 1
+		if count == choice {
+			// binary.Write(os.Stdout, binary.LittleEndian, data)
+			fmt.Println(key, value)
+			break
+		}
+		count += 1
 	}
+
+	// err := filepath.Walk(dirPath,
+	// 	func(path string, info os.FileInfo, err error) error {
+	// 		if err != nil {
+	// 			return err
+	// 		}
+	// 		// fmt.Println(path, info.Size())
+	// 		if count == choice {
+	// 			data, err := Asset(path)
+	// 			if err != nil {
+	// 				return err
+	// 			}
+	// 			binary.Write(os.Stdout, binary.LittleEndian, data)
+	// 		}
+	// 		count += 1
+	// 		return nil
+	// 	})
+	// fmt.Println(count)
+	// if err != nil {
+	// 	log.Println(err)
+	// }
 }
