@@ -26,6 +26,12 @@ build/cows:
 	@tar czf cows.tar.gz cows/
 	@rm -rf cows/
 	@docker rm -f pokebuilder
+	@du -sh cows.tar.gz
+
+build/bindata: build/docker build/cows
+	go-bindata cows/...
+	go build pokesay.go bindata.go
+	time fortune | ./pokesay
 
 build/bin:
 	docker run -it \
@@ -50,4 +56,4 @@ build/android:
 install:
 	@./install.sh
 
-.PHONY: all clean build/docker build/cows build/bin build/android install
+.PHONY: all clean build/docker build/cows build/bindata build/bin build/android install

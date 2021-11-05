@@ -1,53 +1,64 @@
 package main
 
 import (
-	// "io/ioutil"
-	// "encoding/binary"
+	"bufio"
+	"encoding/binary"
 	"fmt"
-	// "log"
+	"log"
 	"math/rand"
 	"os"
-	// "path/filepath"
 	"time"
+	"strings"
+	"github.com/mitchellh/go-wordwrap"
+	"strconv"
 )
 
 func main() {
-	walk(os.Args[1])
-}
+	width := 40
+	if len(os.Args) > 1 {
+		width, _ = strconv.Atoi(os.Args[1])
+	}
+	// width, _ := strconv.ParseUint(os.Args[1])
 
-func walk(dirPath string) {
+	lines := make([]string, 0, width)
+	lines = append(lines, strings.Repeat("-", width))
+	scanner := bufio.NewScanner(os.Stdin)
+	for scanner.Scan() {
+		lines = append(lines, strings.Replace(scanner.Text(), "\t", "    ", -1))
+	}
+	lines = append(lines, strings.Repeat("-", width))
+
+	// lim, _ := strconv.ParseUint(os.Args[1])
+	for _, l := range(strings.Split(wordwrap.WrapString(strings.Join(lines, "\n"), uint(width)), "\n")) {
+		fmt.Println("| " + l + strings.Repeat(" ", width-len(l)) + "|")
+	}
+	for i := 0; i<4; i++ {
+		fmt.Println(strings.Repeat(" ", i+8) + "\\")
+	}
+
 	count := 0
 	choice := rand.New(rand.NewSource(time.Now().UnixNano())).Intn(len(_bindata))
-	fmt.Println(len(_bindata), choice)
+	fpath := ""
 
-	for key, value := range _bindata {
-		count += 1
+	for path, _ := range _bindata {
 		if count == choice {
-			// binary.Write(os.Stdout, binary.LittleEndian, data)
-			fmt.Println(key, value)
-			break
+			data, err := Asset(path)
+			fpath = path
+			if err != nil {
+				log.Println(err)
+				break
+			}
+			binary.Write(os.Stdout, binary.LittleEndian, data)
+			if err != nil {
+				log.Println("Asset %s can't read by error: %v", path, err)
+				break
+			}
 		}
 		count += 1
 	}
+	fpathParts := strings.Split(fpath, "/")
+	fchoice := strings.Split(fpathParts[len(fpathParts)-1], ".")[0]
+	cats := fpathParts[1:len(fpathParts)-1]
 
-	// err := filepath.Walk(dirPath,
-	// 	func(path string, info os.FileInfo, err error) error {
-	// 		if err != nil {
-	// 			return err
-	// 		}
-	// 		// fmt.Println(path, info.Size())
-	// 		if count == choice {
-	// 			data, err := Asset(path)
-	// 			if err != nil {
-	// 				return err
-	// 			}
-	// 			binary.Write(os.Stdout, binary.LittleEndian, data)
-	// 		}
-	// 		count += 1
-	// 		return nil
-	// 	})
-	// fmt.Println(count)
-	// if err != nil {
-	// 	log.Println(err)
-	// }
+	fmt.Println("choice:", fchoice, "/", "categories:", cats)
 }
