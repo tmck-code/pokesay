@@ -1,3 +1,6 @@
+ARG GOOS=linux
+ARG GOARCH=amd64
+
 FROM golang:latest
 
 WORKDIR /usr/local/src
@@ -13,6 +16,9 @@ RUN git clone --depth 1 git://github.com/msikma/pokesprite && \
 ENV PATH "/usr/lib/x86_64-linux-gnu/ImageMagick-6.9.11/bin-q16:/usr/include/ImageMagick-6/:$PATH"
 RUN git clone --depth 1 git://github.com/rossy/img2xterm && \
     (cd img2xterm && make && make install)
+
+ENV GOOS $GOOS
+ENV GOARCH $GOARCH
 
 WORKDIR /usr/local/src/
 RUN go mod init github.com/tmck-code/pokesay-go \
