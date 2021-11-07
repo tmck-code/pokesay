@@ -1,4 +1,4 @@
-TARGET_GOOS       ?= darwin
+TARGET_GOOS       ?= linux
 TARGET_GOARCH     ?= amd64
 DOCKER_BUILD_DIR  ?= /usr/local/src
 DOCKER_OUTPUT_DIR ?= /tmp
@@ -12,6 +12,8 @@ clean:
 
 build/docker:
 	docker build \
+		--build-arg GOOS=$(TARGET_GOOS) \
+		--build-arg GOARCH=$(TARGET_GOARCH) \
 		-f Dockerfile \
 		-t pokesay-go:latest .
 
@@ -30,6 +32,7 @@ build/bin: build/docker
 	docker create --name pokesay pokesay-go:latest
 	docker cp pokesay:/usr/local/src/pokesay .
 	docker rm pokesay
+	mv -v pokesay build/pokesay-$(TARGET_GOOS)-$(TARGET_GOARCH)
 
 build/android:
 	rm -f go.mod go.sum
