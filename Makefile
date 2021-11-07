@@ -16,18 +16,15 @@ build/docker:
 		-t pokesay-go:latest .
 
 build/cows:
-	docker run -it \
-		--name pokebuilder \
-		-e DOCKER_BUILD_DIR=$(DOCKER_BUILD_DIR) \
-		-e DOCKER_OUTPUT_DIR=$(DOCKER_OUTPUT_DIR) \
-		pokesay-go:latest \
-		bash -c "/usr/local/src/build_cows.sh"
 	@rm -rf cows/
+	docker create \
+		--name pokebuilder \
+		pokesay-go:latest
 	@docker cp pokebuilder:/tmp/cows/ .
-	@tar czf cows.tar.gz cows/
+	@tar czf build/cows.tar.gz cows/
 	@rm -rf cows/
 	@docker rm -f pokebuilder
-	@du -sh cows.tar.gz
+	@du -sh build/cows.tar.gz
 
 build/bin: build/docker
 	docker create --name pokesay pokesay-go:latest
@@ -37,8 +34,8 @@ build/bin: build/docker
 build/android:
 	rm -f go.mod go.sum
 	go mod init github.com/tmck-code/pokesay-go
-	go install github.com/go-bindata/go-bindata/...@latest
 	go get github.com/mitchellh/go-wordwrap
+	go build pokesay.go cows/bindata.go
 
 install: build/bin
 	cp -v pokesay $(HOME)/bin/
