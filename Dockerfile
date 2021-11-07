@@ -1,6 +1,3 @@
-ARG GOOS=linux
-ARG GOARCH=amd64
-
 FROM golang:latest
 
 WORKDIR /usr/local/src
@@ -25,15 +22,14 @@ RUN go mod init github.com/tmck-code/pokesay-go \
     && go install github.com/go-bindata/go-bindata/...@latest \
     && go get github.com/mitchellh/go-wordwrap
 
-ADD build/build_cows.sh ./
+ADD *.go build/build_cows.sh ./
 
 ENV DOCKER_BUILD_DIR  /usr/local/src
 ENV DOCKER_OUTPUT_DIR /tmp
-
-ADD *.go ./
-
 RUN ./build_cows.sh \
-    && go-bindata /tmp/cows/... \
-    && go build pokesay.go bindata.go
+    && go-bindata /tmp/cows/...
 
-RUN /usr/games/fortune | ./pokesay
+ARG GOOS=linux
+ARG GOARCH=amd64
+RUN echo "building $GOOS / $GOARCH" \
+    && go build pokesay.go bindata.go
