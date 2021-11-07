@@ -15,22 +15,23 @@ function generateCowfile() {
   local dir_path=$(dirname /tmp/cows/${local_path})
 
   # Cowsay bubble header
-  cat <<EOF > "${ofpath}"
-binmode STDOUT, ":utf8";
-\$the_cow =<<EOC;
-     \$thoughts
-      \$thoughts
-       \$thoughts
-        \$thoughts
-EOF
+#   cat <<EOF > "${ofpath}"
+# binmode STDOUT, ":utf8";
+# \$the_cow =<<EOC;
+#      \$thoughts
+#       \$thoughts
+#        \$thoughts
+#         \$thoughts
+# EOF
 
   # Pokemon
-  img2xterm "${f}" >> "${ofpath}"
+  img2xterm "${f}" | sed '/^\ $/d' >> "${ofpath}"
+  echo -e "\n" >> "{ofpath}"
 
   # Cowsay footer
-  cat <<EOF >> "${ofpath}"
-EOC
-EOF
+#   cat <<EOF >> "${ofpath}"
+# EOC
+# EOF
 
   [ -d "${dir_path}" ] || mkdir -p "${dir_path}"
   mv ${ofpath} /tmp/cows/${local_path}
@@ -68,5 +69,5 @@ shopt -s extglob
 mv ${DOCKER_BUILD_DIR}/icons/pokemon ${DOCKER_OUTPUT_DIR}/pokemon/
 mkdir ${DOCKER_OUTPUT_DIR}/items/
 mv ${DOCKER_BUILD_DIR}/icons/* ${DOCKER_OUTPUT_DIR}/items/
-echo "- Finished building cowfiles"
+echo "- Finished building cowfiles -> ${DOCKER_OUTPUT_DIR}"
 

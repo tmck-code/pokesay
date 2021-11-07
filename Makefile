@@ -8,46 +8,36 @@ all: clean build/docker build/cows build/bin
 
 clean:
 	rm -rf cows/
-	rm -f cowsay
 	docker rm -f pokebuilder || echo 'no container to remove'
 
 build/docker:
-	docker build -f ops/Dockerfile -t pokesay-go:latest .
+	docker build \
+		-f Dockerfile \
+		-t pokesay-go:latest .
 
 build/cows:
-	docker run -it \
-		--name pokebuilder \
-		-e DOCKER_BUILD_DIR=$(DOCKER_BUILD_DIR) \
-		-e DOCKER_OUTPUT_DIR=$(DOCKER_OUTPUT_DIR) \
-		pokesay-go:latest \
-		bash -c "/usr/local/src/build_cows.sh"
 	@rm -rf cows/
+	docker create \
+		--name pokebuilder \
+		pokesay-go:latest
 	@docker cp pokebuilder:/tmp/cows/ .
-	@tar czf cows.tar.gz cows/
+	@tar czf build/cows.tar.gz cows/
 	@rm -rf cows/
 	@docker rm -f pokebuilder
+	@du -sh build/cows.tar.gz
 
-build/bin:
-	docker run -it \
-		-v $(PWD)/cows/:/cows \
-		--name pokebuilder \
-		-e DOCKER_BUILD_DIR=$(DOCKER_BUILD_DIR)/go-cowsay \
-		-e DOCKER_OUTPUT_DIR=$(DOCKER_OUTPUT_DIR) \
-		-e TARGET_GOOS=$(TARGET_GOOS) \
-		-e TARGET_GOARCH=$(TARGET_GOARCH) \
-		pokesay-go:latest \
-		bash -c "$(DOCKER_BUILD_DIR)/build_bin.sh"
-	@rm -rf cowsay cows
-	@docker cp pokebuilder:$(DOCKER_OUTPUT_DIR)/cowsay .
-	@docker rm -f pokebuilder
+build/bin: build/docker
+	docker create --name pokesay pokesay-go:latest
+	docker cp pokesay:/usr/local/src/pokesay .
+	docker rm pokesay
 
 build/android:
-	go get -u -v github.com/msmith491/go-cowsay || true
-	cd $(GOPATH)/src/github.com/msmith491/go-cowsay; \
-		make
-	cp -v $(GOPATH)/src/github.com/msmith491/go-cowsay/cowsay .
+	rm -f go.mod go.sum
+	go mod init github.com/tmck-code/pokesay-go
+	go get github.com/mitchellh/go-wordwrap
+	go build pokesay.go cows/bindata.go
 
-install:
-	@./install.sh
+install: build/bin
+	cp -v pokesay $(HOME)/bin/
 
 .PHONY: all clean build/docker build/cows build/bin build/android install
