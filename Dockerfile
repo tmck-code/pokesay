@@ -25,7 +25,7 @@ RUN go mod init github.com/tmck-code/pokesay-go \
     && go install github.com/go-bindata/go-bindata/...@latest \
     && go get github.com/mitchellh/go-wordwrap
 
-ADD ops/build_cows.sh ops/build_bin.sh ./
+ADD build/build_cows.sh ./
 
 ENV DOCKER_BUILD_DIR  /usr/local/src
 ENV DOCKER_OUTPUT_DIR /tmp
