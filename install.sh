@@ -2,7 +2,7 @@
 
 set -euo pipefail
 
-VERSION=0.1.0
+VERSION=0.1.1
 GOOS=$1
 GOARCH=$2
 
