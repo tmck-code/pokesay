@@ -28,13 +28,13 @@ func main() {
 			if len(wline) > width {
 				fmt.Println("| ", wline, len(wline))
 			} else {
-				fmt.Println("| " + wline + strings.Repeat(" ", width-len(wline)) + " |")
+				fmt.Println("|", wline, strings.Repeat(" ", width-len(wline)), "|")
 			}
 		}
 	}
 	fmt.Println("\\" + strings.Repeat("-", width+2) + "/")
 	for i := 0; i < 4; i++ {
-		fmt.Println(strings.Repeat(" ", i+8) + "\\")
+		fmt.Println(strings.Repeat(" ", i+8), "\\")
 	}
 
 	count := 0
