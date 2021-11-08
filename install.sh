@@ -6,9 +6,14 @@ VERSION=0.1.0
 GOOS=$1
 GOARCH=$2
 
+cd /tmp/
 mkdir -p $HOME/bin
-sudo chown -R $USER:$USER $HOME/bin
-curl -L --output $HOME/bin/pokesay https://github.com/tmck-code/pokesay-go/releases/download/v${VERSION}/pokesay-$GOOS-$GOARCH
+
+curl -sL -o pokesay https://github.com/tmck-code/pokesay-go/releases/download/v${VERSION}/pokesay-$GOOS-$GOARCH
+# Use sudo in case someone's $HOME/bin dir is root-owned
+sudo mv -v /tmp/pokesay $HOME/bin/
+sudo chmod u+wrx $HOME/bin/pokesay
+
 export PATH="$HOME/bin:$PATH"
 echo "hello world!" | pokesay
 echo -e "\nInstall complete! Location: $HOME/bin/pokesay"
