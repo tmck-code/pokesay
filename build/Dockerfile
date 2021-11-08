@@ -19,12 +19,14 @@ RUN go mod init github.com/tmck-code/pokesay-go \
     && go install github.com/go-bindata/go-bindata/...@latest \
     && go get github.com/mitchellh/go-wordwrap
 
-ADD *.go build/build_cows.sh ./
+ADD build/build_cows.sh ./
 
 ENV DOCKER_BUILD_DIR  /usr/local/src
 ENV DOCKER_OUTPUT_DIR /tmp
 RUN ./build_cows.sh \
     && go-bindata /tmp/cows/...
+
+ADD *.go ./
 
 ARG GOOS=linux
 ARG GOARCH=amd64

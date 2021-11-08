@@ -18,7 +18,6 @@ func main() {
 	if len(os.Args) > 1 {
 		width, _ = strconv.Atoi(os.Args[1])
 	}
-	// width, _ := strconv.ParseUint(os.Args[1])
 
 	lines := make([]string, 0, width)
 	lines = append(lines, strings.Repeat("-", width))
@@ -28,9 +27,12 @@ func main() {
 	}
 	lines = append(lines, strings.Repeat("-", width))
 
-	// lim, _ := strconv.ParseUint(os.Args[1])
 	for _, l := range(strings.Split(wordwrap.WrapString(strings.Join(lines, "\n"), uint(width)), "\n")) {
-		fmt.Println("| " + l + strings.Repeat(" ", width-len(l)) + "|")
+		if (len(l) > width+2) {
+			fmt.Println("| " + l)
+		} else {
+			fmt.Println("| " + l + strings.Repeat(" ", (width+2)-len(l)) + "|")
+		}
 	}
 	for i := 0; i<4; i++ {
 		fmt.Println(strings.Repeat(" ", i+8) + "\\")
