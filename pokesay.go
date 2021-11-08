@@ -7,10 +7,11 @@ import (
 	"log"
 	"math/rand"
 	"os"
-	"time"
-	"strings"
-	"github.com/mitchellh/go-wordwrap"
 	"strconv"
+	"strings"
+	"time"
+
+	"github.com/mitchellh/go-wordwrap"
 )
 
 func main() {
@@ -19,22 +20,20 @@ func main() {
 		width, _ = strconv.Atoi(os.Args[1])
 	}
 
-	lines := make([]string, 0, width)
-	lines = append(lines, strings.Repeat("-", width))
 	scanner := bufio.NewScanner(os.Stdin)
+	fmt.Println("/" + strings.Repeat("-", width+2) + "\\")
 	for scanner.Scan() {
-		lines = append(lines, strings.Replace(scanner.Text(), "\t", "    ", -1))
-	}
-	lines = append(lines, strings.Repeat("-", width))
-
-	for _, l := range(strings.Split(wordwrap.WrapString(strings.Join(lines, "\n"), uint(width)), "\n")) {
-		if (len(l) > width+2) {
-			fmt.Println("| " + l)
-		} else {
-			fmt.Println("| " + l + strings.Repeat(" ", (width+2)-len(l)) + "|")
+		line := wordwrap.WrapString(strings.Replace(scanner.Text(), "\t", "    ", -1), uint(width))
+		for _, wline := range strings.Split(wordwrap.WrapString(line, uint(width)), "\n") {
+			if len(wline) > width {
+				fmt.Println("| ", wline, len(wline))
+			} else {
+				fmt.Println("| " + wline + strings.Repeat(" ", width-len(wline)) + " |")
+			}
 		}
 	}
-	for i := 0; i<4; i++ {
+	fmt.Println("\\" + strings.Repeat("-", width+2) + "/")
+	for i := 0; i < 4; i++ {
 		fmt.Println(strings.Repeat(" ", i+8) + "\\")
 	}
 
@@ -60,7 +59,7 @@ func main() {
 	}
 	fpathParts := strings.Split(fpath, "/")
 	fchoice := strings.Split(fpathParts[len(fpathParts)-1], ".")[0]
-	cats := fpathParts[1:len(fpathParts)-1]
+	cats := fpathParts[1 : len(fpathParts)-1]
 
 	fmt.Println("choice:", fchoice, "/", "categories:", cats)
 }
