@@ -14,9 +14,6 @@ ENV PATH "/usr/lib/x86_64-linux-gnu/ImageMagick-6.9.11/bin-q16:/usr/include/Imag
 RUN git clone --depth 1 git://github.com/rossy/img2xterm && \
     (cd img2xterm && make && make install)
 
-ENV GOOS $GOOS
-ENV GOARCH $GOARCH
-
 WORKDIR /usr/local/src/
 RUN go mod init github.com/tmck-code/pokesay-go \
     && go install github.com/go-bindata/go-bindata/...@latest \
@@ -31,5 +28,8 @@ RUN ./build_cows.sh \
 
 ARG GOOS=linux
 ARG GOARCH=amd64
+ENV GOOS $GOOS
+ENV GOARCH $GOARCH
+
 RUN echo "building $GOOS / $GOARCH" \
     && go build pokesay.go bindata.go
