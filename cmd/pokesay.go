@@ -12,8 +12,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/mitchellh/go-wordwrap"
-	"github.com/tmck-code/pokesay-go/internal/bindata"
+	"github.com/isbm/textwrap"
 )
 
 type finishedTimer struct {
@@ -62,14 +61,17 @@ func (t *timer) stopTimer() {
 }
 
 func (t *timer) PrintJson() {
-	json.NewEncoder(os.Stdout).Encode(t)
+	json.NewEncoder(os.Stderr).Encode(t)
 }
 
 func printSpeechBubble(scanner *bufio.Scanner, width int, timer *timer) {
-	fmt.Println("/" + strings.Repeat("-", width+2) + "\\")
+	wrapper := textwrap.NewTextWrap().SetWidth(width) // Defaults to 70
+
+	border := strings.Repeat("-", width+2)
+	fmt.Println("/" + border + "\\")
 	for scanner.Scan() {
-		line := wordwrap.WrapString(strings.Replace(scanner.Text(), "\t", "    ", -1), uint(width))
-		for _, wline := range strings.Split(wordwrap.WrapString(line, uint(width)), "\n") {
+		// Get each line
+		for _, wline := range wrapper.Wrap(scanner.Text()) {
 			if len(wline) > width {
 				fmt.Println("| ", wline, len(wline))
 			} else {
@@ -77,7 +79,7 @@ func printSpeechBubble(scanner *bufio.Scanner, width int, timer *timer) {
 			}
 		}
 	}
-	fmt.Println("\\" + strings.Repeat("-", width+2) + "/")
+	fmt.Println("\\" + border + "/")
 	for i := 0; i < 4; i++ {
 		fmt.Println(strings.Repeat(" ", i+8), "\\")
 	}
@@ -85,20 +87,20 @@ func printSpeechBubble(scanner *bufio.Scanner, width int, timer *timer) {
 
 func printPokemon(timer *timer) {
 	count := 0
-	choice := rand.New(rand.NewSource(time.Now().UnixNano())).Intn(len(bindata.Bindata))
+	choice := rand.New(rand.NewSource(time.Now().UnixNano())).Intn(len(_bindata))
 	fpath := ""
 	timer.mark("printPokemon.randomChoice")
 
-	for path, _ := range bindata.Bindata {
+	for path, _ := range _bindata {
 		if count == choice {
-			data, err := bindata.Asset(path)
+			data, err := Asset(path)
 			fpath = path
 			if err != nil {
 				log.Println(path, err)
 				break
 			}
 			binary.Write(os.Stdout, binary.LittleEndian, data)
-			// break
+			break
 		}
 		count += 1
 	}
