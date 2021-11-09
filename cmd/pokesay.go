@@ -13,6 +13,7 @@ import (
 	"time"
 
 	"github.com/mitchellh/go-wordwrap"
+	"github.com/tmck-code/pokesay-go/internal/bindata"
 )
 
 type finishedTimer struct {
@@ -84,13 +85,13 @@ func printSpeechBubble(scanner *bufio.Scanner, width int, timer *timer) {
 
 func printPokemon(timer *timer) {
 	count := 0
-	choice := rand.New(rand.NewSource(time.Now().UnixNano())).Intn(len(_bindata))
+	choice := rand.New(rand.NewSource(time.Now().UnixNano())).Intn(len(bindata.Bindata))
 	fpath := ""
 	timer.mark("printPokemon.randomChoice")
 
-	for path, _ := range _bindata {
+	for path, _ := range bindata.Bindata {
 		if count == choice {
-			data, err := Asset(path)
+			data, err := bindata.Asset(path)
 			fpath = path
 			if err != nil {
 				log.Println(path, err)

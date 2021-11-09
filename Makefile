@@ -14,8 +14,8 @@ build/docker:
 	docker build \
 		--build-arg GOOS=$(TARGET_GOOS) \
 		--build-arg GOARCH=$(TARGET_GOARCH) \
-		-f Dockerfile \
-		-t pokesay-go:latest ../
+		-f build/Dockerfile \
+		-t pokesay-go:latest .
 
 build/cows:
 	@rm -rf cows/ bindata.go

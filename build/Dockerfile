@@ -15,18 +15,15 @@ RUN git clone --depth 1 git://github.com/rossy/img2xterm && \
     (cd img2xterm && make && make install)
 
 WORKDIR /usr/local/src/
-RUN go mod init github.com/tmck-code/pokesay-go \
-    && go install github.com/go-bindata/go-bindata/...@latest \
+ADD . .
+RUN go mod tidy \
+    && go install -v github.com/kevinburke/go-bindata/...@latest \
     && go get github.com/mitchellh/go-wordwrap
-
-ADD build/build_cows.sh ./
 
 ENV DOCKER_BUILD_DIR  /usr/local/src
 ENV DOCKER_OUTPUT_DIR /tmp
-RUN ./build_cows.sh \
-    && go-bindata /tmp/cows/...
-
-ADD *.go ./
+RUN ./build/build_cows.sh \
+    && go-bindata -pkg bindata -nometadata -o internal/bindata/bindata.go /tmp/cows/...
 
 ARG GOOS=linux
 ARG GOARCH=amd64
@@ -34,4 +31,4 @@ ENV GOOS $GOOS
 ENV GOARCH $GOARCH
 
 RUN echo "building $GOOS / $GOARCH" \
-    && go build pokesay.go bindata.go
+    && go build cmd/pokesay.go
