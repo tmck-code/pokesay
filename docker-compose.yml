@@ -1,0 +1,15 @@
+version: '3'
+
+services:
+  pokesay-go:
+    image: pokesay-go:${TAG:-latest}
+    build:
+      context: .
+      dockerfile: build/Dockerfile
+    command: bash
+    volumes:
+      - .:/usr/local/src
+      - vscode-pokesay-go:/root/.vscode-server
+
+volumes:
+  vscode-pokesay-go:
