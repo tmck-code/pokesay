@@ -26,8 +26,11 @@
 
 	// Add the IDs of extensions you want installed when the container is created.
 	"extensions": [
-		"golang.go",
-		"ms-azuretools.vscode-docker"
+		"ms-azuretools.vscode-docker",
+		"dracula-theme.theme-dracula",
+		"golang.go-nightly",
+		"msyrus.go-doc",
+		"766b.go-outliner"
 	],
 
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
