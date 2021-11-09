@@ -18,7 +18,7 @@ WORKDIR /usr/local/src/
 ADD . .
 RUN go mod tidy \
     && go install -v github.com/kevinburke/go-bindata/...@latest \
-    && go get github.com/mitchellh/go-wordwrap
+    && go get -v github.com/mitchellh/go-wordwrap
 
 ENV DOCKER_BUILD_DIR  /usr/local/src
 ENV DOCKER_OUTPUT_DIR /tmp
