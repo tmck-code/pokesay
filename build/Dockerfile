@@ -23,7 +23,7 @@ RUN go mod tidy \
 ENV DOCKER_BUILD_DIR  /usr/local/src
 ENV DOCKER_OUTPUT_DIR /tmp
 RUN ./build/build_cows.sh \
-    && go-bindata -pkg bindata -nometadata -o internal/bindata/bindata.go /tmp/cows/...
+    && go-bindata -nometadata -o cmd/bindata.go /tmp/cows/...
 
 ARG GOOS=linux
 ARG GOARCH=amd64
@@ -31,4 +31,4 @@ ENV GOOS $GOOS
 ENV GOARCH $GOARCH
 
 RUN echo "building $GOOS / $GOARCH" \
-    && go build cmd/pokesay.go
+    && go build cmd/pokesay.go cmd/bindata.go
