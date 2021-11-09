@@ -36,16 +36,13 @@ build/bin: build/docker
 	mv -v pokesay pokesay-$(TARGET_GOOS)-$(TARGET_GOARCH)
 
 build/android:
-	rm -f go.mod go.sum
-	go mod init github.com/tmck-code/pokesay-go
+	go mod tidy
 	go get github.com/mitchellh/go-wordwrap
 	go get github.com/go-bindata/go-bindata
 	tar xzf cows.tar.gz
 	go-bindata -o ../bindata.go cows/...
 	go build ../pokesay.go ../bindata.go
-	rm -rf cows
 	mv -v pokesay pokesay-$(TARGET_GOOS)-$(TARGET_GOARCH)
-	rm -f go.mod go.sum
 
 install:
 	cp -v pokesay-$(TARGET_GOOS)-$(TARGET_GOARCH) $(HOME)/bin/pokesay
