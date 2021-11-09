@@ -3,7 +3,6 @@ package main
 import (
 	"bufio"
 	"encoding/binary"
-	"encoding/json"
 	"fmt"
 	"log"
 	"math/rand"
@@ -12,66 +11,15 @@ import (
 	"strings"
 	"time"
 
-	"github.com/isbm/textwrap"
+	"github.com/mitchellh/go-wordwrap"
+	"github.com/tmck-code/pokesay-go/internal/timer"
 )
 
-type finishedTimer struct {
-	OrderedDurations []int64
-	StageDurations   map[string]int64
-}
-
-type timer struct {
-	Start          time.Time
-	StageNames     []string
-	StageTimes     map[string]time.Time
-	StageDurations map[string]time.Duration
-	FinishedTimer  finishedTimer
-}
-
-func newTimer() *timer {
-	now := time.Now()
-	return &timer{
-		Start:          now,
-		StageNames:     []string{"start"},
-		StageTimes:     map[string]time.Time{"start": now},
-		StageDurations: map[string]time.Duration{"start": now.Sub(now)},
-	}
-}
-
-func (t *timer) lastStageTime() time.Time {
-	return t.StageTimes[t.StageNames[len(t.StageNames)-1]]
-}
-
-func (t *timer) mark(stage string) {
-	now := time.Now()
-	t.StageDurations[stage] = now.Sub(t.lastStageTime())
-	t.StageTimes[stage] = now
-	t.StageNames = append(t.StageNames, stage)
-}
-
-func (t *timer) stopTimer() {
-	t.FinishedTimer = finishedTimer{StageDurations: map[string]int64{}}
-	var total int64 = 0
-	for _, stage := range t.StageNames {
-		n := t.StageDurations[stage].Nanoseconds()
-		t.FinishedTimer.OrderedDurations = append(t.FinishedTimer.OrderedDurations, n)
-		t.FinishedTimer.StageDurations[stage] = n
-		total += n
-	}
-}
-
-func (t *timer) PrintJson() {
-	json.NewEncoder(os.Stderr).Encode(t)
-}
-
-func printSpeechBubble(scanner *bufio.Scanner, width int, timer *timer) {
-	wrapper := textwrap.NewTextWrap().SetWidth(width) // Defaults to 70
-
+func printSpeechBubble(scanner *bufio.Scanner, width int) {
 	border := strings.Repeat("-", width+2)
 	fmt.Println("/" + border + "\\")
 	for scanner.Scan() {
-		// Get each line
-		for _, wline := range wrapper.Wrap(scanner.Text()) {
+		for _, wline := range strings.Split(wordwrap.WrapString(strings.Replace(scanner.Text(), "\t", "    ", -1), uint(width)), "\n") {
 			if len(wline) > width {
 				fmt.Println("| ", wline, len(wline))
 			} else {
@@ -85,32 +33,36 @@ func printSpeechBubble(scanner *bufio.Scanner, width int, timer *timer) {
 	}
 }
 
-func printPokemon(timer *timer) {
+func pickRandomPokemon() string {
 	count := 0
 	choice := rand.New(rand.NewSource(time.Now().UnixNano())).Intn(len(_bindata))
 	fpath := ""
-	timer.mark("printPokemon.randomChoice")
-
 	for path, _ := range _bindata {
 		if count == choice {
-			data, err := Asset(path)
 			fpath = path
-			if err != nil {
-				log.Println(path, err)
-				break
-			}
-			binary.Write(os.Stdout, binary.LittleEndian, data)
 			break
 		}
 		count += 1
 	}
-	timer.mark("printPokemon.findAndPrint")
+	return fpath
+}
+
+func printPokemon(t *timer.Timer) {
+	fpath := pickRandomPokemon()
+	t.Mark("printPokemon.randomChoice")
+	data, err := Asset(fpath)
+	if err != nil {
+		log.Println(fpath, err)
+	}
+	binary.Write(os.Stdout, binary.LittleEndian, data)
+
+	t.Mark("printPokemon.findAndPrint")
 	fpathParts := strings.Split(fpath, "/")
 	fchoice := strings.Split(fpathParts[len(fpathParts)-1], ".")[0]
 	cats := fpathParts[1 : len(fpathParts)-1]
 
 	fmt.Println("choice:", fchoice, "/", "categories:", cats)
-	timer.mark("printPokemon.summarise")
+	t.Mark("printPokemon.summarise")
 }
 
 func main() {
@@ -118,14 +70,14 @@ func main() {
 	if len(os.Args) > 1 {
 		width, _ = strconv.Atoi(os.Args[1])
 	}
-	t := newTimer()
+	t := timer.NewTimer()
 
-	printSpeechBubble(bufio.NewScanner(os.Stdin), width, t)
-	t.mark("printSpeechBubble")
+	printSpeechBubble(bufio.NewScanner(os.Stdin), width)
+	t.Mark("printSpeechBubble")
 
 	printPokemon(t)
-	t.mark("printPokemon")
+	t.Mark("printPokemon")
 
-	t.stopTimer()
+	t.StopTimer()
 	t.PrintJson()
 }
