@@ -18,16 +18,16 @@ build/docker:
 		-t pokesay-go:latest .
 
 build/cows:
-	@rm -rf cows/ bindata.go
+	@rm -rf build/cows/ cmd/bindata.go
 	docker create \
 		--name pokebuilder \
 		pokesay-go:latest
-	@docker cp pokebuilder:/tmp/cows/ .
-	@docker cp pokebuilder:$(DOCKER_BUILD_DIR)/bindata.go .
-	@tar czf cows.tar.gz cows/
-	@rm -rf cows/
+	@docker cp pokebuilder:/tmp/cows/ build/
+	@docker cp pokebuilder:$(DOCKER_BUILD_DIR)/cmd/bindata.go cmd/
+	@tar czf build/cows.tar.gz build/cows/
+	@rm -rf build/cows/
 	@docker rm -f pokebuilder
-	@du -sh cows.tar.gz
+	@du -sh build/cows.tar.gz
 
 build/bin: build/docker
 	docker create --name pokesay pokesay-go:latest

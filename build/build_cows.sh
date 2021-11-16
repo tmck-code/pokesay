@@ -50,8 +50,9 @@ echo -e "\n- All jobs have finished..."
 
 echo "- Rearranging files"
 shopt -s extglob
+ls -alh ${DOCKER_BUILD_DIR}
 mv ${DOCKER_BUILD_DIR}/icons/pokemon ${DOCKER_OUTPUT_DIR}/pokemon/
 mkdir ${DOCKER_OUTPUT_DIR}/items/
 mv ${DOCKER_BUILD_DIR}/icons/* ${DOCKER_OUTPUT_DIR}/items/
-echo "- Finished building cowfiles -> ${DOCKER_OUTPUT_DIR}"
+echo "- Finished building ${i} cowfiles -> ${DOCKER_OUTPUT_DIR}"
 

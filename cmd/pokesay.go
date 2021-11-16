@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"encoding/binary"
 	"fmt"
-	"log"
 	"math/rand"
 	"os"
 	"strconv"
@@ -33,36 +32,29 @@ func printSpeechBubble(scanner *bufio.Scanner, width int) {
 	}
 }
 
-func pickRandomPokemon() string {
-	count := 0
-	choice := rand.New(rand.NewSource(time.Now().UnixNano())).Intn(len(_bindata))
-	fpath := ""
-	for path, _ := range _bindata {
-		if count == choice {
-			fpath = path
+func pickRandomPokemon() []byte {
+	idx := rand.New(rand.NewSource(time.Now().UnixNano())).Intn(len(_bindata))
+	current := 0
+	var choice []byte
+	for data, _ := range _bindata {
+		if current == idx {
+			choice, _ = Asset(data)
 			break
 		}
-		count += 1
+		current += 1
 	}
-	return fpath
+	return choice
 }
 
 func printPokemon(t *timer.Timer) {
-	fpath := pickRandomPokemon()
-	t.Mark("printPokemon.randomChoice")
-	data, err := Asset(fpath)
-	if err != nil {
-		log.Println(fpath, err)
-	}
+	data := pickRandomPokemon()
+	t.Mark("printPokemon.choose")
+
 	binary.Write(os.Stdout, binary.LittleEndian, data)
+	t.Mark("printPokemon.print")
 
-	t.Mark("printPokemon.findAndPrint")
-	fpathParts := strings.Split(fpath, "/")
-	fchoice := strings.Split(fpathParts[len(fpathParts)-1], ".")[0]
-	cats := fpathParts[1 : len(fpathParts)-1]
-
-	fmt.Println("choice:", fchoice, "/", "categories:", cats)
-	t.Mark("printPokemon.summarise")
+	fmt.Println(string(data))
+	t.Mark("printPokemon.println")
 }
 
 func main() {
@@ -76,7 +68,6 @@ func main() {
 	t.Mark("printSpeechBubble")
 
 	printPokemon(t)
-	t.Mark("printPokemon")
 
 	t.StopTimer()
 	t.PrintJson()
