@@ -11,7 +11,6 @@ import (
 	"time"
 
 	"github.com/mitchellh/go-wordwrap"
-	"github.com/tmck-code/pokesay-go/internal/timer"
 )
 
 func printSpeechBubble(scanner *bufio.Scanner, width int) {
@@ -32,17 +31,18 @@ func printSpeechBubble(scanner *bufio.Scanner, width int) {
 	}
 }
 
-func pickRandomPokemon(t *timer.Timer) []byte {
-	idx := rand.New(rand.NewSource(time.Now().UnixNano())).Intn(len(_bindatalist))
-	return _bindatalist[idx].Data
+func randomInt(n int) int {
+	return rand.New(rand.NewSource(time.Now().UnixNano())).Intn(n)
 }
 
-func printPokemon(t *timer.Timer) {
-	data := pickRandomPokemon(t)
-	t.Mark("printPokemon.choose")
+func pickRandomPokemon() PokemonData {
+	return PokemonList[randomInt(len(PokemonList))]
+}
 
-	binary.Write(os.Stdout, binary.LittleEndian, data)
-	t.Mark("printPokemon.print")
+func printPokemon() {
+	choice := pickRandomPokemon()
+	binary.Write(os.Stdout, binary.LittleEndian, choice.Data)
+	fmt.Println("categories:", choice.Name.Categories, "choice:", choice.Name.Name)
 }
 
 func main() {
@@ -50,13 +50,6 @@ func main() {
 	if len(os.Args) > 1 {
 		width, _ = strconv.Atoi(os.Args[1])
 	}
-	t := timer.NewTimer()
-
 	printSpeechBubble(bufio.NewScanner(os.Stdin), width)
-	t.Mark("printSpeechBubble")
-
-	printPokemon(t)
-
-	t.StopTimer()
-	t.PrintJson()
+	printPokemon()
 }
