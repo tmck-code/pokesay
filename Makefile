@@ -38,9 +38,6 @@ build/bin: build/docker
 build/android:
 	go mod tidy
 	go get github.com/mitchellh/go-wordwrap
-	go get github.com/go-bindata/go-bindata
-	tar xzf build/cows.tar.gz -C build/
-	go-bindata -o cmd/bindata.go build/cows/...
 	go build cmd/pokesay.go cmd/bindata.go
 	mv -v pokesay build/pokesay-android-arm64
 	rm -rf build/cows
