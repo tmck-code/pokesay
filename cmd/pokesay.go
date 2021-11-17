@@ -42,7 +42,7 @@ func pickRandomPokemon() PokemonData {
 func printPokemon() {
 	choice := pickRandomPokemon()
 	binary.Write(os.Stdout, binary.LittleEndian, choice.Data)
-	fmt.Println("categories:", choice.Name.Categories, "choice:", choice.Name.Name)
+	fmt.Printf("choice: %s / categories: %s\n", choice.Name.Name, choice.Name.Categories)
 }
 
 func main() {
