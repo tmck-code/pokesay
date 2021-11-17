@@ -46,15 +46,20 @@ func pickRandomPokemon() []byte {
 	return choice
 }
 
+func pickRandomPokemon2() []byte {
+	idx := rand.New(rand.NewSource(time.Now().UnixNano())).Intn(len(_bindatalist))
+	choice, _ := Asset(_bindatalist[idx])
+	return choice
+}
+
 func printPokemon(t *timer.Timer) {
-	data := pickRandomPokemon()
-	t.Mark("printPokemon.choose")
+	// data := pickRandomPokemon()
+	// t.Mark("printPokemon.choose")
+	data := pickRandomPokemon2()
+	t.Mark("printPokemon.choose2")
 
 	binary.Write(os.Stdout, binary.LittleEndian, data)
 	t.Mark("printPokemon.print")
-
-	fmt.Println(string(data))
-	t.Mark("printPokemon.println")
 }
 
 func main() {
