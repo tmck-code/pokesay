@@ -1,0 +1,26 @@
+version: '3'
+
+services:
+  pokesay-go:
+    image: github.com/tmck-code/pokesay-go:${TAG:-latest}
+    build:
+      context: .
+      dockerfile: build/Dockerfile
+    command: bash
+    volumes:
+      - .:/usr/local/src
+      - vscode-pokesay-go:/root/.vscode-server
+  pokesay-go-vscode:
+    image: pokesay-go-vscode:${TAG:-latest}
+    depends_on:
+      - pokesay-go
+    build:
+      context: .
+      dockerfile: .devcontainer/Dockerfile
+    command: bash
+    volumes:
+      - .:/usr/local/src
+      - vscode-pokesay-go:/root/.vscode-server
+
+volumes:
+  vscode-pokesay-go:
