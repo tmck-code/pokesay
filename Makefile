@@ -39,10 +39,11 @@ build/android:
 	go mod tidy
 	go get github.com/mitchellh/go-wordwrap
 	go get github.com/go-bindata/go-bindata
-	tar xzf cows.tar.gz
-	go-bindata -o ../bindata.go cows/...
-	go build ../pokesay.go ../bindata.go
-	mv -v pokesay pokesay-$(TARGET_GOOS)-$(TARGET_GOARCH)
+	tar xzf build/cows.tar.gz -C build/
+	go-bindata -o cmd/bindata.go build/cows/...
+	go build cmd/pokesay.go cmd/bindata.go
+	mv -v pokesay build/pokesay-android-arm64
+	rm -rf build/cows
 
 install:
 	cp -v pokesay-$(TARGET_GOOS)-$(TARGET_GOARCH) $(HOME)/bin/pokesay
