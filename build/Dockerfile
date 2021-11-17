@@ -12,7 +12,7 @@ RUN git clone --depth 1 git://github.com/rossy/img2xterm \
 
 ENV DOCKER_BUILD_DIR /tmp/original
 ENV DOCKER_OUTPUT_DIR /tmp/converted
-ADD build/ /usr/local/src/build/
+ADD build/build_cows.sh /usr/local/src/build/
 
 RUN mkdir -p /tmp/original /tmp/converted
 WORKDIR /tmp/original
@@ -27,14 +27,9 @@ ADD go.* /usr/local/src/
 RUN go mod tidy \
     && go get -v github.com/mitchellh/go-wordwrap
 
-
-ARG GOOS=linux
-ARG GOARCH=amd64
-ENV GOOS $GOOS
-ENV GOARCH $GOARCH
-
 ADD cmd/ /usr/local/src/cmd/
-RUN echo "building $GOOS / $GOARCH" \
-    && go build cmd/pokesay.go cmd/bindata.go
 
-ADD . .
+RUN echo "building darwin / amd64"  && GOOS=darwin  GOARCH=amd64 go build -o pokesay-darwin-amd64  cmd/pokesay.go cmd/bindata.go && \
+    echo "building linux / amd64"   && GOOS=linux   GOARCH=amd64 go build -o pokesay-linux-amd64   cmd/pokesay.go cmd/bindata.go && \
+    echo "building windows / amd64" && GOOS=windows GOARCH=amd64 go build -o pokesay-windows-amd64 cmd/pokesay.go cmd/bindata.go && \
+    echo "building android / arm64" && GOOS=android GOARCH=arm64 go build -o pokesay-android-arm64 cmd/pokesay.go cmd/bindata.go
