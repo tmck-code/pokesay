@@ -33,30 +33,14 @@ func printSpeechBubble(scanner *bufio.Scanner, width int) {
 }
 
 func pickRandomPokemon() []byte {
-	idx := rand.New(rand.NewSource(time.Now().UnixNano())).Intn(len(_bindata))
-	current := 0
-	var choice []byte
-	for data, _ := range _bindata {
-		if current == idx {
-			choice, _ = Asset(data)
-			break
-		}
-		current += 1
-	}
-	return choice
-}
-
-func pickRandomPokemon2() []byte {
 	idx := rand.New(rand.NewSource(time.Now().UnixNano())).Intn(len(_bindatalist))
-	choice, _ := Asset(_bindatalist[idx])
-	return choice
+	choice := _bindatalist[idx]
+	return choice.Data
 }
 
 func printPokemon(t *timer.Timer) {
-	// data := pickRandomPokemon()
-	// t.Mark("printPokemon.choose")
-	data := pickRandomPokemon2()
-	t.Mark("printPokemon.choose2")
+	data := pickRandomPokemon()
+	t.Mark("printPokemon.choose")
 
 	binary.Write(os.Stdout, binary.LittleEndian, data)
 	t.Mark("printPokemon.print")
