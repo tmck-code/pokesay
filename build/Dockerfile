@@ -11,7 +11,7 @@ RUN git clone --depth 1 git://github.com/rossy/img2xterm && \
     (cd img2xterm && make && make install)
 
 WORKDIR /usr/local/src/
-ADD go.* build cmd internal ./
+ADD . .
 RUN go mod tidy \
     && go install -v github.com/kevinburke/go-bindata/...@latest \
     && go get -v github.com/mitchellh/go-wordwrap
