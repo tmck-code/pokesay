@@ -12,8 +12,6 @@ clean:
 
 build/docker:
 	docker build \
-		--build-arg GOOS=$(TARGET_GOOS) \
-		--build-arg GOARCH=$(TARGET_GOARCH) \
 		-f build/Dockerfile \
 		-t pokesay-go:latest .
 
@@ -30,10 +28,9 @@ build/cows:
 	@du -sh build/cows.tar.gz
 
 build/bin: build/docker
-	docker create --name pokesay pokesay-go:latest
-	docker cp pokesay:/usr/local/src/pokesay .
-	docker rm pokesay
-	mv -v pokesay pokesay-$(TARGET_GOOS)-$(TARGET_GOARCH)
+	@docker create --name pokesay pokesay-go:latest
+	@docker cp pokesay:/usr/local/src/pokesay-$(TARGET_GOOS)-$(TARGET_GOARCH) .
+	@docker rm -f pokesay
 
 build/android:
 	go mod tidy
@@ -42,7 +39,15 @@ build/android:
 	mv -v pokesay build/pokesay-android-arm64
 	rm -rf build/cows
 
-install:
+install: build/bin
 	cp -v pokesay-$(TARGET_GOOS)-$(TARGET_GOARCH) $(HOME)/bin/pokesay
 
-.PHONY: all clean build/docker build/cows build/bin build/android install
+build/release: build/docker
+	@docker create --name pokesay pokesay-go:latest
+	@docker cp pokesay:/usr/local/src/pokesay-linux-amd64 .
+	@docker cp pokesay:/usr/local/src/pokesay-darwin-amd64 .
+	@docker cp pokesay:/usr/local/src/pokesay-windows-amd64 .
+	@docker cp pokesay:/usr/local/src/pokesay-android-arm64 .
+	@docker rm -f pokesay
+
+.PHONY: all clean build/docker build/cows build/bin build/android install build/release
