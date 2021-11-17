@@ -26,8 +26,7 @@ RUN go mod tidy \
 ENV DOCKER_BUILD_DIR /tmp/original
 ENV DOCKER_OUTPUT_DIR /tmp/converted
 
-RUN /usr/local/src/build/build_cows.sh \
-    && go-bindata -nometadata -nocompress -o cmd/bindata.go /tmp/cows/...
+RUN /usr/local/src/build/build_cows.sh
 
 ARG GOOS=linux
 ARG GOARCH=amd64
