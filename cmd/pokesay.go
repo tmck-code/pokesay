@@ -2,13 +2,17 @@ package main
 
 import (
 	"bufio"
+	"bytes"
 	"encoding/binary"
 	"fmt"
+	"io"
 	"math/rand"
 	"os"
 	"strconv"
 	"strings"
 	"time"
+
+	"compress/gzip"
 
 	"github.com/mitchellh/go-wordwrap"
 	"github.com/tmck-code/pokesay-go/internal/timer"
@@ -35,7 +39,12 @@ func printSpeechBubble(scanner *bufio.Scanner, width int) {
 func pickRandomPokemon() []byte {
 	idx := rand.New(rand.NewSource(time.Now().UnixNano())).Intn(len(_bindatalist))
 	choice := _bindatalist[idx]
-	return choice.Data
+	gz, _ := gzip.NewReader(bytes.NewBuffer(choice.Data))
+
+	var buf bytes.Buffer
+	_, _ = io.Copy(&buf, gz)
+	_ = gz.Close()
+	return buf.Bytes()
 }
 
 func printPokemon(t *timer.Timer) {
@@ -59,5 +68,5 @@ func main() {
 	printPokemon(t)
 
 	t.StopTimer()
-	t.PrintJson()
+	// t.PrintJson()
 }
