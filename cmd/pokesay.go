@@ -35,21 +35,29 @@ func randomInt(n int) int {
 	return rand.New(rand.NewSource(time.Now().UnixNano())).Intn(n)
 }
 
-func pickRandomPokemon() PokemonData {
-	return PokemonList[randomInt(len(PokemonList))]
-}
-
 func printPokemon() {
-	choice := pickRandomPokemon()
+	choice :=  PokemonList[randomInt(len(PokemonList))]
 	binary.Write(os.Stdout, binary.LittleEndian, choice.Data)
 	fmt.Printf("choice: %s / categories: %s\n", choice.Name.Name, choice.Name.Categories)
 }
 
-func main() {
-	width := 40
-	if len(os.Args) > 1 {
-		width, _ = strconv.Atoi(os.Args[1])
+type Args struct {
+	Width int
+}
+
+func parseArgs() Args {
+	if len(os.Args) <= 1 {
+		return Args{Width: 40}
 	}
-	printSpeechBubble(bufio.NewScanner(os.Stdin), width)
+	width, err := strconv.Atoi(os.Args[1])
+	if err != nil {
+		return Args{Width: 40}
+	}
+	return Args{Width: width}
+}
+
+func main() {
+	args := parseArgs()
+	printSpeechBubble(bufio.NewScanner(os.Stdin), args.Width)
 	printPokemon()
 }
