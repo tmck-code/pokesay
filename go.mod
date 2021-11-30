@@ -5,5 +5,7 @@ go 1.17
 require github.com/mitchellh/go-wordwrap v1.0.1
 
 require internal/timer v1.0.0
-replace internal/timer => ./internal/timer
 
+require google.golang.org/protobuf v1.27.1 // indirect
+
+replace internal/timer => ./internal/timer
