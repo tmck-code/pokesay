@@ -1,0 +1,14 @@
+syntax="proto3";
+
+option go_package = "./";
+
+package main;
+
+message PokemonSerial {
+      string name = 1;
+      bytes data = 2;
+}
+
+message PokemonSerialList {
+      repeated PokemonSerial pokemon = 1;
+}
