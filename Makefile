@@ -52,6 +52,6 @@ build/release: build/docker
 
 protoc:
 	protoc --proto_path=cmd --go_out=cmd/ --go_opt=paths=source_relative cmd/pokemon.proto 
-
+	go build cmd/pokesay.go cmd/pokemon.pb.go cmd/bindata.go 
 
 .PHONY: all clean build/docker build/cows build/bin build/android install build/release protoc
