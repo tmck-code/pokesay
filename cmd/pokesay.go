@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"encoding/binary"
 	"fmt"
+	"log"
 	"math/rand"
 	"os"
 	"strconv"
@@ -11,6 +12,7 @@ import (
 	"time"
 
 	"github.com/mitchellh/go-wordwrap"
+	"google.golang.org/protobuf/proto"
 )
 
 func printSpeechBubble(scanner *bufio.Scanner, width int) {
@@ -35,10 +37,10 @@ func randomInt(n int) int {
 	return rand.New(rand.NewSource(time.Now().UnixNano())).Intn(n)
 }
 
-func printPokemon() {
-	choice :=  PokemonList[randomInt(len(PokemonList))]
+func printPokemon(list *PokemonSerialList) {
+	choice := list.Pokemon[randomInt(len(list.Pokemon))]
 	binary.Write(os.Stdout, binary.LittleEndian, choice.Data)
-	fmt.Printf("choice: %s / categories: %s\n", choice.Name.Name, choice.Name.Categories)
+	fmt.Printf("choice: %s", choice.Name)
 }
 
 type Args struct {
@@ -57,7 +59,37 @@ func parseArgs() Args {
 }
 
 func main() {
+	// args := parseArgs()
+	// printSpeechBubble(bufio.NewScanner(os.Stdin), args.Width)
+	// printPokemon()
+
+	// var list []*PokemonSerial = []*PokemonSerial{}
+
+	// for _, pokemon := range PokemonList {
+	// 	p := &PokemonSerial{
+	// 		Name: pokemon.Name.Name,
+	// 		Data: pokemon.Data,
+	// 	}
+	// 	list = append(list, p)
+	// 	// fmt.Println(i, p)
+	// }
+
+	// data, err := proto.Marshal(&PokemonSerialList{Pokemon: list})
+	// if err != nil {
+	// 	log.Fatal("marshaling error: ", err)
+	// }
+	// // printing out our raw protobuf object
+	// err = os.WriteFile("data.txt", data, 0644)
+
+	newPokemon := &PokemonSerialList{}
+	data2, _ := os.ReadFile("data.txt")
+	// fmt.Println("read file", data2)
+	err := proto.Unmarshal(data2, newPokemon)
+	if err != nil {
+		log.Fatal("unmarshaling error: ", err)
+	}
+
 	args := parseArgs()
 	printSpeechBubble(bufio.NewScanner(os.Stdin), args.Width)
-	printPokemon()
+	printPokemon(newPokemon)
 }

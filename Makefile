@@ -50,4 +50,8 @@ build/release: build/docker
 	@docker cp pokesay:/usr/local/src/pokesay-android-arm64 .
 	@docker rm -f pokesay
 
-.PHONY: all clean build/docker build/cows build/bin build/android install build/release
+protoc:
+	protoc --proto_path=cmd --go_out=cmd/ --go_opt=paths=source_relative cmd/pokemon.proto 
+
+
+.PHONY: all clean build/docker build/cows build/bin build/android install build/release protoc
