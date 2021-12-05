@@ -12,15 +12,16 @@ RUN git clone --depth 1 git://github.com/rossy/img2xterm \
 
 ENV DOCKER_BUILD_DIR /tmp/original
 ENV DOCKER_OUTPUT_DIR /tmp/converted
-ADD build/build_cows.sh /usr/local/src/build/
 
 RUN mkdir -p /tmp/original /tmp/converted
 WORKDIR /tmp/original
 
-RUN git clone --depth 1 git://github.com/msikma/pokesprite \
-    && cp -R pokesprite/icons/ . \
-    && rm -rf pokesprite \
-    && /usr/local/src/build/build_cows.sh
+RUN git clone --depth 1 git://github.com/msikma/pokesprite
+
+ADD build/build_cows.go /usr/local/src/build/
+
+
+RUN go run /usr/local/src/build/build_cows.go -from /tmp/original/pokesprite/ -to /tmp/converted/
 
 WORKDIR /usr/local/src/
 ADD go.* /usr/local/src/
