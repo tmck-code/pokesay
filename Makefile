@@ -1,7 +1,7 @@
 TARGET_GOOS       ?= linux
 TARGET_GOARCH     ?= amd64
 DOCKER_BUILD_DIR  ?= /usr/local/src
-DOCKER_OUTPUT_DIR ?= /tmp
+DOCKER_OUTPUT_DIR ?= /tmp/cows
 COWFILE_BUILD_DIR ?= /cows
 
 all: clean build/docker build/cows build/bin
@@ -16,15 +16,16 @@ build/docker:
 		-t pokesay-go:latest .
 
 build/cows:
-	@rm -rf build/cows/ cmd/bindata.go
+	@rm -rf build/cows.tar.gz cows/
 	docker create \
 		--name pokebuilder \
 		pokesay-go:latest
-	@docker cp pokebuilder:/tmp/cows/ build/
+	@docker cp pokebuilder:$(DOCKER_OUTPUT_DIR)/ .
 	@docker cp pokebuilder:$(DOCKER_BUILD_DIR)/cmd/bindata.go cmd/
-	@tar czf build/cows.tar.gz build/cows/
-	@rm -rf build/cows/
+	@tar czf cows.tar.gz cows
+	@rm -rf cows
 	@docker rm -f pokebuilder
+	@mv cows.tar.gz build/
 	@du -sh build/cows.tar.gz
 
 build/bin: build/docker
