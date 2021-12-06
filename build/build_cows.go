@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"encoding/json"
 	"flag"
 	"fmt"
 	"log"
@@ -10,25 +11,38 @@ import (
 	"path/filepath"
 	"strings"
 	"sync"
+	"time"
+
+	"github.com/schollz/progressbar/v3"
 )
 
-func run() []string {
+type CowBuildArgs struct {
+	FromDir  string
+	ToDir    string
+	SkipDirs []string
+}
+
+func parseArgs() CowBuildArgs {
 	fromDir := flag.String("from", ".", "from dir")
 	toDir := flag.String("to", ".", "to dir")
+	skipDirs := flag.String("skip", "'[\"resources\"]'", "JSON array of dir patterns to skip converting")
 
 	flag.Parse()
-	args := []string{*fromDir, *toDir}
-	fmt.Println(args)
+
+	args := CowBuildArgs{FromDir: *fromDir, ToDir: *toDir}
+	json.Unmarshal([]byte(*skipDirs), &args.SkipDirs)
+
 	return args
 }
 
-func findFiles(dirpath string, ext string, ch chan<- string) {
-	fmt.Println("starting at", dirpath)
-	count := 0
+var SENTINEL string = "__END__"
+var N_FILES int
+
+func findFiles(dirpath string, ext string) []string {
+	fpaths := []string{}
 	err := filepath.Walk(dirpath, func(path string, f os.FileInfo, err error) error {
 		if !f.IsDir() && filepath.Ext(f.Name()) == ext {
-			ch <- path
-			count += 1
+			fpaths = append(fpaths, path)
 		}
 		return err
 	})
@@ -36,54 +50,92 @@ func findFiles(dirpath string, ext string, ch chan<- string) {
 		fmt.Println("Fatal!")
 		log.Fatal(err)
 	}
-	ch <- "END"
-	close(ch)
-	fmt.Println("exiting", count, len(ch))
+	return fpaths
 }
 
-func convertPngToCow(source_fpath string, source_dirpath string, destination_dirpath string, wg *sync.WaitGroup) {
-	defer wg.Done()
-	to_dir := filepath.Join(destination_dirpath, filepath.Dir(strings.ReplaceAll(source_fpath, source_dirpath, "")))
-	to_fpath := filepath.Join(to_dir, filepath.Base(source_fpath)+".cow")
-	os.MkdirAll(to_dir, 0755)
-
-	cmd := exec.Command("/usr/local/bin/img2xterm", string(source_fpath))
+func img2xterm(sourceFpath string) []byte {
+	cmd := exec.Command("/usr/local/bin/img2xterm", sourceFpath)
 
 	var out bytes.Buffer
 	var stderr bytes.Buffer
-	cmd.Stdout = &out
-	cmd.Stderr = &stderr
+	cmd.Stdout, cmd.Stderr = &out, &stderr
 
 	err := cmd.Run()
+
 	if err != nil {
 		fmt.Println(fmt.Sprint(err) + ": " + stderr.String())
 		log.Fatal(err)
 	}
-	err = os.WriteFile(to_fpath, out.Bytes(), 0644)
-	fmt.Println(source_fpath, "->", to_fpath)
+	return out.Bytes()
+}
+
+func convertPngToCow(sourceDirpath string, sourceFpath string, destDirpath string, wg *sync.WaitGroup, pbar *progressbar.ProgressBar) {
+	defer wg.Done()
+	destDir := filepath.Join(
+		destDirpath,
+		// strip the root "source dirpath" from the source path
+		// e.g. fpath: /a/b/c.txt sourceDir: /a/ -> b/c.txt
+		filepath.Dir(strings.ReplaceAll(sourceFpath, sourceDirpath, "")),
+	)
+	// Ensure that the destination dir exists
+	os.MkdirAll(destDir, 0755)
+	time.Sleep(0)
+
+	destFpath := filepath.Join(destDir, strings.ReplaceAll(filepath.Base(sourceFpath), ".png", ".cow"))
+
+	err := os.WriteFile(destFpath, img2xterm(sourceFpath), 0644)
+	time.Sleep(0)
+	if err != nil {
+		log.Fatal(err)
+	}
+	pbar.Add(1)
+	// fmt.Printf("%s -> %s\n", sourceFpath, destFpath)
+}
+
+func newProgressBar(max int) progressbar.ProgressBar {
+	return *progressbar.NewOptions(
+		max,
+		progressbar.OptionSetWriter(os.Stderr),
+		progressbar.OptionSetWidth(40),
+		progressbar.OptionThrottle(100*time.Millisecond),
+		progressbar.OptionShowCount(),
+		progressbar.OptionShowIts(),
+		progressbar.OptionOnCompletion(func() { fmt.Fprint(os.Stderr, "\n") }),
+		progressbar.OptionSetTheme(progressbar.Theme{Saucer: "█", SaucerPadding: "░", BarStart: "╢", BarEnd: "╟"}),
+	)
 }
 
 func main() {
-	args := run()
+	args := parseArgs()
 
-	ch := make(chan string)
-	go findFiles(args[0], ".png", ch)
+	fmt.Println("starting at", args.FromDir)
 
-	fmt.Println("channel has", len(ch), "items")
+	// var fpath string
+
+	fpaths := findFiles(args.FromDir, ".png")
+	pbar := newProgressBar(len(fpaths))
+
+	fpathChan := make(chan string, len(fpaths))
+	fmt.Println(len(fpaths), len(fpathChan))
+
+	go func() {
+		for _, f := range fpaths {
+			fpathChan <- f
+		}
+		fpathChan <- SENTINEL
+	}()
+
 	var wg sync.WaitGroup
-	opened := true
-	var file string
-	count := 0
-	for opened {
-		file = <-ch
-		if file == "END" {
-			fmt.Println("reached END, exiting")
+	var fpath string
+
+	for true {
+		fpath = <-fpathChan
+		if fpath == SENTINEL {
 			break
 		}
+		go convertPngToCow(args.FromDir, fpath, args.ToDir, &wg, &pbar)
 		wg.Add(1)
-		go convertPngToCow(file, args[0], args[1], &wg)
-		count += 1
 	}
 	wg.Wait()
-	fmt.Println("final", count)
+	fmt.Println("finished converting", N_FILES, "pokemon .pngs -> cowfiles!")
 }
