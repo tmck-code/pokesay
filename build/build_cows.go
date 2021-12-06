@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bytes"
 	"encoding/json"
 	"flag"
 	"fmt"
@@ -35,11 +34,15 @@ func parseArgs() CowBuildArgs {
 	return args
 }
 
-var SENTINEL string = "__END__"
-
-func findFiles(dirpath string, ext string) []string {
+func findFiles(dirpath string, ext string, skip []string) []string {
 	fpaths := []string{}
 	err := filepath.Walk(dirpath, func(path string, f os.FileInfo, err error) error {
+		for _, s := range(skip) {
+			if strings.Contains(path, s) {
+				fmt.Println(path, s, strings.Contains(path, s))
+				return err
+			}
+		}
 		if !f.IsDir() && filepath.Ext(f.Name()) == ext {
 			fpaths = append(fpaths, path)
 		}
@@ -53,19 +56,12 @@ func findFiles(dirpath string, ext string) []string {
 }
 
 func img2xterm(sourceFpath string) []byte {
-	cmd := exec.Command("/usr/local/bin/img2xterm", sourceFpath)
-
-	var out bytes.Buffer
-	var stderr bytes.Buffer
-	cmd.Stdout, cmd.Stderr = &out, &stderr
-
-	err := cmd.Run()
+	out, err := exec.Command("bash", "-c", fmt.Sprintf("/usr/local/bin/img2xterm %s | grep \"\\S\"", sourceFpath)).Output()
 
 	if err != nil {
-		fmt.Println(fmt.Sprint(err) + ": " + stderr.String())
 		log.Fatal(err)
 	}
-	return out.Bytes()
+	return out
 }
 
 func convertPngToCow(sourceDirpath string, sourceFpath string, destDirpath string, wg *sync.WaitGroup, pbar *progressbar.ProgressBar) {
@@ -105,30 +101,22 @@ func newProgressBar(max int) progressbar.ProgressBar {
 
 func main() {
 	args := parseArgs()
-
 	fmt.Println("starting at", args.FromDir)
 
-	fpaths := findFiles(args.FromDir, ".png")
-	pbar := newProgressBar(len(fpaths))
-
+	fpaths := findFiles(args.FromDir, ".png", args.SkipDirs)
 	fpathChan := make(chan string, len(fpaths))
 
 	go func() {
 		for _, f := range fpaths {
 			fpathChan <- f
 		}
-		fpathChan <- SENTINEL
 	}()
 
 	var wg sync.WaitGroup
-	var fpath string
+	pbar := newProgressBar(len(fpaths))
 
-	for true {
-		fpath = <-fpathChan
-		if fpath == SENTINEL {
-			break
-		}
-		go convertPngToCow(args.FromDir, fpath, args.ToDir, &wg, &pbar)
+	for i := 0; i < len(fpaths) ; i++ {
+		go convertPngToCow(args.FromDir, <-fpathChan, args.ToDir, &wg, &pbar)
 		wg.Add(1)
 	}
 	wg.Wait()
