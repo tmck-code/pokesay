@@ -1,7 +1,7 @@
 TARGET_GOOS       ?= linux
 TARGET_GOARCH     ?= amd64
 DOCKER_BUILD_DIR  ?= /usr/local/src
-DOCKER_OUTPUT_DIR ?= /tmp/converted
+DOCKER_OUTPUT_DIR ?= /tmp/cows
 COWFILE_BUILD_DIR ?= /cows
 
 all: clean build/docker build/cows build/bin
