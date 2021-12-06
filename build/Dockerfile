@@ -31,7 +31,7 @@ RUN go run /usr/local/src/build/build_cows.go \
         -skip '["resources/", "misc/"]'
 
 ADD cmd/ /usr/local/src/cmd/
-RUN go-bindata -nometadata -nocompress -nomemcopy -prefix /tmp/ /tmp/cows/... && \
+RUN go-bindata -nometadata -nomemcopy -prefix /tmp/ /tmp/cows/... && \
         ./build/bindata.sh
 
 

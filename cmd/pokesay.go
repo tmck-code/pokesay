@@ -3,8 +3,12 @@ package main
 import (
 	"bufio"
 	"encoding/binary"
+	"bytes"
 	"flag"
 	"fmt"
+	"log"
+	"compress/gzip"
+	"io"
 	"math/rand"
 	"os"
 	"strings"
@@ -55,7 +59,23 @@ func randomInt(n int) int {
 
 func printPokemon() {
 	choice := PokemonList[randomInt(len(PokemonList))]
-	binary.Write(os.Stdout, binary.LittleEndian, choice.Data)
+	gz, err := gzip.NewReader(bytes.NewReader(choice.Data))
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	var buf bytes.Buffer
+	_, err = io.Copy(&buf, gz)
+	clErr := gz.Close()
+
+	if err != nil {
+		log.Fatal(err)
+	}
+	if clErr != nil {
+		log.Fatal(clErr)
+	}
+
+	binary.Write(os.Stdout, binary.LittleEndian, buf.Bytes())
 	fmt.Printf("choice: %s / categories: %s\n", choice.Name.Name, choice.Name.Categories)
 }
 
