@@ -36,7 +36,6 @@ func parseArgs() CowBuildArgs {
 }
 
 var SENTINEL string = "__END__"
-var N_FILES int
 
 func findFiles(dirpath string, ext string) []string {
 	fpaths := []string{}
@@ -89,7 +88,6 @@ func convertPngToCow(sourceDirpath string, sourceFpath string, destDirpath strin
 		log.Fatal(err)
 	}
 	pbar.Add(1)
-	// fmt.Printf("%s -> %s\n", sourceFpath, destFpath)
 }
 
 func newProgressBar(max int) progressbar.ProgressBar {
@@ -110,13 +108,10 @@ func main() {
 
 	fmt.Println("starting at", args.FromDir)
 
-	// var fpath string
-
 	fpaths := findFiles(args.FromDir, ".png")
 	pbar := newProgressBar(len(fpaths))
 
 	fpathChan := make(chan string, len(fpaths))
-	fmt.Println(len(fpaths), len(fpathChan))
 
 	go func() {
 		for _, f := range fpaths {
@@ -137,5 +132,4 @@ func main() {
 		wg.Add(1)
 	}
 	wg.Wait()
-	fmt.Println("finished converting", N_FILES, "pokemon .pngs -> cowfiles!")
 }
