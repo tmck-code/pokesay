@@ -18,15 +18,16 @@ WORKDIR /tmp/original
 
 RUN git clone --depth 1 git://github.com/msikma/pokesprite
 
-ADD build/build_cows.go /usr/local/src/build/
-
-
-RUN go run /usr/local/src/build/build_cows.go -from /tmp/original/pokesprite/ -to /tmp/cows/
-
 WORKDIR /usr/local/src/
+ADD build/build_cows.go /usr/local/src/build/
 ADD go.* /usr/local/src/
 RUN go mod tidy \
     && go get -v github.com/mitchellh/go-wordwrap
+
+RUN go run /usr/local/src/build/build_cows.go \
+        -from /tmp/original/pokesprite/ \
+        -to /tmp/cows/ \
+        -skip '["resources"]'
 
 ADD cmd/ /usr/local/src/cmd/
 
