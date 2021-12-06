@@ -39,7 +39,6 @@ func findFiles(dirpath string, ext string, skip []string) []string {
 	err := filepath.Walk(dirpath, func(path string, f os.FileInfo, err error) error {
 		for _, s := range(skip) {
 			if strings.Contains(path, s) {
-				fmt.Println(path, s, strings.Contains(path, s))
 				return err
 			}
 		}

@@ -19,17 +19,21 @@ WORKDIR /tmp/original
 RUN git clone --depth 1 git://github.com/msikma/pokesprite
 
 WORKDIR /usr/local/src/
-ADD build/build_cows.go /usr/local/src/build/
+ADD build/build_cows.go build/bindata.sh /usr/local/src/build/
 ADD go.* /usr/local/src/
 RUN go mod tidy \
-    && go get -v github.com/mitchellh/go-wordwrap
+    && go get -v github.com/mitchellh/go-wordwrap \
+    && go install github.com/go-bindata/go-bindata/...@latest
 
 RUN go run /usr/local/src/build/build_cows.go \
         -from /tmp/original/pokesprite/ \
         -to /tmp/cows/ \
-        -skip '["resources"]'
+        -skip '["resources/", "misc/"]'
 
 ADD cmd/ /usr/local/src/cmd/
+RUN go-bindata -nometadata -nocompress -nomemcopy -prefix /tmp/ /tmp/cows/... && \
+        ./build/bindata.sh
+
 
 RUN echo "building darwin / amd64"  && GOOS=darwin  GOARCH=amd64 go build -o pokesay-darwin-amd64  cmd/pokesay.go cmd/bindata.go && \
     echo "building linux / amd64"   && GOOS=linux   GOARCH=amd64 go build -o pokesay-linux-amd64   cmd/pokesay.go cmd/bindata.go && \

@@ -21,6 +21,7 @@ build/cows:
 		--name pokebuilder \
 		pokesay-go:latest
 	@docker cp pokebuilder:$(DOCKER_OUTPUT_DIR)/ .
+	@docker cp pokebuilder:$(DOCKER_BUILD_DIR)/cmd/bindata.go cmd/
 	@tar czf cows.tar.gz cows
 	@rm -rf cows
 	@docker rm -f pokebuilder
