@@ -6,8 +6,7 @@ RUN apt-get update \
     && apt-get install -y --no-install-recommends \
         parallel make gcc libmagickwand-dev ncurses-dev fortune-mod fortunes
 
-ENV PATH "/usr/lib/x86_64-linux-gnu/ImageMagick-6.9.11/bin-q16:/usr/include/ImageMagick-6/:$PATH"
-RUN git clone --depth 1 git://github.com/rossy/img2xterm \
+RUN git clone --depth 1 git://github.com/denilsonsa/img2xterm \
     && (cd img2xterm && make && make install)
 
 ENV DOCKER_BUILD_DIR /tmp/original
