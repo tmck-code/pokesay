@@ -27,7 +27,7 @@ RUN go mod tidy \
 RUN go run /usr/local/src/build/build_cows.go \
         -from /tmp/original/pokesprite/ \
         -to /tmp/cows/ \
-        -skip '["resources/", "misc/"]'
+        -skip '["resources/", "misc/", "icons/", "items/", "items-outline/"]'
 
 ADD cmd/ /usr/local/src/cmd/
 RUN go-bindata -nometadata -nomemcopy -prefix /tmp/ /tmp/cows/... && \
