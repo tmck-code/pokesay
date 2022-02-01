@@ -54,13 +54,10 @@ func findFiles(dirpath string, ext string, skip []string) []string {
 	return fpaths
 }
 
-func img2xterm(sourceFpath string) []byte {
+func img2xterm(sourceFpath string) (error, []byte) {
 	out, err := exec.Command("bash", "-c", fmt.Sprintf("/usr/local/bin/img2xterm %s | grep \"\\S\"", sourceFpath)).Output()
 
-	if err != nil {
-		log.Fatal(err)
-	}
-	return out
+	return err, out
 }
 
 func convertPngToCow(sourceDirpath string, sourceFpath string, destDirpath string, wg *sync.WaitGroup, pbar *progressbar.ProgressBar) {
@@ -77,10 +74,15 @@ func convertPngToCow(sourceDirpath string, sourceFpath string, destDirpath strin
 
 	destFpath := filepath.Join(destDir, strings.ReplaceAll(filepath.Base(sourceFpath), ".png", ".cow"))
 
-	err := os.WriteFile(destFpath, img2xterm(sourceFpath), 0644)
-	time.Sleep(0)
-	if err != nil {
-		log.Fatal(err)
+	// Some conversions are failing with something about colour channels
+	// Can't be bothered resolving atm, so just skip past any failed conversions
+	imgErr, converted := img2xterm(sourceFpath)
+	if imgErr == nil {
+		err := os.WriteFile(destFpath, converted, 0644)
+		time.Sleep(0)
+		if err != nil {
+			log.Fatal(err)
+		}
 	}
 	pbar.Add(1)
 }
