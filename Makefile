@@ -47,7 +47,7 @@ build/release: build/docker
 	@docker create --name pokesay pokesay-go:latest
 	@docker cp pokesay:/usr/local/src/pokesay-linux-amd64 .
 	@docker cp pokesay:/usr/local/src/pokesay-darwin-amd64 .
-	@docker cp pokesay:/usr/local/src/pokesay-windows-amd64 .
+	@docker cp pokesay:/usr/local/src/pokesay-windows-amd64.exe .
 	@docker cp pokesay:/usr/local/src/pokesay-android-arm64 .
 	@docker rm -f pokesay
 
