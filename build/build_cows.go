@@ -55,7 +55,7 @@ func findFiles(dirpath string, ext string, skip []string) []string {
 }
 
 func img2xterm(sourceFpath string) (error, []byte) {
-	out, err := exec.Command("bash", "-c", fmt.Sprintf("/usr/local/bin/img2xterm %s | grep \"\\S\" | tail -n +2 | cut -c 14-", sourceFpath)).Output()
+	out, err := exec.Command("bash", "-c", fmt.Sprintf("/usr/local/bin/img2xterm %s | grep \"\\S\" | tail -n +2 | sed 's/^\\s\\{14\\}//g'", sourceFpath)).Output()
 
 	return err, out
 }
