@@ -58,38 +58,21 @@ func parseArgs() Args {
 	return Args{Width: width}
 }
 
-func main() {
-	// args := parseArgs()
-	// printSpeechBubble(bufio.NewScanner(os.Stdin), args.Width)
-	// printPokemon()
-
-	// var list []*PokemonSerial = []*PokemonSerial{}
-
-	// for _, pokemon := range PokemonList {
-	// 	p := &PokemonSerial{
-	// 		Name: pokemon.Name.Name,
-	// 		Data: pokemon.Data,
-	// 	}
-	// 	list = append(list, p)
-	// 	// fmt.Println(i, p)
-	// }
-
-	// data, err := proto.Marshal(&PokemonSerialList{Pokemon: list})
-	// if err != nil {
-	// 	log.Fatal("marshaling error: ", err)
-	// }
-	// // printing out our raw protobuf object
-	// err = os.WriteFile("data.txt", data, 0644)
-
-	newPokemon := &PokemonSerialList{}
-	data2, _ := os.ReadFile("data.txt")
-	// fmt.Println("read file", data2)
-	err := proto.Unmarshal(data2, newPokemon)
+func loadPokemon(fpath string) *PokemonSerialList {
+	pokemon := &PokemonSerialList{}
+	data, _ := os.ReadFile(fpath)
+	err := proto.Unmarshal(data, pokemon)
 	if err != nil {
 		log.Fatal("unmarshaling error: ", err)
 	}
+	return pokemon
 
+}
+
+func main() {
 	args := parseArgs()
+	pokemon := loadPokemon("data.txt")
+
 	printSpeechBubble(bufio.NewScanner(os.Stdin), args.Width)
-	printPokemon(newPokemon)
+	printPokemon(pokemon)
 }
