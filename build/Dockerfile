@@ -25,11 +25,13 @@ RUN git clone --depth 1 git://github.com/msikma/pokesprite \
 WORKDIR /usr/local/src/
 ADD go.* /usr/local/src/
 RUN go mod tidy \
-    && go get -v github.com/mitchellh/go-wordwrap
+    && go get -v github.com/mitchellh/go-wordwrap \
+    && go get google.golang.org/protobuf/proto
 
 ADD cmd/ /usr/local/src/cmd/
 
-RUN echo "building darwin / amd64"  && GOOS=darwin  GOARCH=amd64 go build -o pokesay-darwin-amd64  cmd/pokesay.go cmd/bindata.go && \
-    echo "building linux / amd64"   && GOOS=linux   GOARCH=amd64 go build -o pokesay-linux-amd64   cmd/pokesay.go cmd/bindata.go && \
-    echo "building windows / amd64" && GOOS=windows GOARCH=amd64 go build -o pokesay-windows-amd64 cmd/pokesay.go cmd/bindata.go && \
-    echo "building android / arm64" && GOOS=android GOARCH=arm64 go build -o pokesay-android-arm64 cmd/pokesay.go cmd/bindata.go
+# RUN protoc --proto_path=cmd --go_out=cmd/ --go_opt=paths=source_relative cmd/pokemon.proto
+RUN echo "building darwin / amd64"  && GOOS=darwin  GOARCH=amd64 go build -o pokesay-darwin-amd64  cmd/pokesay.go cmd/pokemon.pb.go && \
+    echo "building linux / amd64"   && GOOS=linux   GOARCH=amd64 go build -o pokesay-linux-amd64   cmd/pokesay.go cmd/pokemon.pb.go && \
+    echo "building windows / amd64" && GOOS=windows GOARCH=amd64 go build -o pokesay-windows-amd64 cmd/pokesay.go cmd/pokemon.pb.go && \
+    echo "building android / arm64" && GOOS=android GOARCH=arm64 go build -o pokesay-android-arm64 cmd/pokesay.go cmd/pokemon.pb.go
