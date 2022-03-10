@@ -3,11 +3,12 @@ package main
 import (
 	"bufio"
 	"encoding/binary"
+	"bytes"
+	"flag"
 	"fmt"
 	"log"
 	"math/rand"
 	"os"
-	"strconv"
 	"strings"
 	"time"
 
@@ -15,16 +16,34 @@ import (
 	"google.golang.org/protobuf/proto"
 )
 
-func printSpeechBubble(scanner *bufio.Scanner, width int) {
-	border := strings.Repeat("-", width+2)
+func printSpeechBubbleLine(line string, width int) {
+	if len(line) > width {
+		fmt.Println("|", line)
+	} else {
+		fmt.Println("|", line, strings.Repeat(" ", width-len(line)), "|")
+	}
+}
+
+func printWrappedText(line string, width int, tabSpaces string) {
+	for _, wline := range strings.Split(wordwrap.WrapString(strings.Replace(line, "\t", tabSpaces, -1), uint(width)), "\n") {
+		printSpeechBubbleLine(wline, width)
+	}
+}
+
+func printSpeechBubble(scanner *bufio.Scanner, args Args) {
+	border := strings.Repeat("-", args.Width+2)
 	fmt.Println("/" + border + "\\")
+
 	for scanner.Scan() {
-		for _, wline := range strings.Split(wordwrap.WrapString(strings.Replace(scanner.Text(), "\t", "    ", -1), uint(width)), "\n") {
-			if len(wline) > width {
-				fmt.Println("| ", wline, len(wline))
-			} else {
-				fmt.Println("|", wline, strings.Repeat(" ", width-len(wline)), "|")
-			}
+		line := scanner.Text()
+
+		if !args.NoTabSpaces {
+			line = strings.Replace(line, "\t", args.TabSpaces, -1)
+		}
+		if args.NoWrap {
+			printSpeechBubbleLine(line, args.Width)
+		} else {
+			printWrappedText(line, args.Width, args.TabSpaces)
 		}
 	}
 	fmt.Println("\\" + border + "/")
@@ -44,18 +63,38 @@ func printPokemon(list *PokemonSerialList) {
 }
 
 type Args struct {
-	Width int
+	Width       int
+	NoWrap      bool
+	TabSpaces   string
+	NoTabSpaces bool
 }
 
-func parseArgs() Args {
-	if len(os.Args) <= 1 {
-		return Args{Width: 40}
+func parseFlags() Args {
+	width := flag.Int("width", 80, "the max speech bubble width")
+	noWrap := flag.Bool("nowrap", false, "disable text wrapping (fastest)")
+	tabWidth := flag.Int("tabwidth", 4, "replace any tab characters with N spaces")
+	noTabSpaces := flag.Bool("notabspaces", false, "do not replace tab characters (fastest)")
+	fastest := flag.Bool("fastest", false, "run with the fastest possible configuration (-nowrap -notabspaces)")
+
+	flag.Parse()
+	var args Args
+
+	if *fastest {
+		args = Args{
+			Width:       *width,
+			NoWrap:      true,
+			TabSpaces:   "    ",
+			NoTabSpaces: true,
+		}
+	} else {
+		args = Args{
+			Width:       *width,
+			NoWrap:      *noWrap,
+			TabSpaces:   strings.Repeat(" ", *tabWidth),
+			NoTabSpaces: *noTabSpaces,
+		}
 	}
-	width, err := strconv.Atoi(os.Args[1])
-	if err != nil {
-		return Args{Width: 40}
-	}
-	return Args{Width: width}
+	return args
 }
 
 func loadPokemon(fpath string) *PokemonSerialList {
