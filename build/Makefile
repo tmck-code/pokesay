@@ -8,7 +8,7 @@ all: build/docker build/cows build/release
 build/docker:
 	docker build \
 		-f Dockerfile \
-		-t pokesay-go:latest .
+		-t pokesay-go:latest ..
 
 build/cows:
 	@rm -rf cows.tar.gz cows/
