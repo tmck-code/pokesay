@@ -3,7 +3,6 @@ package main
 import (
 	"bufio"
 	"encoding/binary"
-	"bytes"
 	"flag"
 	"fmt"
 	"log"
@@ -109,9 +108,9 @@ func loadPokemon(fpath string) *PokemonSerialList {
 }
 
 func main() {
-	args := parseArgs()
+	args := parseFlags()
 	pokemon := loadPokemon("data.txt")
 
-	printSpeechBubble(bufio.NewScanner(os.Stdin), args.Width)
+	printSpeechBubble(bufio.NewScanner(os.Stdin), args)
 	printPokemon(pokemon)
 }
