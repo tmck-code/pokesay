@@ -30,7 +30,8 @@
 		"dracula-theme.theme-dracula",
 		"golang.go-nightly",
 		"msyrus.go-doc",
-		"766b.go-outliner"
+		"766b.go-outliner",
+		"golang.go"
 	],
 
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
