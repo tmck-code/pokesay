@@ -51,7 +51,9 @@ build/release: build/docker
 	@docker rm -f pokesay
 
 protoc:
-	protoc --proto_path=cmd --go_out=cmd/ --go_opt=paths=source_relative cmd/pokemon.proto 
-	go build cmd/pokesay.go cmd/pokemon.pb.go cmd/bindata.go 
+	protoc --proto_path=cmd --go_out=cmd/ --go_opt=paths=source_relative cmd/pokemon.proto
+	sed -i 's/__/main/g' cmd/pokemon.pb.go
+	go build cmd/pokesay.go cmd/pokemon.pb.go cmd/bindata.go
+	echo 'hello world' | ./pokesay
 
 .PHONY: all clean build/docker build/cows build/bin build/android install build/release protoc
