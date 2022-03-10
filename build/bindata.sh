@@ -25,8 +25,8 @@ grep '^.*"cows/.*cow",$' bindata.go > pokemon_names
 rm -f left centre right data tmp tmp_bytes tmp_end
 
 echo "Generating data"
-while read line; do
-    echo $line | cut -d '=' -f 2 | tr -d ' ' >> data
+while read -r line; do
+    echo $line | cut -d '=' -f 2 >> data
     echo $line | sed 's/var _cows/\t{PokemonName{[]string{"/g' | sed 's/Cow = /Cow"}, "/g' | sed 's/, "".*/, "/g' >> left
     echo '"}, []byte(' >> tmp_bytes
     echo ')},' >> tmp_end
@@ -38,7 +38,6 @@ while read line; do
 done < pokemon_names
 
 n_pokemon=$(wc -l pokemon_data)
-
 
 cat header > tmp
 
