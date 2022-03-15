@@ -61,7 +61,7 @@ func createCategories(fpath string) []string {
 	return strings.Split(fpath, "/")
 }
 
-func writeToFile(categories map[string][]PokemonEntry, fpath string) {
+func writeToFile(categories PokemonEntryMap, fpath string) {
 	ostream, err := os.Create(fpath)
 	check(err)
 
@@ -81,20 +81,20 @@ func writeProtobuf(categories PokemonEntryMap, fpath string) {
 	err = os.WriteFile("data.txt", data, 0644)
 }
 
-func readFromFile(fpath string) map[string][]PokemonEntry {
+func readFromFile(fpath string) PokemonEntryMap {
 	istream, err := os.Open(fpath)
 	check(err)
 
 	reader := bufio.NewReader(istream)
 	dec := gob.NewDecoder(reader)
 
-	categories := make(map[string][]PokemonEntry)
+	categories := &PokemonEntryMap{}
 
 	err = dec.Decode(&categories)
 	check(err)
 	istream.Close()
 
-	return categories
+	return *categories
 }
 
 type CowBuildArgs struct {
@@ -131,20 +131,16 @@ func main() {
 
 	categories := findFiles(args.FromDir, ".cow", args.SkipDirs)
 
-	// writeToFile(categories, args.ToFpath)
-	writeProtobuf(categories, args.ToFpath)
+	writeToFile(categories, args.ToFpath)
 
-	// categories := readFromFile(args.ToFpath)
+	categories = readFromFile(args.ToFpath)
 
-	// categories := readFromEmbeddedString()
 	t.Mark("writeProtobuf")
 
 	total := 0
 	for _, _ = range categories.Pokemon {
 		total += 1
-		// fmt.Println(k, len(v))
 	}
-	// fmt.Println("TOTAL:", total)
 	rand.Seed(time.Now().UnixNano())
 	randomCategory := randInt(total)
 	t.Mark("randomCategory")
