@@ -4,11 +4,15 @@ option go_package = "./";
 
 package main;
 
-message PokemonSerial {
+message PokemonEntry {
       string name = 1;
       bytes data = 2;
 }
 
-message PokemonSerialList {
-      repeated PokemonSerial pokemon = 1;
+message PokemonEntryList {
+      repeated PokemonEntry pokemon = 1;
+}
+
+message PokemonEntryMap {
+      map<string, PokemonEntryList> pokemon = 1;
 }

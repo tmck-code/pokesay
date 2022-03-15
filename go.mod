@@ -9,7 +9,7 @@ require (
 )
 
 // uncomment when debugging timings
-// require internal/timer v1.0.0
+require internal/timer v1.0.0
 
 require (
 	github.com/mattn/go-runewidth v0.0.13 // indirect
