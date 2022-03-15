@@ -14,7 +14,6 @@ import (
 	"time"
 
 	"internal/timer"
-	"google.golang.org/protobuf/proto"
 	// "timer"
 	// "github.com/tmck-code/pokesay-go/internal/timer"
 )
@@ -25,8 +24,20 @@ func check(e error) {
 	}
 }
 
+type PokemonEntry struct {
+	Name       string
+	Data       []byte
+	Categories []string
+}
+
+type PokemonEntryMap struct {
+	Categories map[string][]PokemonEntry
+	Total int
+}
+
+
 func findFiles(dirpath string, ext string, skip []string) PokemonEntryMap {
-	categories := &PokemonEntryMap{Pokemon: make(map[string]*PokemonEntryList)}
+	categories := &PokemonEntryMap{Categories: make(map[string][]PokemonEntry)}
 	err := filepath.Walk(dirpath, func(fpath string, f os.FileInfo, err error) error {
 		for _, s := range skip {
 			if strings.Contains(fpath, s) {
@@ -40,14 +51,14 @@ func findFiles(dirpath string, ext string, skip []string) PokemonEntryMap {
 
 			for _, c := range pokemonCategories[3 : len(pokemonCategories)-1] {
 				p := PokemonEntry{Name: fpath, Data: data}
-				if val, ok := categories.Pokemon[c]; ok {
-					val.Pokemon = append(val.Pokemon, &p)
+				if val, ok := categories.Categories[c]; ok {
+					val = append(val, p)
 				} else {
-					categories.Pokemon[c] = &PokemonEntryList{Pokemon: []*PokemonEntry{&p}}
+					categories.Categories[c] = []PokemonEntry{p}
 				}
 				// fmt.Println("categories:", categories.Pokemon[c], c)
 
-				categories.Pokemon[c].Pokemon = append(categories.Pokemon[c].Pokemon, &PokemonEntry{Name: fpath, Data: data})
+				categories.Categories[c] = append(categories.Categories[c], PokemonEntry{Name: fpath, Data: data})
 			}
 		}
 		return err
@@ -70,15 +81,6 @@ func writeToFile(categories PokemonEntryMap, fpath string) {
 	enc.Encode(categories)
 	writer.Flush()
 	ostream.Close()
-}
-
-func writeProtobuf(categories PokemonEntryMap, fpath string) {
-	fmt.Println("writing protobuf file")
-	data, err := proto.Marshal(&categories)
-	check(err)
-
-	// printing out our raw protobuf object
-	err = os.WriteFile("data.txt", data, 0644)
 }
 
 func readFromFile(fpath string) PokemonEntryMap {
@@ -138,7 +140,7 @@ func main() {
 	t.Mark("writeProtobuf")
 
 	total := 0
-	for _, _ = range categories.Pokemon {
+	for _, _ = range categories.Categories {
 		total += 1
 	}
 	rand.Seed(time.Now().UnixNano())
@@ -147,7 +149,7 @@ func main() {
 
 	idx := 0
 	choice := ""
-	for cat, _ := range categories.Pokemon {
+	for cat, _ := range categories.Categories {
 		idx += 1
 		if idx == randomCategory {
 			choice = cat
@@ -156,11 +158,11 @@ func main() {
 	t.Mark("randomCategoryChoice")
 
 	// fmt.Println(choice, categories[choice])
-	fmt.Println("choosing pokemon", "cat:", randomCategory, "choice:", choice, " - ", len(categories.Pokemon[choice].Pokemon))
-	randPokemon := randInt(len(categories.Pokemon[choice].Pokemon))
+	fmt.Println("choosing pokemon", "cat:", randomCategory, "choice:", choice, " - ", len(categories.Categories[choice]))
+	randPokemon := randInt(len(categories.Categories[choice]))
 	t.Mark("randomPokemon")
 	// fmt.Println("category choice", choice, "pokemon choice", randPokemon, "/", len(categories[choice]))
-	pokemon := categories.Pokemon[choice].Pokemon[randPokemon]
+	pokemon := categories.Categories[choice][randPokemon]
 	t.Mark("randomPokemonChoice")
 
 	fmt.Printf("%s\n", pokemon.Data)
