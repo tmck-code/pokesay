@@ -8,18 +8,35 @@ import (
 	"log"
 	"math/rand"
 	"os"
+	"bytes"
 	"strings"
 	"time"
 	"encoding/gob"
+	_ "embed"
 
 	"github.com/mitchellh/go-wordwrap"
-	"google.golang.org/protobuf/proto"
+)
+
+var (
+	//go:embed data.txt
+	data []byte
 )
 
 func check(e error) {
 	if e != nil {
 		log.Fatal(e)
 	}
+}
+
+type PokemonEntry struct {
+	Name       string
+	Data       []byte
+	Categories []string
+}
+
+type PokemonEntryMap struct {
+	Categories map[string][]PokemonEntry
+	Total int
 }
 
 func printSpeechBubbleLine(line string, width int) {
@@ -65,15 +82,15 @@ func randomInt(n int) int {
 func printPokemon(list *PokemonEntryMap) {
 	// fmt.Printf("%+v\n", list.Pokemon)
 	nCategories := 0
-	for _, _ = range list.Pokemon {
+	for _, _ = range list.Categories {
 		nCategories += 1
 	}
 	chosenCategory, idx := randomInt(nCategories), 0
 
-	for category, pokemon := range list.Pokemon {
+	for category, pokemon := range list.Categories {
 		if idx == chosenCategory {
 			fmt.Println(category)
-			chosenPokemon := pokemon.Pokemon[randomInt(len(pokemon.Pokemon))]
+			chosenPokemon := pokemon[randomInt(len(pokemon))]
 			binary.Write(os.Stdout, binary.LittleEndian, chosenPokemon.Data)
 			fmt.Printf("choice: %s\n", chosenPokemon.Name)
 		}
@@ -116,22 +133,12 @@ func parseFlags() Args {
 	return args
 }
 
-func loadPokemon(fpath string) *PokemonEntryMap {
-	pokemon := &PokemonEntryMap{}
-	data, _ := os.ReadFile(fpath)
-	err := proto.Unmarshal(data, pokemon)
-	if err != nil {
-		log.Fatal("unmarshaling error: ", err)
-	}
-	return pokemon
-}
-
-func readFromFile(fpath string) *PokemonEntryMap {
-	istream, err := os.Open(fpath)
+func readFromFile() *PokemonEntryMap {
+	istream, err := os.Open("data.txt")
 	check(err)
 
-	reader := bufio.NewReader(istream)
-	dec := gob.NewDecoder(reader)
+	buf := bytes.NewBuffer(data)
+	dec := gob.NewDecoder(buf)
 
 	categories := &PokemonEntryMap{}
 
@@ -145,7 +152,7 @@ func readFromFile(fpath string) *PokemonEntryMap {
 func main() {
 	args := parseFlags()
 	// pokemon := loadPokemon("data.txt")
-	pokemon := readFromFile("data.txt")
+	pokemon := readFromFile()
 
 	printSpeechBubble(bufio.NewScanner(os.Stdin), args)
 	printPokemon(pokemon)
