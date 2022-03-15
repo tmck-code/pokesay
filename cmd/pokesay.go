@@ -10,10 +10,17 @@ import (
 	"os"
 	"strings"
 	"time"
+	"encoding/gob"
 
 	"github.com/mitchellh/go-wordwrap"
 	"google.golang.org/protobuf/proto"
 )
+
+func check(e error) {
+	if e != nil {
+		log.Fatal(e)
+	}
+}
 
 func printSpeechBubbleLine(line string, width int) {
 	if len(line) > width {
@@ -117,12 +124,28 @@ func loadPokemon(fpath string) *PokemonEntryMap {
 		log.Fatal("unmarshaling error: ", err)
 	}
 	return pokemon
+}
 
+func readFromFile(fpath string) *PokemonEntryMap {
+	istream, err := os.Open(fpath)
+	check(err)
+
+	reader := bufio.NewReader(istream)
+	dec := gob.NewDecoder(reader)
+
+	categories := &PokemonEntryMap{}
+
+	err = dec.Decode(&categories)
+	check(err)
+	istream.Close()
+
+	return categories
 }
 
 func main() {
 	args := parseFlags()
-	pokemon := loadPokemon("data.txt")
+	// pokemon := loadPokemon("data.txt")
+	pokemon := readFromFile("data.txt")
 
 	printSpeechBubble(bufio.NewScanner(os.Stdin), args)
 	printPokemon(pokemon)
