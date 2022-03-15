@@ -55,10 +55,23 @@ func randomInt(n int) int {
 	return rand.New(rand.NewSource(time.Now().UnixNano())).Intn(n)
 }
 
-func printPokemon(list *PokemonSerialList) {
-	choice := list.Pokemon[randomInt(len(list.Pokemon))]
-	binary.Write(os.Stdout, binary.LittleEndian, choice.Data)
-	fmt.Printf("choice: %s", choice.Name)
+func printPokemon(list *PokemonEntryMap) {
+	// fmt.Printf("%+v\n", list.Pokemon)
+	nCategories := 0
+	for _, _ = range list.Pokemon {
+		nCategories += 1
+	}
+	chosenCategory, idx := randomInt(nCategories), 0
+
+	for category, pokemon := range list.Pokemon {
+		if idx == chosenCategory {
+			fmt.Println(category)
+			chosenPokemon := pokemon.Pokemon[randomInt(len(pokemon.Pokemon))]
+			binary.Write(os.Stdout, binary.LittleEndian, chosenPokemon.Data)
+			fmt.Printf("choice: %s\n", chosenPokemon.Name)
+		}
+		idx += 1
+	}
 }
 
 type Args struct {
@@ -96,8 +109,8 @@ func parseFlags() Args {
 	return args
 }
 
-func loadPokemon(fpath string) *PokemonSerialList {
-	pokemon := &PokemonSerialList{}
+func loadPokemon(fpath string) *PokemonEntryMap {
+	pokemon := &PokemonEntryMap{}
 	data, _ := os.ReadFile(fpath)
 	err := proto.Unmarshal(data, pokemon)
 	if err != nil {
