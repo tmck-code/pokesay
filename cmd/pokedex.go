@@ -32,12 +32,14 @@ func findFiles(dirpath string, ext string, skip []string) map[string][]PokemonEn
 			data, err := os.ReadFile(fpath)
 			check(err)
 			pokemonCategories := createCategories(fpath)
-			for _, c := range pokemonCategories[3 : len(pokemonCategories)-1] {
+			// fmt.Println(pokemonCategories)
+			for _, c := range pokemonCategories[2 : len(pokemonCategories)-1] {
 
 				if val, ok := categories[c]; ok {
 					categories[c] = append(val, PokemonEntry{Name: fpath, Data: data})
 				} else {
 					categories[c] = []PokemonEntry{PokemonEntry{Name: fpath, Data: data}}
+					// fmt.Println(categories[c])
 				}
 			}
 		}
@@ -76,7 +78,7 @@ func writeToFile(categories map[string][]PokemonEntry, fpath string) {
 	writer.Flush()
 	ostream.Close()
 
-	fmt.Println("->", fpath)
+	// fmt.Println("->", fpath)
 }
 
 func readFromFile(fpath string) map[string][]PokemonEntry {
@@ -114,13 +116,16 @@ func parseArgs() CowBuildArgs {
 	return args
 }
 
-func randInt(n int) int {
-	return rand.New(rand.NewSource(time.Now().UnixNano())).Intn(n)
+func randInt(r *rand.Rand, n int) int {
+	if n <= 0 {
+		log.Fatal("n <= 0! -_-")
+	}
+	return r.Intn(n) + 1
 }
 
 func main() {
 	args := parseArgs()
-	fmt.Println("starting at", args.FromDir)
+	// fmt.Println("starting at", args.FromDir)
 
 	// categories := findFiles(args.FromDir, ".cow", args.SkipDirs)
 
@@ -131,8 +136,11 @@ func main() {
 	total := 0
 	for _, _ = range categories {
 		total += 1
+		// fmt.Println(k, len(v))
 	}
-	randomCategory := randInt(total)
+	// fmt.Println("TOTAL:", total)
+	seed := rand.New(rand.NewSource(time.Now().UnixNano()))
+	randomCategory := randInt(seed, total)
 
 	idx := 0
 	choice := ""
@@ -142,9 +150,12 @@ func main() {
 			choice = cat
 		}
 	}
-	fmt.Println("category choice", choice)
 
-	pokemon := categories[choice][randInt(len(categories[choice]))]
+	// fmt.Println(choice, categories[choice])
+	fmt.Println("choosing pokemon", "cat:", randomCategory, "choice:", choice, " - ", len(categories[choice]))
+	randPokemon := randInt(seed, len(categories[choice]))
+	// fmt.Println("category choice", choice, "pokemon choice", randPokemon, "/", len(categories[choice]))
+	pokemon := categories[choice][randPokemon]
 
 	fmt.Printf("%s\n", pokemon.Data)
 }
