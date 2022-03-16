@@ -18,23 +18,22 @@ WORKDIR /tmp/original
 RUN git clone --depth 1 git://github.com/msikma/pokesprite
 
 WORKDIR /usr/local/src/
-ADD build/build_cows.go build/bindata.sh /usr/local/src/build/
+ADD build/build_cows.go /usr/local/src/build/
 ADD go.* /usr/local/src/
 RUN go mod tidy \
-    && go get -v github.com/mitchellh/go-wordwrap \
-    && go install github.com/go-bindata/go-bindata/...@latest
+    && go get -v github.com/mitchellh/go-wordwrap
 
 RUN go run /usr/local/src/build/build_cows.go \
         -from /tmp/original/pokesprite/ \
         -to /tmp/cows/ \
         -skip '["resources/", "misc/", "icons/", "items/", "items-outline/"]'
 
-ADD cmd/ /usr/local/src/cmd/
-RUN go-bindata -nometadata -nomemcopy -prefix /tmp/ /tmp/cows/... && \
-        ./build/bindata.sh
+ADD . .
+RUN go build src/pokedex.go && \
+    ./pokedex -from /tmp/cows/ -to build/cows.gob
 
-
-RUN echo "building darwin / amd64"  && GOOS=darwin  GOARCH=amd64 go build -o pokesay-darwin-amd64  cmd/pokesay.go cmd/bindata.go && \
-    echo "building linux / amd64"   && GOOS=linux   GOARCH=amd64 go build -o pokesay-linux-amd64   cmd/pokesay.go cmd/bindata.go && \
-    echo "building windows / amd64" && GOOS=windows GOARCH=amd64 go build -o pokesay-windows-amd64.exe cmd/pokesay.go cmd/bindata.go && \
-    echo "building android / arm64" && GOOS=android GOARCH=arm64 go build -o pokesay-android-arm64 cmd/pokesay.go cmd/bindata.go
+# RUN protoc --proto_path=cmd --go_out=cmd/ --go_opt=paths=source_relative cmd/pokemon.proto
+RUN echo "building darwin / amd64"  && GOOS=darwin  GOARCH=amd64 go build -o pokesay-darwin-amd64      pokesay.go && \
+    echo "building linux / amd64"   && GOOS=linux   GOARCH=amd64 go build -o pokesay-linux-amd64       pokesay.go && \
+    echo "building windows / amd64" && GOOS=windows GOARCH=amd64 go build -o pokesay-windows-amd64.exe pokesay.go && \
+    echo "building android / arm64" && GOOS=android GOARCH=arm64 go build -o pokesay-android-arm64     pokesay.go
