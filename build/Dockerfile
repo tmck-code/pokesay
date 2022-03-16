@@ -18,7 +18,7 @@ WORKDIR /tmp/original
 RUN git clone --depth 1 git://github.com/msikma/pokesprite
 
 WORKDIR /usr/local/src/
-ADD build/build_cows.go build/bindata.sh /usr/local/src/build/
+ADD build/build_cows.go /usr/local/src/build/
 ADD go.* /usr/local/src/
 RUN go mod tidy \
     && go get -v github.com/mitchellh/go-wordwrap
