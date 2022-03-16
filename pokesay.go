@@ -27,17 +27,6 @@ func check(e error) {
 	}
 }
 
-type PokemonEntry struct {
-	Name       string
-	Data       []byte
-	Categories []string
-}
-
-type PokemonEntryMap struct {
-	Categories map[string][]PokemonEntry
-	Total int
-}
-
 func printSpeechBubbleLine(line string, width int) {
 	if len(line) > width {
 		fmt.Println("|", line)
@@ -88,7 +77,7 @@ func printPokemon(list pokedex.PokemonEntryMap) {
 	for _, pokemon := range list.Categories {
 		if idx == chosenCategory {
 			chosenPokemon := pokemon[randomInt(len(pokemon))]
-			binary.Write(os.Stdout, binary.LittleEndian, chosenPokemon.Data)
+			binary.Write(os.Stdout, binary.LittleEndian, pokedex.Decompress(chosenPokemon.Data))
 			fmt.Printf("choice: %s / categories: %s\n", chosenPokemon.Name, chosenPokemon.Categories)
 		}
 		idx += 1
