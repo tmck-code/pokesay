@@ -41,7 +41,7 @@ Thee pokemon sprites used here are sourced from the awesome repo [msikma/pokespr
 
 All of these sprites are converted into a form that can be rendered in a terminal (unicode characters and colour control sequences) by the `img2xterm` tool, found at [rossy/img2xterm](https://github.com/rossy/img2xterm)
 
-The last pre-compile step is to use `go-bindata` tool ([go-bindata/go-bindata](https://github.com/go-bindata/go-bindata)) to generate a go source code file that encodes all of the converted unicode sprites as binary text.
+The last pre-compile step is to use `encoding/gob` and `go:embed` to generate a go source code file that encodes all of the converted unicode sprites as binary text.
 
 Finally, this is built with the main CLI logic in `pokesay.go` into an single executable that can be easily popped into a directory in the user's $PATH
 

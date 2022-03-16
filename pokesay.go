@@ -3,19 +3,40 @@ package main
 import (
 	"bufio"
 	"encoding/binary"
-	"bytes"
 	"flag"
 	"fmt"
 	"log"
-	"compress/gzip"
-	"io"
 	"math/rand"
 	"os"
 	"strings"
 	"time"
+	_ "embed"
 
+	"github.com/tmck-code/pokesay-go/src/pokedex"
 	"github.com/mitchellh/go-wordwrap"
 )
+
+var (
+    //go:embed build/cows.gob
+    data []byte
+)
+
+func check(e error) {
+	if e != nil {
+		log.Fatal(e)
+	}
+}
+
+type PokemonEntry struct {
+	Name       string
+	Data       []byte
+	Categories []string
+}
+
+type PokemonEntryMap struct {
+	Categories map[string][]PokemonEntry
+	Total int
+}
 
 func printSpeechBubbleLine(line string, width int) {
 	if len(line) > width {
@@ -57,26 +78,21 @@ func randomInt(n int) int {
 	return rand.New(rand.NewSource(time.Now().UnixNano())).Intn(n)
 }
 
-func printPokemon() {
-	choice := PokemonList[randomInt(len(PokemonList))]
-	gz, err := gzip.NewReader(bytes.NewReader(choice.Data))
-	if err != nil {
-		log.Fatal(err)
+func printPokemon(list pokedex.PokemonEntryMap) {
+	nCategories := 0
+	for _, _ = range list.Categories {
+		nCategories += 1
 	}
+	chosenCategory, idx := randomInt(nCategories), 0
 
-	var buf bytes.Buffer
-	_, err = io.Copy(&buf, gz)
-	clErr := gz.Close()
-
-	if err != nil {
-		log.Fatal(err)
+	for _, pokemon := range list.Categories {
+		if idx == chosenCategory {
+			chosenPokemon := pokemon[randomInt(len(pokemon))]
+			binary.Write(os.Stdout, binary.LittleEndian, chosenPokemon.Data)
+			fmt.Printf("choice: %s / categories: %s\n", chosenPokemon.Name, chosenPokemon.Categories)
+		}
+		idx += 1
 	}
-	if clErr != nil {
-		log.Fatal(clErr)
-	}
-
-	binary.Write(os.Stdout, binary.LittleEndian, buf.Bytes())
-	fmt.Printf("choice: %s / categories: %s\n", choice.Name.Name, choice.Name.Categories)
 }
 
 type Args struct {
@@ -116,6 +132,8 @@ func parseFlags() Args {
 
 func main() {
 	args := parseFlags()
+	pokemon := pokedex.ReadFromBytes(data)
+
 	printSpeechBubble(bufio.NewScanner(os.Stdin), args)
-	printPokemon()
+	printPokemon(pokemon)
 }
