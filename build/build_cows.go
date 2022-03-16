@@ -78,10 +78,14 @@ func convertPngToCow(sourceDirpath string, sourceFpath string, destDirpath strin
 	// Can't be bothered resolving atm, so just skip past any failed conversions
 	imgErr, converted := img2xterm(sourceFpath)
 	if imgErr == nil {
-		err := os.WriteFile(destFpath, converted, 0644)
-		time.Sleep(0)
-		if err != nil {
-			log.Fatal(err)
+		if len(converted) == 0 {
+			fmt.Println("skipping empty conversion result", sourceFpath)
+		} else {
+			err := os.WriteFile(destFpath, converted, 0644)
+			time.Sleep(0)
+			if err != nil {
+				log.Fatal(err)
+			}
 		}
 	}
 	pbar.Add(1)
