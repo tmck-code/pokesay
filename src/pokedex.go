@@ -32,13 +32,13 @@ func findFiles(dirpath string, ext string, skip []string) pokedex.PokemonEntryMa
 			pokemonCategories := createCategories(fpath)
 
 			for _, c := range pokemonCategories {
-				p := pokedex.PokemonEntry{Name: createName(fpath), Categories: createCategories(fpath), Data: data}
+				p := pokedex.NewPokemonEntry(data, createName(fpath), createCategories(fpath))
 				if val, ok := categories.Categories[c]; ok {
-					val = append(val, p)
+					val = append(val, *p)
 				} else {
-					categories.Categories[c] = []pokedex.PokemonEntry{p}
+					categories.Categories[c] = []pokedex.PokemonEntry{*p}
 				}
-				categories.Categories[c] = append(categories.Categories[c], p)
+				categories.Categories[c] = append(categories.Categories[c], *p)
 			}
 		}
 		return err
