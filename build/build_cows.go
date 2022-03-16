@@ -121,4 +121,5 @@ func main() {
 		wg.Add(1)
 	}
 	wg.Wait()
+	fmt.Println("Finished converting", len(fpaths), "pokesprite -> cowfiles")
 }
