@@ -3,6 +3,7 @@ package pokedex
 import (
 	"os"
 	"bufio"
+	"bytes"
 	"encoding/gob"
 	"log"
 )
@@ -33,6 +34,18 @@ func WriteToFile(categories PokemonEntryMap, fpath string) {
 	enc.Encode(categories)
 	writer.Flush()
 	ostream.Close()
+}
+
+func ReadFromBytes(data []byte) PokemonEntryMap {
+	buf := bytes.NewBuffer(data)
+	dec := gob.NewDecoder(buf)
+
+	categories := &PokemonEntryMap{}
+
+	err := dec.Decode(&categories)
+	check(err)
+
+	return *categories
 }
 
 func ReadFromFile(fpath string) PokemonEntryMap {
