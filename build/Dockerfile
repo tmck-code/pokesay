@@ -23,16 +23,17 @@ ADD go.* /usr/local/src/
 RUN go mod tidy \
     && go get -v github.com/mitchellh/go-wordwrap
 
+# Convert all of the pokesprite .pngs -> cowfiles for the terminal
 RUN go run /usr/local/src/build/build_cows.go \
         -from /tmp/original/pokesprite/ \
         -to /tmp/cows/ \
         -skip '["resources/", "misc/", "icons/", "items/", "items-outline/"]'
 
+# Now, build up a map of category -> pokemon, and write it as a "encoding/gob" file
 ADD . .
 RUN go build src/pokedex.go && \
     ./pokedex -from /tmp/cows/ -to build/cows.gob
 
-# RUN protoc --proto_path=cmd --go_out=cmd/ --go_opt=paths=source_relative cmd/pokemon.proto
 RUN echo "building darwin / amd64"  && GOOS=darwin  GOARCH=amd64 go build -o pokesay-darwin-amd64      pokesay.go && \
     echo "building linux / amd64"   && GOOS=linux   GOARCH=amd64 go build -o pokesay-linux-amd64       pokesay.go && \
     echo "building windows / amd64" && GOOS=windows GOARCH=amd64 go build -o pokesay-windows-amd64.exe pokesay.go && \
