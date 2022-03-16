@@ -55,7 +55,7 @@ func createName(fpath string) string {
 
 func createCategories(fpath string) []string {
 	parts := strings.Split(fpath, "/")
-	return parts[3:len(parts)-1]
+	return parts[2:len(parts)-1]
 }
 
 type CowBuildArgs struct {

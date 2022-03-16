@@ -8,10 +8,8 @@ import (
 	"log"
 	"math/rand"
 	"os"
-	"bytes"
 	"strings"
 	"time"
-	"encoding/gob"
 	_ "embed"
 
 	"github.com/tmck-code/pokesay-go/src/pokedex"
@@ -19,8 +17,8 @@ import (
 )
 
 var (
-	//go:embed data.txt
-	data []byte
+    //go:embed build/cows.gob
+    data []byte
 )
 
 func check(e error) {
@@ -91,7 +89,7 @@ func printPokemon(list pokedex.PokemonEntryMap) {
 		if idx == chosenCategory {
 			chosenPokemon := pokemon[randomInt(len(pokemon))]
 			binary.Write(os.Stdout, binary.LittleEndian, chosenPokemon.Data)
-			fmt.Printf("%s / %s\n", chosenPokemon.Name, chosenPokemon.Categories)
+			fmt.Printf("choice: %s / categories: %s\n", chosenPokemon.Name, chosenPokemon.Categories)
 		}
 		idx += 1
 	}
@@ -132,26 +130,9 @@ func parseFlags() Args {
 	return args
 }
 
-func readFromFile() *PokemonEntryMap {
-	istream, err := os.Open("data.txt")
-	check(err)
-
-	buf := bytes.NewBuffer(data)
-	dec := gob.NewDecoder(buf)
-
-	categories := &PokemonEntryMap{}
-
-	err = dec.Decode(&categories)
-	check(err)
-	istream.Close()
-
-	return categories
-}
-
 func main() {
 	args := parseFlags()
-	// pokemon := loadPokemon("data.txt")
-	pokemon := pokedex.ReadFromFile("data.txt")
+	pokemon := pokedex.ReadFromBytes(data)
 
 	printSpeechBubble(bufio.NewScanner(os.Stdin), args)
 	printPokemon(pokemon)
