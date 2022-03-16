@@ -5,6 +5,7 @@ import (
 	"bufio"
 	"bytes"
 	"encoding/gob"
+	"compress/gzip"
 	"log"
 )
 
@@ -23,6 +24,41 @@ type PokemonEntry struct {
 type PokemonEntryMap struct {
 	Categories map[string][]PokemonEntry
 	NCategories int
+}
+
+func NewPokemonEntry(data []byte, name string, categories []string) *PokemonEntry {
+	return &PokemonEntry{
+		Name: name,
+		Categories: categories,
+		Data: Compress(data),
+	}
+}
+
+func Compress(data []byte) []byte {
+	var b bytes.Buffer
+	gz := gzip.NewWriter(&b)
+
+	_, err := gz.Write(data)
+	check(err)
+
+	err = gz.Close()
+	check(err)
+
+	return b.Bytes()
+}
+
+func Decompress(data []byte) []byte {
+	buf := bytes.NewBuffer(data)
+
+	reader, err := gzip.NewReader(buf)
+	check(err)
+
+	var resB bytes.Buffer
+
+	_, err = resB.ReadFrom(reader)
+	check(err)
+
+	return resB.Bytes()
 }
 
 func WriteToFile(categories PokemonEntryMap, fpath string) {
