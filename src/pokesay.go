@@ -14,6 +14,7 @@ import (
 	"encoding/gob"
 	_ "embed"
 
+	"github.com/tmck-code/pokesay-go/src/pokedex"
 	"github.com/mitchellh/go-wordwrap"
 )
 
@@ -79,20 +80,18 @@ func randomInt(n int) int {
 	return rand.New(rand.NewSource(time.Now().UnixNano())).Intn(n)
 }
 
-func printPokemon(list *PokemonEntryMap) {
-	// fmt.Printf("%+v\n", list.Pokemon)
+func printPokemon(list pokedex.PokemonEntryMap) {
 	nCategories := 0
 	for _, _ = range list.Categories {
 		nCategories += 1
 	}
 	chosenCategory, idx := randomInt(nCategories), 0
 
-	for category, pokemon := range list.Categories {
+	for _, pokemon := range list.Categories {
 		if idx == chosenCategory {
-			fmt.Println(category)
 			chosenPokemon := pokemon[randomInt(len(pokemon))]
 			binary.Write(os.Stdout, binary.LittleEndian, chosenPokemon.Data)
-			fmt.Printf("choice: %s\n", chosenPokemon.Name)
+			fmt.Printf("%s / %s\n", chosenPokemon.Name, chosenPokemon.Categories)
 		}
 		idx += 1
 	}
@@ -152,7 +151,7 @@ func readFromFile() *PokemonEntryMap {
 func main() {
 	args := parseFlags()
 	// pokemon := loadPokemon("data.txt")
-	pokemon := readFromFile()
+	pokemon := pokedex.ReadFromFile("data.txt")
 
 	printSpeechBubble(bufio.NewScanner(os.Stdin), args)
 	printPokemon(pokemon)
