@@ -15,6 +15,10 @@ import (
 	"github.com/schollz/progressbar/v3"
 )
 
+var (
+	failures []string
+)
+
 type CowBuildArgs struct {
 	FromDir  string
 	ToDir    string
@@ -79,7 +83,7 @@ func convertPngToCow(sourceDirpath string, sourceFpath string, destDirpath strin
 	imgErr, converted := img2xterm(sourceFpath)
 	if imgErr == nil {
 		if len(converted) == 0 {
-			fmt.Println("skipping empty conversion result", sourceFpath)
+			failures = append(failures, sourceFpath)
 		} else {
 			err := os.WriteFile(destFpath, converted, 0644)
 			time.Sleep(0)
@@ -126,4 +130,5 @@ func main() {
 	}
 	wg.Wait()
 	fmt.Println("Finished converting", len(fpaths), "pokesprite -> cowfiles")
+	fmt.Println("Failures:", len(failures), "/", len(fpaths), "-", failures)
 }
