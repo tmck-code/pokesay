@@ -5,11 +5,10 @@ go 1.17
 require (
 	github.com/mitchellh/go-wordwrap v1.0.1
 	github.com/schollz/progressbar/v3 v3.8.3
-	google.golang.org/protobuf v1.27.1
 )
 
 // uncomment when debugging timings
-require internal/timer v1.0.0
+// require internal/timer v1.0.0
 
 require (
 	github.com/mattn/go-runewidth v0.0.13 // indirect
