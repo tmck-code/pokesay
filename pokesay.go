@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	_ "embed"
 	"encoding/binary"
 	"flag"
 	"fmt"
@@ -10,15 +11,14 @@ import (
 	"os"
 	"strings"
 	"time"
-	_ "embed"
 
-	"github.com/tmck-code/pokesay-go/src/pokedex"
 	"github.com/mitchellh/go-wordwrap"
+	"github.com/tmck-code/pokesay-go/src/pokedex"
 )
 
 var (
-    //go:embed build/cows.gob
-    data []byte
+	//go:embed build/cows.gob
+	data []byte
 )
 
 func check(e error) {
@@ -64,31 +64,38 @@ func printSpeechBubble(scanner *bufio.Scanner, args Args) {
 }
 
 func randomInt(n int) int {
-	return rand.New(rand.NewSource(time.Now().UnixNano())).Intn(n)
+	return rand.New(rand.NewSource(time.Now().UnixNano())).Intn(n) + 1
 }
 
-func printPokemon(list pokedex.PokemonEntryMap) {
-	nCategories := 0
-	for _, _ = range list.Categories {
-		nCategories += 1
-	}
-	chosenCategory, idx := randomInt(nCategories), 0
+func printPokemon(choice pokedex.PokemonEntry) {
+	binary.Write(os.Stdout, binary.LittleEndian, pokedex.Decompress(choice.Data))
+	fmt.Printf("choice: %s / categories: %s\n", choice.Name, choice.Categories)
 
-	for _, pokemon := range list.Categories {
-		if idx == chosenCategory {
-			chosenPokemon := pokemon[randomInt(len(pokemon))]
-			binary.Write(os.Stdout, binary.LittleEndian, pokedex.Decompress(chosenPokemon.Data))
-			fmt.Printf("choice: %s / categories: %s\n", chosenPokemon.Name, chosenPokemon.Categories)
+}
+
+func chooseRandomCategory(entries pokedex.PokemonEntryMap) []pokedex.PokemonEntry {
+	choice := 3 // randomInt(entries.NCategories)
+	idx := 0
+	for category, _ := range entries.Categories {
+		if idx == choice {
+			return entries.Categories[category]
 		}
-		idx += 1
+		idx++
 	}
+	return entries.Categories["regular"]
+}
+
+func chooseRandomPokemon(pokemon []pokedex.PokemonEntry) pokedex.PokemonEntry {
+	return pokemon[randomInt(len(pokemon))]
 }
 
 type Args struct {
-	Width       int
-	NoWrap      bool
-	TabSpaces   string
-	NoTabSpaces bool
+	Width          int
+	NoWrap         bool
+	TabSpaces      string
+	NoTabSpaces    bool
+	ListCategories bool
+	Category       string
 }
 
 func parseFlags() Args {
@@ -97,6 +104,8 @@ func parseFlags() Args {
 	tabWidth := flag.Int("tabwidth", 4, "replace any tab characters with N spaces")
 	noTabSpaces := flag.Bool("notabspaces", false, "do not replace tab characters (fastest)")
 	fastest := flag.Bool("fastest", false, "run with the fastest possible configuration (-nowrap -notabspaces)")
+	listCategories := flag.Bool("list-categories", false, "list all available categories")
+	category := flag.String("category", "", "list all available categories")
 
 	flag.Parse()
 	var args Args
@@ -110,10 +119,12 @@ func parseFlags() Args {
 		}
 	} else {
 		args = Args{
-			Width:       *width,
-			NoWrap:      *noWrap,
-			TabSpaces:   strings.Repeat(" ", *tabWidth),
-			NoTabSpaces: *noTabSpaces,
+			Width:          *width,
+			NoWrap:         *noWrap,
+			TabSpaces:      strings.Repeat(" ", *tabWidth),
+			NoTabSpaces:    *noTabSpaces,
+			ListCategories: *listCategories,
+			Category:       *category,
 		}
 	}
 	return args
@@ -123,6 +134,17 @@ func main() {
 	args := parseFlags()
 	pokemon := pokedex.ReadFromBytes(data)
 
+	if args.ListCategories {
+		for k, v := range pokemon.Categories {
+			fmt.Printf("%s (%d)\n", k, len(v))
+		}
+		os.Exit(0)
+	}
 	printSpeechBubble(bufio.NewScanner(os.Stdin), args)
-	printPokemon(pokemon)
+
+	if len(args.Category) < 0 {
+		printPokemon(chooseRandomPokemon(pokemon.Categories[args.Category]))
+	} else {
+		printPokemon(chooseRandomPokemon(chooseRandomCategory(pokemon)))
+	}
 }
