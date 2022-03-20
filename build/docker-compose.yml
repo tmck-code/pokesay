@@ -4,7 +4,7 @@ services:
   pokesay-go:
     image: github.com/tmck-code/pokesay-go:${TAG:-latest}
     build:
-      context: .
+      context: ..
       dockerfile: build/Dockerfile
     command: bash
     volumes:
@@ -15,7 +15,7 @@ services:
     depends_on:
       - pokesay-go
     build:
-      context: .
+      context: ..
       dockerfile: .devcontainer/Dockerfile
     command: bash
     volumes:
