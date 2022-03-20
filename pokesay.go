@@ -104,7 +104,7 @@ func parseFlags() Args {
 	tabWidth := flag.Int("tabwidth", 4, "replace any tab characters with N spaces")
 	noTabSpaces := flag.Bool("notabspaces", false, "do not replace tab characters (fastest)")
 	fastest := flag.Bool("fastest", false, "run with the fastest possible configuration (-nowrap -notabspaces)")
-	listCategories := flag.Bool("list-categories", false, "list all available categories")
+	listCategories := flag.Bool("categories-list", false, "list all available categories")
 	category := flag.String("category", "", "list all available categories")
 
 	flag.Parse()
