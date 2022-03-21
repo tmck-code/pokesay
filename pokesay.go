@@ -64,7 +64,7 @@ func printSpeechBubble(scanner *bufio.Scanner, args Args) {
 }
 
 func randomInt(n int) int {
-	return rand.New(rand.NewSource(time.Now().UnixNano())).Intn(n) + 1
+	return rand.New(rand.NewSource(time.Now().UnixNano())).Intn(n)
 }
 
 func printPokemon(choice pokedex.PokemonEntry) {
