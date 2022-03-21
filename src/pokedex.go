@@ -32,7 +32,12 @@ func findFiles(dirpath string, ext string, skip []string) pokedex.PokemonEntryMa
 			pokemonCategories := createCategories(fpath)
 
 			for _, c := range pokemonCategories {
-				p := pokedex.NewPokemonEntry(data, createName(fpath), createCategories(fpath))
+				p := pokedex.NewPokemonEntry(
+					data,
+					createName(fpath),
+					tokenizeName(fpath),
+					createCategories(fpath),
+				)
 				if val, ok := categories.Categories[c]; ok {
 					val = append(val, *p)
 				} else {
@@ -45,6 +50,8 @@ func findFiles(dirpath string, ext string, skip []string) pokedex.PokemonEntryMa
 	})
 	check(err)
 
+	categories.NCategories = len(categories.Categories)
+
 	return *categories
 }
 
@@ -53,9 +60,13 @@ func createName(fpath string) string {
 	return strings.Split(parts[len(parts)-1], ".")[0]
 }
 
+func tokenizeName(fpath string) []string {
+	return strings.Split(createName(fpath), "-")
+}
+
 func createCategories(fpath string) []string {
 	parts := strings.Split(fpath, "/")
-	return parts[2:len(parts)-1]
+	return parts[2 : len(parts)-1]
 }
 
 type CowBuildArgs struct {
