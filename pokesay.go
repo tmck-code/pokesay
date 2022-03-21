@@ -104,8 +104,8 @@ func parseFlags() Args {
 	tabWidth := flag.Int("tabwidth", 4, "replace any tab characters with N spaces")
 	noTabSpaces := flag.Bool("notabspaces", false, "do not replace tab characters (fastest)")
 	fastest := flag.Bool("fastest", false, "run with the fastest possible configuration (-nowrap -notabspaces)")
-	listCategories := flag.Bool("categories-list", false, "list all available categories")
-	category := flag.String("category", "", "list all available categories")
+	category := flag.String("category", "cows", "choose a pokemon from a specific category")
+	listCategories := flag.Bool("category-list", false, "list all available categories")
 
 	flag.Parse()
 	var args Args
@@ -140,11 +140,11 @@ func main() {
 		}
 		os.Exit(0)
 	}
-	printSpeechBubble(bufio.NewScanner(os.Stdin), args)
 
-	if len(args.Category) < 0 {
-		printPokemon(chooseRandomPokemon(pokemon.Categories[args.Category]))
+	if category, ok := pokemon.Categories[args.Category]; ok {
+		printSpeechBubble(bufio.NewScanner(os.Stdin), args)
+		printPokemon(chooseRandomPokemon(category))
 	} else {
-		printPokemon(chooseRandomPokemon(chooseRandomCategory(pokemon)))
+		log.Fatal(fmt.Sprintf("Not a valid category: '%s'", args.Category))
 	}
 }
