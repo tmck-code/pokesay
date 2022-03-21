@@ -16,9 +16,10 @@ func check(e error) {
 }
 
 type PokemonEntry struct {
-	Name       string
-	Data       []byte
-	Categories []string
+	Name       	string
+	NameTokens	[]string
+	Data       	[]byte
+	Categories 	[]string
 }
 
 type PokemonEntryMap struct {
@@ -26,9 +27,10 @@ type PokemonEntryMap struct {
 	NCategories int
 }
 
-func NewPokemonEntry(data []byte, name string, categories []string) *PokemonEntry {
+func NewPokemonEntry(data []byte, name string, nameTokens []string, categories []string) *PokemonEntry {
 	return &PokemonEntry{
 		Name: name,
+		NameTokens: nameTokens,
 		Categories: categories,
 		Data: Compress(data),
 	}
