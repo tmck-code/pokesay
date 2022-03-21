@@ -74,7 +74,7 @@ func printPokemon(choice pokedex.PokemonEntry) {
 }
 
 func chooseRandomCategory(entries pokedex.PokemonEntryMap) []pokedex.PokemonEntry {
-	choice := 3 // randomInt(entries.NCategories)
+	choice := randomInt(entries.NCategories)
 	idx := 0
 	for category, _ := range entries.Categories {
 		if idx == choice {
@@ -82,7 +82,8 @@ func chooseRandomCategory(entries pokedex.PokemonEntryMap) []pokedex.PokemonEntr
 		}
 		idx++
 	}
-	return entries.Categories["regular"]
+	// If something goes wrong, select from the parent category "cows"
+	return entries.Categories["cows"]
 }
 
 func chooseRandomPokemon(pokemon []pokedex.PokemonEntry) pokedex.PokemonEntry {
