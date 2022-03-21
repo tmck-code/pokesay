@@ -90,6 +90,19 @@ func chooseRandomPokemon(pokemon []pokedex.PokemonEntry) pokedex.PokemonEntry {
 	return pokemon[randomInt(len(pokemon))]
 }
 
+func collectPokemonWithToken(entries pokedex.PokemonEntryMap, token string) []pokedex.PokemonEntry {
+	found := []pokedex.PokemonEntry{}
+
+	for _, entry := range entries.Categories["cows"] {
+		for _, t := range entry.NameTokens {
+			if t == token {
+				found = append(found, entry)
+			}
+		}
+	}
+	return found
+}
+
 type Args struct {
 	Width          int
 	NoWrap         bool
@@ -97,6 +110,7 @@ type Args struct {
 	NoTabSpaces    bool
 	ListCategories bool
 	Category       string
+	NameToken      string
 }
 
 func parseFlags() Args {
@@ -106,6 +120,7 @@ func parseFlags() Args {
 	noTabSpaces := flag.Bool("notabspaces", false, "do not replace tab characters (fastest)")
 	fastest := flag.Bool("fastest", false, "run with the fastest possible configuration (-nowrap -notabspaces)")
 	category := flag.String("category", "cows", "choose a pokemon from a specific category")
+	name := flag.String("name", "", "choose a pokemon from a specific name")
 	listCategories := flag.Bool("category-list", false, "list all available categories")
 
 	flag.Parse()
@@ -126,6 +141,7 @@ func parseFlags() Args {
 			NoTabSpaces:    *noTabSpaces,
 			ListCategories: *listCategories,
 			Category:       *category,
+			NameToken:      *name,
 		}
 	}
 	return args
@@ -139,6 +155,12 @@ func main() {
 		for k, v := range pokemon.Categories {
 			fmt.Printf("%s (%d)\n", k, len(v))
 		}
+		os.Exit(0)
+	}
+
+	if args.NameToken != "" {
+		printSpeechBubble(bufio.NewScanner(os.Stdin), args)
+		printPokemon(chooseRandomPokemon(collectPokemonWithToken(pokemon, args.NameToken)))
 		os.Exit(0)
 	}
 
