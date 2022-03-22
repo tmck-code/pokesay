@@ -2,7 +2,6 @@ package main
 
 import (
 	"bufio"
-	"encoding/json"
 	_ "embed"
 	"encoding/binary"
 	"flag"
