@@ -19,7 +19,7 @@ func check(e error) {
 }
 
 func findFiles(dirpath string, ext string, skip []string) pokedex.PokemonEntryMap {
-	categories := &pokedex.PokemonEntryMap{Categories: make(map[string][]pokedex.PokemonEntry)}
+	categories := &pokedex.PokemonEntryMap{Categories: make(map[string][]*pokedex.PokemonEntry)}
 	err := filepath.Walk(dirpath, func(fpath string, f os.FileInfo, err error) error {
 		for _, s := range skip {
 			if strings.Contains(fpath, s) {
@@ -29,21 +29,22 @@ func findFiles(dirpath string, ext string, skip []string) pokedex.PokemonEntryMa
 		if !f.IsDir() && filepath.Ext(f.Name()) == ext {
 			data, err := os.ReadFile(fpath)
 			check(err)
+
 			pokemonCategories := createCategories(fpath)
+			p := pokedex.NewPokemonEntry(
+				data,
+				createName(fpath),
+				tokenizeName(fpath),
+				createCategories(fpath),
+			)
 
 			for _, c := range pokemonCategories {
-				p := pokedex.NewPokemonEntry(
-					data,
-					createName(fpath),
-					tokenizeName(fpath),
-					createCategories(fpath),
-				)
 				if val, ok := categories.Categories[c]; ok {
-					val = append(val, *p)
+					val = append(val, p)
 				} else {
-					categories.Categories[c] = []pokedex.PokemonEntry{*p}
+					categories.Categories[c] = []*pokedex.PokemonEntry{p}
 				}
-				categories.Categories[c] = append(categories.Categories[c], *p)
+				categories.Categories[c] = append(categories.Categories[c], p)
 			}
 		}
 		return err
@@ -66,7 +67,7 @@ func tokenizeName(fpath string) []string {
 
 func createCategories(fpath string) []string {
 	parts := strings.Split(fpath, "/")
-	return parts[2 : len(parts)-1]
+	return parts[3 : len(parts)-1]
 }
 
 type CowBuildArgs struct {
