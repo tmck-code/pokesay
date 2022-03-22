@@ -23,7 +23,7 @@ type PokemonEntry struct {
 }
 
 type PokemonEntryMap struct {
-	Categories map[string][]PokemonEntry
+	Categories map[string][]*PokemonEntry
 	NCategories int
 }
 
