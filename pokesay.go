@@ -159,8 +159,12 @@ func main() {
 	}
 
 	if args.NameToken != "" {
+		matches := collectPokemonWithToken(pokemon, args.NameToken)
+		if len(matches) == 0 {
+			log.Fatal(fmt.Sprintf("Not a valid name: '%s'", args.NameToken))
+		}
 		printSpeechBubble(bufio.NewScanner(os.Stdin), args)
-		printPokemon(chooseRandomPokemon(collectPokemonWithToken(pokemon, args.NameToken)))
+		printPokemon(chooseRandomPokemon(matches))
 		os.Exit(0)
 	}
 
