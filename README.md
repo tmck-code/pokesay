@@ -49,6 +49,13 @@ Finally, this is built with the main CLI logic in `pokesay.go` into an single ex
 
 If all you are after is installing the program to use, then there are no dependencies required! Navigate to the Releases and download the latest binary.
 
+## TODO
+
+- [ ] List all names
+- [ ] Make data structure to hold categories, names and pokemon
+- [ ] Increase speed
+- [ ] Improve categories to be more specific than shiny/regular
+
 ## Building binaries
 
 ### In docker
