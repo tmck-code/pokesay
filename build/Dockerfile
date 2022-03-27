@@ -35,6 +35,7 @@ RUN go build src/pokedex.go && \
     ./pokedex -from /tmp/cows/ -to build/cows.gob
 
 RUN echo "building darwin / amd64"  && GOOS=darwin  GOARCH=amd64 go build -o pokesay-darwin-amd64      pokesay.go && \
+    echo "building darwin / arm64"  && GOOS=darwin  GOARCH=arm64 go build -o pokesay-darwin-arm64      pokesay.go && \
     echo "building linux / amd64"   && GOOS=linux   GOARCH=amd64 go build -o pokesay-linux-amd64       pokesay.go && \
     echo "building windows / amd64" && GOOS=windows GOARCH=amd64 go build -o pokesay-windows-amd64.exe pokesay.go && \
     echo "building android / arm64" && GOOS=android GOARCH=arm64 go build -o pokesay-android-arm64     pokesay.go
