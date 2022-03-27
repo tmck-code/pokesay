@@ -7,6 +7,10 @@ A (much) faster go version of tmck-code/pokesay
     ```shell
     bash -c "$(curl https://raw.githubusercontent.com/tmck-code/pokesay-go/master/scripts/install.sh)" bash darwin amd64
     ```
+- OSX / darwin (M1)
+    ```shell
+    bash -c "$(curl https://raw.githubusercontent.com/tmck-code/pokesay-go/master/scripts/install.sh)" bash darwin arm64
+    ```
 - Linux x64
     ```shell
     bash -c "$(curl https://raw.githubusercontent.com/tmck-code/pokesay-go/master/scripts/install.sh)" bash linux amd64
