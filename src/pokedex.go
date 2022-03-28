@@ -103,8 +103,8 @@ func main() {
 	pokedex.WriteToFile(categories, args.ToFpath)
 	t.Mark("WriteToFile")
 
-	t.Stop()
 	if args.DebugTimer {
+		t.Stop()
 		t.PrintJson()
 	}
 }
