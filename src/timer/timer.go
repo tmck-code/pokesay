@@ -16,9 +16,7 @@ type Timer struct {
 }
 
 func NewTimer() *Timer {
-	now := time.Now()
 	t := &Timer{
-		Start:          now,
 		stageNames:     make([]string, 0),
 		StageTimes:     make(map[string]time.Time),
 		StageDurations: make(map[string]time.Duration),
@@ -35,6 +33,7 @@ func (t *Timer) Mark(stage string) {
 
 	t.StageTimes[stage] = now
 	if len(t.stageNames) == 0 {
+		t.Start = now
 		t.StageDurations[stage] = 0
 	} else {
 		t.StageDurations[stage] = now.Sub(t.StageTimes[t.stageNames[len(t.stageNames)-1]])
