@@ -10,6 +10,7 @@ import (
 	"strings"
 
 	"github.com/tmck-code/pokesay-go/src/pokedex"
+	"github.com/tmck-code/pokesay-go/src/timer"
 )
 
 func check(e error) {
@@ -74,16 +75,18 @@ type CowBuildArgs struct {
 	FromDir  string
 	ToFpath  string
 	SkipDirs []string
+	DebugTimer bool
 }
 
 func parseArgs() CowBuildArgs {
 	fromDir := flag.String("from", ".", "from dir")
 	toFpath := flag.String("to", ".", "to fpath")
 	skipDirs := flag.String("skip", "'[\"resources\"]'", "JSON array of dir patterns to skip converting")
+	debugTimer := flag.Bool("debugTimer", false, "show a debug timer")
 
 	flag.Parse()
 
-	args := CowBuildArgs{FromDir: *fromDir, ToFpath: *toFpath}
+	args := CowBuildArgs{FromDir: *fromDir, ToFpath: *toFpath, DebugTimer: *debugTimer}
 	json.Unmarshal([]byte(*skipDirs), &args.SkipDirs)
 
 	return args
@@ -92,8 +95,16 @@ func parseArgs() CowBuildArgs {
 func main() {
 	args := parseArgs()
 	fmt.Println("starting at", args.FromDir)
+	t := timer.NewTimer()
 
 	categories := findFiles(args.FromDir, ".cow", args.SkipDirs)
+	t.Mark("CreateEntriesFromFiles")
 
 	pokedex.WriteToFile(categories, args.ToFpath)
+	t.Mark("WriteToFile")
+
+	if args.DebugTimer {
+		t.Stop()
+		t.PrintJson()
+	}
 }
