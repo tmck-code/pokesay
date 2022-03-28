@@ -34,22 +34,17 @@ func (t *Timer) Mark(stage string) {
 	stage = fmt.Sprintf("%d.%s", len(t.stageNames), stage)
 
 	t.StageTimes[stage] = now
+	if len(t.stageNames) == 0 {
+		t.StageDurations[stage] = 0
+	} else {
+		t.StageDurations[stage] = now.Sub(t.StageTimes[t.stageNames[len(t.stageNames)-1]])
+	}
 	t.stageNames = append(t.stageNames, stage)
 }
 
-func (t *Timer) StopTimer() {
-	idx := 0
-	for name, stage := range t.StageTimes {
-		fmt.Println(name, stage)
-		if idx == 0 {
-			t.StageDurations[name] = 0
-			idx += 1
-			continue
-		}
-		t.StageDurations[name] = stage.Sub(t.StageTimes[t.stageNames[idx-1]])
-		t.Total += t.StageDurations[name].Nanoseconds()
-		idx += 1
-	}
+func (t *Timer) Stop() {
+	// From the first stage, subtract the last stage, to get total duration
+	t.Total = t.StageTimes[t.stageNames[0]].Sub(t.StageTimes[t.stageNames[len(t.stageNames)-1]]).Nanoseconds()
 }
 
 func (t *Timer) PrintJson() {
