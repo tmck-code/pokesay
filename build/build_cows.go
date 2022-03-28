@@ -150,7 +150,7 @@ func convertPngToCow(sourceDirpath string, sourceFpath string, destDirpath strin
 
 	// Join all of the lines back together, and add a colour reset sequence at
 	// the end
-	_, err = writer.WriteString(strings.Join(final, "\n") + fmt.Sprintf("%s[%dm", "\x1b", 39))
+	_, err = writer.WriteString(strings.Join(final, "\n") + fmt.Sprintf("%s[%dm\n", "\x1b", 39))
 	if err != nil {
 		log.Fatal(err)
 	}
