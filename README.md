@@ -55,7 +55,13 @@ If all you are after is installing the program to use, then there are no depende
 
 ## TODO
 
+### Short-term
+
+- [ ] Fix bad whitespace stripping when building assets
 - [ ] List all names
+
+### Longer-term
+
 - [ ] Make data structure to hold categories, names and pokemon
 - [ ] Increase speed
 - [ ] Improve categories to be more specific than shiny/regular
