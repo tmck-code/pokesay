@@ -10,6 +10,7 @@ import (
 	"strings"
 
 	"github.com/tmck-code/pokesay-go/src/pokedex"
+	"github.com/tmck-code/pokesay-go/src/timer"
 )
 
 func check(e error) {
@@ -92,8 +93,14 @@ func parseArgs() CowBuildArgs {
 func main() {
 	args := parseArgs()
 	fmt.Println("starting at", args.FromDir)
+	t := timer.NewTimer()
 
 	categories := findFiles(args.FromDir, ".cow", args.SkipDirs)
+	t.Mark("GenerateEntriesFromFiles")
 
 	pokedex.WriteToFile(categories, args.ToFpath)
+	t.Mark("WriteToFile")
+
+	t.StopTimer()
+	t.PrintJson()
 }
