@@ -7,6 +7,10 @@ A (much) faster go version of tmck-code/pokesay
     ```shell
     bash -c "$(curl https://raw.githubusercontent.com/tmck-code/pokesay-go/master/scripts/install.sh)" bash darwin amd64
     ```
+- OSX / darwin (M1)
+    ```shell
+    bash -c "$(curl https://raw.githubusercontent.com/tmck-code/pokesay-go/master/scripts/install.sh)" bash darwin arm64
+    ```
 - Linux x64
     ```shell
     bash -c "$(curl https://raw.githubusercontent.com/tmck-code/pokesay-go/master/scripts/install.sh)" bash linux amd64
@@ -51,7 +55,13 @@ If all you are after is installing the program to use, then there are no depende
 
 ## TODO
 
+### Short-term
+
+- [ ] Fix bad whitespace stripping when building assets
 - [ ] List all names
+
+### Longer-term
+
 - [ ] Make data structure to hold categories, names and pokemon
 - [ ] Increase speed
 - [ ] Improve categories to be more specific than shiny/regular
