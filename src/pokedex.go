@@ -75,16 +75,18 @@ type CowBuildArgs struct {
 	FromDir  string
 	ToFpath  string
 	SkipDirs []string
+	DebugTimer bool
 }
 
 func parseArgs() CowBuildArgs {
 	fromDir := flag.String("from", ".", "from dir")
 	toFpath := flag.String("to", ".", "to fpath")
 	skipDirs := flag.String("skip", "'[\"resources\"]'", "JSON array of dir patterns to skip converting")
+	debugTimer := flag.Bool("debugTimer", false, "show a debug timer")
 
 	flag.Parse()
 
-	args := CowBuildArgs{FromDir: *fromDir, ToFpath: *toFpath}
+	args := CowBuildArgs{FromDir: *fromDir, ToFpath: *toFpath, DebugTimer: *debugTimer}
 	json.Unmarshal([]byte(*skipDirs), &args.SkipDirs)
 
 	return args
@@ -96,11 +98,13 @@ func main() {
 	t := timer.NewTimer()
 
 	categories := findFiles(args.FromDir, ".cow", args.SkipDirs)
-	t.Mark("GenerateEntriesFromFiles")
+	t.Mark("CreateEntriesFromFiles")
 
 	pokedex.WriteToFile(categories, args.ToFpath)
 	t.Mark("WriteToFile")
 
-	t.StopTimer()
-	t.PrintJson()
+	t.Stop()
+	if args.DebugTimer {
+		t.PrintJson()
+	}
 }
