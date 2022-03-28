@@ -3,6 +3,9 @@
 *.so
 *.dylib
 
+# All binaries
+build/pokesay-*
+
 # Test binary, built with `go test -c`
 *.test
 
