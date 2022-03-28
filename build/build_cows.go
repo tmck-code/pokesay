@@ -85,7 +85,6 @@ func countCowfileLeftPadding(cowfile []byte) int {
 	for _, line := range lines {
 		paddings = append(paddings, countLineLeftPadding(line))
 	}
-	fmt.Println(paddings)
 
 	minPadding := 100 // TODO: a better way?
 	for _, padding := range paddings {
@@ -115,7 +114,7 @@ func stripPadding(cowfile []byte, n int) []string {
 	return converted
 }
 
-func convertPngToCow(sourceDirpath string, sourceFpath string, destDirpath string, wg *sync.WaitGroup, pbar *progressbar.ProgressBar) {
+func convertPngToCow(sourceDirpath string, sourceFpath string, destDirpath string, extraPadding int, wg *sync.WaitGroup, pbar *progressbar.ProgressBar) {
 	defer wg.Done()
 	destDir := filepath.Join(
 		destDirpath,
@@ -148,9 +147,7 @@ func convertPngToCow(sourceDirpath string, sourceFpath string, destDirpath strin
 	}
 	writer := bufio.NewWriter(ostream)
 
-	padding := countCowfileLeftPadding(converted)
-
-	final := stripPadding(converted, padding)
+	final := stripPadding(converted, countCowfileLeftPadding(converted)-extraPadding)
 
 	// Join all of the lines back together, and add a colour reset sequence at
 	// the end
@@ -193,7 +190,7 @@ func main() {
 	pbar := newProgressBar(len(fpaths))
 
 	for i := 0; i < len(fpaths) ; i++ {
-		go convertPngToCow(args.FromDir, <-fpathChan, args.ToDir, &wg, &pbar)
+		go convertPngToCow(args.FromDir, <-fpathChan, args.ToDir, 2, &wg, &pbar)
 		wg.Add(1)
 	}
 	wg.Wait()
