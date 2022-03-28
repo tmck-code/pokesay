@@ -43,8 +43,8 @@ func (t *Timer) Mark(stage string) {
 }
 
 func (t *Timer) Stop() {
-	// From the first stage, subtract the last stage, to get total duration
-	t.Total = t.StageTimes[t.stageNames[0]].Sub(t.StageTimes[t.stageNames[len(t.stageNames)-1]]).Nanoseconds()
+	// From the last stage, subtract the first stage, to get total duration
+	t.Total = t.StageTimes[t.stageNames[len(t.stageNames)-1]].Sub(t.StageTimes[t.stageNames[0]]).Nanoseconds()
 }
 
 func (t *Timer) PrintJson() {
