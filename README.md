@@ -64,7 +64,7 @@ Navigate to the Releases and download the latest binary.
 
 ### Short-term
 
-- [ ] Fix bad whitespace stripping when building assets
+- [x] Fix bad whitespace stripping when building assets
 - [ ] List all names
 
 ### Longer-term
