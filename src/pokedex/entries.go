@@ -18,22 +18,21 @@ func check(e error) {
 type PokemonEntry struct {
 	Name       	string
 	NameTokens	[]string
-	Data       	[]byte
+	Index       int
 	Categories 	[]string
 }
 
 type PokemonEntryMap struct {
 	Categories map[string][]*PokemonEntry
-	NCategories int
 }
 
-func NewPokemonEntry(data []byte, name string, nameTokens []string, categories []string) *PokemonEntry {
+func NewPokemonEntry(idx int, name string, nameTokens []string, categories []string) *PokemonEntry {
 	return &PokemonEntry{
 		Name: name,
 		NameTokens: nameTokens,
 		Categories: categories,
-		Data: Compress(data),
 	}
+	// Data: Compress(data),
 }
 
 func Compress(data []byte) []byte {
@@ -74,6 +73,17 @@ func WriteToFile(categories PokemonEntryMap, fpath string) {
 	ostream.Close()
 }
 
+func WriteByteToFile(pokemon [][]byte, fpath string) {
+	ostream, err := os.Create(fpath)
+	check(err)
+
+	writer := bufio.NewWriter(ostream)
+	enc := gob.NewEncoder(writer)
+	enc.Encode(pokemon)
+	writer.Flush()
+	ostream.Close()
+}
+
 func ReadFromBytes(data []byte) PokemonEntryMap {
 	buf := bytes.NewBuffer(data)
 	dec := gob.NewDecoder(buf)
@@ -100,5 +110,17 @@ func ReadFromFile(fpath string) PokemonEntryMap {
 	istream.Close()
 
 	return *categories
+}
+
+func ReadDataFromBytes(data []byte) [][]byte {
+	buf := bytes.NewBuffer(data)
+	dec := gob.NewDecoder(buf)
+
+	categories := make([][]byte, 0)
+
+	err := dec.Decode(&categories)
+	check(err)
+
+	return categories
 }
 
