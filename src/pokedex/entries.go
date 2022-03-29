@@ -2,6 +2,7 @@ package pokedex
 
 import (
 	"os"
+	"fmt"
 	"bufio"
 	"bytes"
 	"encoding/gob"
@@ -18,21 +19,19 @@ func check(e error) {
 type PokemonEntry struct {
 	Name       	string
 	NameTokens	[]string
-	Index       int
-	Categories 	[]string
+	Index       string
 }
 
 type PokemonEntryMap struct {
 	Categories map[string][]*PokemonEntry
 }
 
-func NewPokemonEntry(idx int, name string, nameTokens []string, categories []string) *PokemonEntry {
+func NewPokemonEntry(idx int, name string, nameTokens []string) *PokemonEntry {
 	return &PokemonEntry{
+		Index: fmt.Sprintf("build/%d.cow", idx),
 		Name: name,
 		NameTokens: nameTokens,
-		Categories: categories,
 	}
-	// Data: Compress(data),
 }
 
 func Compress(data []byte) []byte {
@@ -74,14 +73,16 @@ func WriteToFile(categories PokemonEntryMap, fpath string) {
 }
 
 func WriteByteToFile(pokemon [][]byte, fpath string) {
-	ostream, err := os.Create(fpath)
-	check(err)
+	for i, entry := range pokemon {
+		ostream, err := os.Create(fmt.Sprintf("build/%d.cow", i))
+		check(err)
 
-	writer := bufio.NewWriter(ostream)
-	enc := gob.NewEncoder(writer)
-	enc.Encode(pokemon)
-	writer.Flush()
-	ostream.Close()
+		writer := bufio.NewWriter(ostream)
+		fmt.Println(i, string(entry))
+		writer.WriteString(string(entry))
+		writer.Flush()
+		ostream.Close()
+	}
 }
 
 func ReadFromBytes(data []byte) PokemonEntryMap {
@@ -113,14 +114,16 @@ func ReadFromFile(fpath string) PokemonEntryMap {
 }
 
 func ReadDataFromBytes(data []byte) [][]byte {
-	buf := bytes.NewBuffer(data)
-	dec := gob.NewDecoder(buf)
+	scanner := bufio.NewScanner(bytes.NewBuffer(data))
+	pokemon := make([][]byte, 0)
+	idx := 0
+	for scanner.Scan() {
+		dat := scanner.Text()
+		fmt.Println(idx, string(dat))
+		pokemon = append(pokemon, []byte(dat))
+		idx++
+	}
 
-	categories := make([][]byte, 0)
-
-	err := dec.Decode(&categories)
-	check(err)
-
-	return categories
+	return pokemon
 }
 

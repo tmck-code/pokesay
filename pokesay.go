@@ -2,8 +2,8 @@ package main
 
 import (
 	"bufio"
-	_ "embed"
-	"encoding/binary"
+	"embed"
+	_ "encoding/binary"
 	"flag"
 	"fmt"
 	"log"
@@ -20,8 +20,8 @@ import (
 var (
 	//go:embed build/cows.gob
 	GOBCategory []byte
-	//go:embed build/data.gob
-	GOBData []byte
+	//go:embed build/*cow
+	cows embed.FS
 )
 
 func check(e error) {
@@ -70,9 +70,10 @@ func randomInt(n int) int {
 	return rand.New(rand.NewSource(time.Now().UnixNano())).Intn(n)
 }
 
-func printPokemon(choice pokedex.PokemonEntry, data [][]byte) {
-	binary.Write(os.Stdout, binary.LittleEndian, pokedex.Decompress(data[choice.Index]))
-	fmt.Printf("choice: %s / categories: %s\n", choice.Name, choice.Categories)
+func printPokemon(choice pokedex.PokemonEntry) {
+	d, _ := cows.ReadFile(choice.Index)
+	fmt.Println(string(d))
+	fmt.Printf("choice: %s\n", choice.Name, choice.Index)
 }
 
 func chooseRandomCategory(entries pokedex.PokemonEntryMap) []*pokedex.PokemonEntry {
@@ -163,11 +164,9 @@ func parseFlags() Args {
 func main() {
 	args := parseFlags()
 	t := timer.NewTimer()
+
 	categories := pokedex.ReadFromBytes(GOBCategory)
 	t.Mark("ReadCategoriesFromBytes")
-
-	pokemon := pokedex.ReadDataFromBytes(GOBData)
-	t.Mark("ReadDataFromBytes")
 
 	if args.ListCategories {
 		for k, v := range categories.Categories {
@@ -185,8 +184,10 @@ func main() {
 		}
 		printSpeechBubble(bufio.NewScanner(os.Stdin), args)
 		t.Mark("printSpeechBubble")
-		printPokemon(chooseRandomPokemon(matches), pokemon)
+		printPokemon(chooseRandomPokemon(matches))
 		t.Mark("chooseRandomPokemon")
+		t.Stop()
+		t.PrintJson()
 		os.Exit(0)
 	}
 
@@ -205,7 +206,7 @@ func main() {
 
 	printSpeechBubble(bufio.NewScanner(os.Stdin), args)
 	t.Mark("printSpeechBubble")
-	printPokemon(chooseRandomPokemon(category), pokemon)
+	printPokemon(chooseRandomPokemon(category))
 	t.Mark("chooseRandomPokemon")
 
 	t.Stop()
