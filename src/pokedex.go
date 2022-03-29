@@ -19,9 +19,12 @@ func check(e error) {
 	}
 }
 
-func findFiles(dirpath string, ext string, skip []string) pokedex.PokemonEntryMap {
+func findFiles(dirpath string, ext string, skip []string) (pokedex.PokemonEntryMap, [][]byte) {
 	categories := &pokedex.PokemonEntryMap{Categories: make(map[string][]*pokedex.PokemonEntry)}
+	pokemon := make([][]byte, 0)
+	idx := 0
 	err := filepath.Walk(dirpath, func(fpath string, f os.FileInfo, err error) error {
+		idx += 1
 		for _, s := range skip {
 			if strings.Contains(fpath, s) {
 				return err
@@ -33,11 +36,12 @@ func findFiles(dirpath string, ext string, skip []string) pokedex.PokemonEntryMa
 
 			pokemonCategories := createCategories(fpath)
 			p := pokedex.NewPokemonEntry(
-				data,
+				idx,
 				createName(fpath),
 				tokenizeName(fpath),
 				createCategories(fpath),
 			)
+			d := pokedex.Compress(data)
 
 			for _, c := range pokemonCategories {
 				if val, ok := categories.Categories[c]; ok {
@@ -47,14 +51,13 @@ func findFiles(dirpath string, ext string, skip []string) pokedex.PokemonEntryMa
 				}
 				categories.Categories[c] = append(categories.Categories[c], p)
 			}
+			pokemon = append(pokemon, d)
 		}
 		return err
 	})
 	check(err)
 
-	categories.NCategories = len(categories.Categories)
-
-	return *categories
+	return *categories, pokemon
 }
 
 func createName(fpath string) string {
@@ -97,11 +100,14 @@ func main() {
 	fmt.Println("starting at", args.FromDir)
 	t := timer.NewTimer()
 
-	categories := findFiles(args.FromDir, ".cow", args.SkipDirs)
+	categories, pokemon := findFiles(args.FromDir, ".cow", args.SkipDirs)
 	t.Mark("CreateEntriesFromFiles")
 
 	pokedex.WriteToFile(categories, args.ToFpath)
-	t.Mark("WriteToFile")
+	t.Mark("WriteCategoriesToFile")
+
+	pokedex.WriteByteToFile(pokemon, "build/data.gob")
+	t.Mark("WritePokemonToFile")
 
 	if args.DebugTimer {
 		t.Stop()
