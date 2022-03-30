@@ -19,43 +19,32 @@ func check(e error) {
 	}
 }
 
-func findFiles(dirpath string, ext string, skip []string) (pokedex.PokemonEntryMap, [][]byte) {
-	categories := &pokedex.PokemonEntryMap{Categories: make(map[string][]*pokedex.PokemonEntry)}
-	pokemon := make([][]byte, 0)
+func findFiles(dirpath string, ext string, skip []string) pokedex.PokemonTrie {
+	categories := pokedex.NewTrie()
+
 	idx := 0
 	err := filepath.Walk(dirpath, func(fpath string, f os.FileInfo, err error) error {
-		idx += 1
 		for _, s := range skip {
 			if strings.Contains(fpath, s) {
 				return err
 			}
 		}
 		if !f.IsDir() && filepath.Ext(f.Name()) == ext {
+			idx += 1
 			data, err := os.ReadFile(fpath)
 			check(err)
 
-			pokemonCategories := createCategories(fpath)
-			p := pokedex.NewPokemonEntry(
-				idx,
-				createName(fpath),
-				tokenizeName(fpath),
-			)
+			p := pokedex.NewPokemonEntry(idx, createName(fpath))
 
-			for _, c := range pokemonCategories {
-				if val, ok := categories.Categories[c]; ok {
-					val = append(val, p)
-				} else {
-					categories.Categories[c] = []*pokedex.PokemonEntry{p}
-				}
-				categories.Categories[c] = append(categories.Categories[c], p)
-			}
-			pokemon = append(pokemon, data)
+			categories.Insert(createCategories(fpath), p)
+			pokedex.WriteByteToFile(data, p)
 		}
 		return err
 	})
 	check(err)
+	fmt.Println("Wrote", idx, "pokemon to file")
 
-	return *categories, pokemon
+	return *categories
 }
 
 func createName(fpath string) string {
@@ -63,13 +52,10 @@ func createName(fpath string) string {
 	return strings.Split(parts[len(parts)-1], ".")[0]
 }
 
-func tokenizeName(fpath string) []string {
-	return strings.Split(createName(fpath), "-")
-}
 
 func createCategories(fpath string) []string {
 	parts := strings.Split(fpath, "/")
-	return parts[3 : len(parts)-1]
+	return append([]string{"pokemon"}, parts[3 : len(parts)-1]...)
 }
 
 type CowBuildArgs struct {
@@ -98,14 +84,11 @@ func main() {
 	fmt.Println("starting at", args.FromDir)
 	t := timer.NewTimer()
 
-	categories, pokemon := findFiles(args.FromDir, ".cow", args.SkipDirs)
+	categories := findFiles(args.FromDir, ".cow", args.SkipDirs)
 	t.Mark("CreateEntriesFromFiles")
 
 	pokedex.WriteToFile(categories, args.ToFpath)
 	t.Mark("WriteCategoriesToFile")
-
-	pokedex.WriteByteToFile(pokemon, "build/data.gob")
-	t.Mark("WritePokemonToFile")
 
 	if args.DebugTimer {
 		t.Stop()
