@@ -209,7 +209,7 @@ func WriteByteToFile(pokemon []byte, entry *PokemonEntry) {
 	check(err)
 
 	writer := bufio.NewWriter(ostream)
-	writer.WriteString(string(pokemon))
+	writer.WriteString(string(Compress(pokemon)))
 	writer.Flush()
 	ostream.Close()
 }
