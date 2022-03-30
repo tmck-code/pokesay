@@ -72,7 +72,7 @@ func randomInt(n int) int {
 
 func printPokemon(choice pokedex.PokemonEntry) {
 	d, _ := GOBCowData.ReadFile(pokedex.EntryFpath(choice.Index))
-	fmt.Printf("%s\nchoice: %s\n", d, choice.Name, choice.Index)
+	fmt.Printf("%s\nchoice: %s\n", pokedex.Decompress(d), choice.Name, choice.Index)
 }
 
 func chooseRandomCategory(entries pokedex.PokemonTrie) []*pokedex.PokemonEntry {
