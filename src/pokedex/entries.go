@@ -58,8 +58,6 @@ func EntryFpath(idx int) string {
 	return fmt.Sprintf("build/%d.cow", idx)
 }
 
-// Equal tells whether a and b contain the same elements.
-// A nil argument is equivalent to an empty slice.
 func Equal(a, b []string) bool {
 	if len(a) != len(b) {
 		return false
@@ -97,19 +95,20 @@ func (t *PokemonTrie) Insert(s []string, data *PokemonEntry) {
 	t.Len += 1
 }
 
-func (t PokemonTrie) GetCategoryPath(s string) []string {
+func (t PokemonTrie) GetCategoryPaths(s string) [][]string {
+	matches := [][]string{}
 	for _, k := range t.Keys {
 		for i, el := range k {
 			if el == s {
 				if i == 0 {
-					return []string{s}
+					matches = append(matches, []string{s})
 				} else {
-					return k
+					matches = append(matches, k)
 				}
 			}
 		}
 	}
-	return []string{}
+	return matches
 }
 
 func (t PokemonTrie) GetCategory(s []string) ([]*PokemonEntry, bool) {
