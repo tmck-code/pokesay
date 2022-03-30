@@ -69,8 +69,8 @@ Navigate to the Releases and download the latest binary.
 
 ### Longer-term
 
-- [ ] Make data structure to hold categories, names and pokemon
-- [ ] Increase speed
+- [x] Make data structure to hold categories, names and pokemon
+- [x] Increase speed
 - [ ] Improve categories to be more specific than shiny/regular
 
 ## Building binaries
@@ -100,8 +100,8 @@ go build src/pokedex.go
 tar xzf build/cows.tar.gz -C build/
 
 # Generate a encoding/gob data file from the cowfiles
-./pokedex -from build/cows -to build/cows.gob
+./pokedex -from build/cows -to build/pokedex.gob
 
-# Finally, build the pokesay tool (this builds and uses the build/cows.gob file automatically)
+# Finally, build the pokesay tool (this builds and uses the build/pokedex.gob file automatically)
 go build pokesay.go
 ```
