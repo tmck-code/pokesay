@@ -16,7 +16,6 @@ build/cows:
 		--name pokebuilder \
 		pokesay-go:latest
 	@docker cp pokebuilder:$(DOCKER_OUTPUT_DIR)/ cows/
-	@docker cp pokebuilder:$(DOCKER_BUILD_DIR)/build/cows.gob .
 	@tar czf cows.tar.gz cows/
 	@rm -rf cows/
 	@docker rm -f pokebuilder

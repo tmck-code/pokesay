@@ -32,4 +32,4 @@ RUN go run /usr/local/src/build/build_cows.go \
 # Now, build up a map of category -> pokemon, and write it as a "encoding/gob" file
 ADD . .
 RUN go build src/pokedex.go && \
-    ./pokedex -from /tmp/cows/ -to build/cows.gob
+    ./pokedex -from /tmp/cows/ -to build/pokedex.gob
