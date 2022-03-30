@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"compress/gzip"
 	"encoding/gob"
+	"errors"
 	"fmt"
 	"log"
 	"os"
@@ -95,7 +96,7 @@ func (t *PokemonTrie) Insert(s []string, data *PokemonEntry) {
 	t.Len += 1
 }
 
-func (t PokemonTrie) GetCategoryPaths(s string) [][]string {
+func (t PokemonTrie) GetCategoryPaths(s string) ([][]string, error) {
 	matches := [][]string{}
 	for _, k := range t.Keys {
 		for i, el := range k {
@@ -108,10 +109,13 @@ func (t PokemonTrie) GetCategoryPaths(s string) [][]string {
 			}
 		}
 	}
-	return matches
+	if len(matches) == 0 {
+		return nil, errors.New(fmt.Sprintf("Category not found: %s", s))
+	}
+	return matches, nil
 }
 
-func (t PokemonTrie) GetCategory(s []string) ([]*PokemonEntry, bool) {
+func (t PokemonTrie) GetCategory(s []string) ([]*PokemonEntry, error) {
 	current := t.Root
 	matches := make([]*PokemonEntry, 0)
 	for _, char := range s {
@@ -121,10 +125,10 @@ func (t PokemonTrie) GetCategory(s []string) ([]*PokemonEntry, bool) {
 				matches = append(matches, p.Data...)
 			}
 		} else {
-			return nil, false
+			return nil, errors.New(fmt.Sprintf("Could not find category: %s", s))
 		}
 	}
-	return matches, true
+	return matches, nil
 }
 
 func TokenizeName(name string) []string {
