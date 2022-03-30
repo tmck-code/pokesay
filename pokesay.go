@@ -13,7 +13,6 @@ import (
 
 	"github.com/mitchellh/go-wordwrap"
 	"github.com/tmck-code/pokesay-go/src/pokedex"
-	"github.com/tmck-code/pokesay-go/src/timer"
 )
 
 var (
@@ -72,7 +71,7 @@ func printSpeechBubble(scanner *bufio.Scanner, args Args) {
 
 func printPokemon(choice *pokedex.PokemonEntry, categoryKeys []string) {
 	d, _ := GOBCowData.ReadFile(pokedex.EntryFpath(choice.Index))
-	fmt.Printf("%s\nchoice: %s / categories: %s\n", pokedex.Decompress(d), choice.Name, categoryKeys)
+	fmt.Printf("%schoice: %s / categories: %s\n", pokedex.Decompress(d), choice.Name, categoryKeys)
 }
 
 func chooseRandomCategory(keys [][]string, categories pokedex.PokemonTrie) ([]string, []*pokedex.PokemonEntry) {
@@ -130,7 +129,7 @@ func parseFlags() Args {
 	return args
 }
 
-func runCategoryList(categories pokedex.PokemonTrie, t *timer.Timer) {
+func runCategoryList(categories pokedex.PokemonTrie) {
 	ukm := map[string]bool{}
 	for _, v := range categories.Keys {
 		for _, k := range v {
@@ -140,56 +139,41 @@ func runCategoryList(categories pokedex.PokemonTrie, t *timer.Timer) {
 	for k, _ := range ukm {
 		fmt.Println(k)
 	}
-	t.Mark("ListCategories")
 }
 
-func runPrintByName(categories pokedex.PokemonTrie, args Args, t *timer.Timer) {
-	matches := categories.MatchNameToken(args.NameToken)
-	t.Mark("matchNameToken")
-	if len(matches) == 0 {
-		log.Fatal(fmt.Sprintf("Not a valid name: '%s'", args.NameToken))
-	}
+func runPrintByName(categories pokedex.PokemonTrie, args Args) {
+	matches, err := categories.MatchNameToken(args.NameToken)
+	check(err)
 	printSpeechBubble(bufio.NewScanner(os.Stdin), args)
-	t.Mark("printSpeechBubble")
 	match := matches[randomInt(len(matches))]
-	t.Mark("chooseRandomPokemon")
 	printPokemon(match.Entry, match.Categories)
-	t.Mark("printPokemon")
 }
 
-func runPrintByCategory(categories pokedex.PokemonTrie, args Args, t *timer.Timer) {
+func runPrintByCategory(categories pokedex.PokemonTrie, args Args) {
 	category := []*pokedex.PokemonEntry{}
 	keys := []string{}
 	if args.Category == "" {
 		keys, category = chooseRandomCategory(categories.Keys, categories)
-		t.Mark("RandomCategory")
 	} else {
 		matches, err := categories.GetCategoryPaths(args.Category)
 		check(err)
 		keys, category = chooseRandomCategory(matches, categories)
-		t.Mark("LookupCategory")
 	}
 
 	printSpeechBubble(bufio.NewScanner(os.Stdin), args)
-	t.Mark("printSpeechBubble")
 	printPokemon(chooseRandomPokemon(category), keys)
-	t.Mark("chooseRandomPokemon")
 }
 
 func main() {
 	args := parseFlags()
-	t := timer.NewTimer()
 
 	categories := pokedex.ReadStructFromBytes(GOBCategory)
-	t.Mark("ReadCategoriesFromBytes")
 
 	if args.ListCategories {
-		runCategoryList(categories, t)
+		runCategoryList(categories)
 	} else if args.NameToken != "" {
-		runPrintByName(categories, args, t)
+		runPrintByName(categories, args)
 	} else {
-		runPrintByCategory(categories, args, t)
+		runPrintByCategory(categories, args)
 	}
-	t.Stop()
-	t.PrintJson()
 }

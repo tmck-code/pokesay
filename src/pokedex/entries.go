@@ -153,8 +153,13 @@ type PokemonMatch struct {
 	Categories []string
 }
 
-func (t PokemonTrie) MatchNameToken(s string) []*PokemonMatch {
-	return t.Root.MatchNameToken(s, []string{})
+func (t PokemonTrie) MatchNameToken(s string) ([]*PokemonMatch, error) {
+	matches := t.Root.MatchNameToken(s, []string{})
+	if len(matches) > 0 {
+		return matches, nil
+	} else {
+		return nil, errors.New(fmt.Sprintf("Could not find name: %s", s))
+	}
 }
 
 func (current Node) MatchNameToken(s string, keys []string) []*PokemonMatch {
