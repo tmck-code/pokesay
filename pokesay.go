@@ -22,6 +22,7 @@ var (
 	GOBCategory []byte
 	//go:embed build/*cow
 	GOBCowData embed.FS
+	Rand       rand.Source = rand.NewSource(time.Now().UnixNano())
 )
 
 func check(e error) {
@@ -67,10 +68,10 @@ func printSpeechBubble(scanner *bufio.Scanner, args Args) {
 }
 
 func randomInt(n int) int {
-	return rand.New(rand.NewSource(time.Now().UnixNano())).Intn(n)
+	return rand.New(Rand).Intn(n)
 }
 
-func printPokemon(choice pokedex.PokemonEntry) {
+func printPokemon(choice *pokedex.PokemonEntry) {
 	d, _ := GOBCowData.ReadFile(pokedex.EntryFpath(choice.Index))
 	fmt.Printf("%s\nchoice: %s\n", pokedex.Decompress(d), choice.Name)
 }
@@ -82,8 +83,8 @@ func chooseRandomCategory(keys [][]string, categories pokedex.PokemonTrie) []*po
 	return category
 }
 
-func chooseRandomPokemon(pokemon []*pokedex.PokemonEntry) pokedex.PokemonEntry {
-	return *pokemon[randomInt(len(pokemon))]
+func chooseRandomPokemon(pokemon []*pokedex.PokemonEntry) *pokedex.PokemonEntry {
+	return pokemon[randomInt(len(pokemon))]
 }
 
 type Args struct {
