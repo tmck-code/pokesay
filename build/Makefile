@@ -26,7 +26,7 @@ install: build/bin
 	cp -v pokesay-$(TARGET_GOOS)-$(TARGET_GOARCH) $(HOME)/bin/pokesay
 
 build/release:
-	@docker create --name pokesay pokesay-go:latest
+	@docker run --name pokesay pokesay-go:latest build/build.sh
 	docker cp pokesay:/usr/local/src/pokesay-linux-amd64 .
 	docker cp pokesay:/usr/local/src/pokesay-darwin-amd64 .
 	docker cp pokesay:/usr/local/src/pokesay-darwin-arm64 .
