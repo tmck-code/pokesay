@@ -135,19 +135,6 @@ func TokenizeName(name string) []string {
 	return strings.Split(name, "-")
 }
 
-func matchPokemon(p []*PokemonEntry, nameToken string) []*PokemonEntry {
-	matches := []*PokemonEntry{}
-	for _, pk := range p {
-		fmt.Println(nameToken, pk)
-		for _, tk := range TokenizeName(pk.Name) {
-			if tk == nameToken {
-				matches = append(matches, pk)
-			}
-		}
-	}
-	return matches
-}
-
 type PokemonMatch struct {
 	Entry      *PokemonEntry
 	Categories []string
