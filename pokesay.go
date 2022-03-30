@@ -130,8 +130,15 @@ func parseFlags() Args {
 }
 
 func runCategoryList(categories pokedex.PokemonTrie, t *timer.Timer) {
-	for k, v := range categories.Keys {
-		fmt.Printf("%d (%d)\n", k, len(v))
+	ukm := map[string]bool{}
+
+	for _, v := range categories.Keys {
+		for _, k := range v {
+			ukm[k] = true
+		}
+	}
+	for k, _ := range ukm {
+		fmt.Println(k)
 	}
 	t.Mark("ListCategories")
 }
