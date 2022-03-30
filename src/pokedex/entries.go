@@ -8,6 +8,7 @@ import (
 	"encoding/gob"
 	"compress/gzip"
 	"log"
+	"strings"
 )
 
 func check(e error) {
@@ -17,21 +18,152 @@ func check(e error) {
 }
 
 type PokemonEntry struct {
-	Name       	string
-	NameTokens	[]string
-	Index       string
+	Name		string
+	Index       int
 }
 
-type PokemonEntryMap struct {
-	Categories map[string][]*PokemonEntry
+type Node struct {
+	Children map[string]*Node
+	Data    []*PokemonEntry
 }
 
-func NewPokemonEntry(idx int, name string, nameTokens []string) *PokemonEntry {
+type PokemonTrie struct {
+	Root	*Node
+	Len     int
+	Keys    [][]string
+}
+
+func NewPokemonEntry(idx int, name string) *PokemonEntry {
 	return &PokemonEntry{
-		Index: fmt.Sprintf("build/%d.cow", idx),
+		Index: idx,
 		Name: name,
-		NameTokens: nameTokens,
 	}
+}
+
+func NewNode() *Node {
+	return &Node{
+		Children: make(map[string]*Node),
+	}
+}
+
+func NewTrie() *PokemonTrie {
+    return &PokemonTrie{
+        Len:  0,
+        Root: NewNode(),
+		Keys: make([][]string, 0),
+    }
+}
+
+func EntryFpath(idx int) string {
+	return fmt.Sprintf("build/%d.cow", idx)
+}
+
+// Equal tells whether a and b contain the same elements.
+// A nil argument is equivalent to an empty slice.
+func Equal(a, b []string) bool {
+    if len(a) != len(b) {
+        return false
+    }
+    for i, v := range a {
+        if v != b[i] {
+            return false
+        }
+    }
+    return true
+}
+
+func (t *PokemonTrie) Insert(s []string, data *PokemonEntry) {
+    current := t.Root
+	found := false
+	for _, k := range t.Keys {
+		if Equal(k, s) {
+			found = true
+			break
+		}
+	}
+	if !found {
+		t.Keys = append(t.Keys, s)
+	}
+    for _, char := range s {
+        if _, ok := current.Children[char]; ok {
+            current = current.Children[char]
+        } else {
+            current.Children[char] = NewNode()
+            current = current.Children[char]
+            current.Data = make([]*PokemonEntry, 0)
+        }
+    }
+    current.Data = append(current.Data, data)
+    t.Len += 1
+}
+
+func (t PokemonTrie) GetCategoryPath(s string) []string {
+	for _, k := range t.Keys {
+		for i, el := range k {
+			if el == s {
+				if i == 0 {
+					return []string{s}
+				} else {
+					return k
+				}
+			}
+		}
+	}
+	return []string{}
+}
+
+func (t PokemonTrie) GetCategory(s []string) ([]*PokemonEntry, bool) {
+    current := t.Root
+	matches := make([]*PokemonEntry, 0)
+    for _, char := range s {
+        if _, ok := current.Children[char]; ok {
+            current = current.Children[char]
+			for _, p := range current.Children {
+				matches = append(matches, p.Data...)
+			}
+        } else {
+            return nil, false
+        }
+    }
+    return matches, true
+}
+
+func TokenizeName(name string) []string {
+	return strings.Split(name, "-")
+}
+
+func matchPokemon(p []*PokemonEntry, nameToken string) ([]*PokemonEntry, bool) {
+	matches := make([]*PokemonEntry, 0)
+	for _, pk := range p {
+		fmt.Println(nameToken, pk)
+		for _, tk := range TokenizeName(pk.Name) {
+			if tk == nameToken {
+				matches = append(matches, pk)
+			}
+		}
+	}
+	if len(matches) > 0 {
+		return matches, true
+	} else {
+		return nil, false
+	}
+}
+
+func (t PokemonTrie) MatchNameToken(s string) []*PokemonEntry {
+    current := t.Root
+	matches := make([]*PokemonEntry, 0)
+    for _, key := range t.Keys {
+		fmt.Println("checking", key)
+		for _, char := range key {
+			if _, ok := current.Children[char]; ok {
+				current = current.Children[char]
+				if m, ok := matchPokemon(current.Data, s); ok {
+					matches = append(matches, m...)
+				}
+			}
+		}
+    }
+	return matches
 }
 
 func Compress(data []byte) []byte {
@@ -61,7 +193,7 @@ func Decompress(data []byte) []byte {
 	return resB.Bytes()
 }
 
-func WriteToFile(categories PokemonEntryMap, fpath string) {
+func WriteToFile(categories PokemonTrie, fpath string) {
 	ostream, err := os.Create(fpath)
 	check(err)
 
@@ -72,58 +204,25 @@ func WriteToFile(categories PokemonEntryMap, fpath string) {
 	ostream.Close()
 }
 
-func WriteByteToFile(pokemon [][]byte, fpath string) {
-	for i, entry := range pokemon {
-		ostream, err := os.Create(fmt.Sprintf("build/%d.cow", i))
-		check(err)
+func WriteByteToFile(pokemon []byte, entry *PokemonEntry) {
+	ostream, err := os.Create(EntryFpath(entry.Index))
+	check(err)
 
-		writer := bufio.NewWriter(ostream)
-		fmt.Println(i, string(entry))
-		writer.WriteString(string(entry))
-		writer.Flush()
-		ostream.Close()
-	}
+	writer := bufio.NewWriter(ostream)
+	writer.WriteString(string(pokemon))
+	writer.Flush()
+	ostream.Close()
 }
 
-func ReadFromBytes(data []byte) PokemonEntryMap {
+func ReadFromBytes(data []byte) PokemonTrie {
 	buf := bytes.NewBuffer(data)
 	dec := gob.NewDecoder(buf)
 
-	categories := &PokemonEntryMap{}
+	categories := &PokemonTrie{}
 
 	err := dec.Decode(&categories)
 	check(err)
 
 	return *categories
-}
-
-func ReadFromFile(fpath string) PokemonEntryMap {
-	istream, err := os.Open(fpath)
-	check(err)
-
-	reader := bufio.NewReader(istream)
-	dec := gob.NewDecoder(reader)
-
-	categories := &PokemonEntryMap{}
-
-	err = dec.Decode(&categories)
-	check(err)
-	istream.Close()
-
-	return *categories
-}
-
-func ReadDataFromBytes(data []byte) [][]byte {
-	scanner := bufio.NewScanner(bytes.NewBuffer(data))
-	pokemon := make([][]byte, 0)
-	idx := 0
-	for scanner.Scan() {
-		dat := scanner.Text()
-		fmt.Println(idx, string(dat))
-		pokemon = append(pokemon, []byte(dat))
-		idx++
-	}
-
-	return pokemon
 }
 
