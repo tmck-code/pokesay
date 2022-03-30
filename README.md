@@ -64,13 +64,13 @@ Navigate to the Releases and download the latest binary.
 
 ### Short-term
 
-- [ ] Fix bad whitespace stripping when building assets
+- [x] Fix bad whitespace stripping when building assets
 - [ ] List all names
 
 ### Longer-term
 
-- [ ] Make data structure to hold categories, names and pokemon
-- [ ] Increase speed
+- [x] Make data structure to hold categories, names and pokemon
+- [x] Increase speed
 - [ ] Improve categories to be more specific than shiny/regular
 
 ## Building binaries
