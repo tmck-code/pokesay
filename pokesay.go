@@ -132,36 +132,26 @@ func parseFlags() Args {
 	return args
 }
 
-func main() {
-	args := parseFlags()
-	t := timer.NewTimer()
-
-	categories := pokedex.ReadStructFromBytes(GOBCategory)
-	t.Mark("ReadCategoriesFromBytes")
-
-	if args.ListCategories {
-		for k, v := range categories.Keys {
-			fmt.Printf("%s (%d)\n", k, len(v))
-		}
-		t.Mark("ListCategories")
-		os.Exit(0)
+func runCategoryList(categories pokedex.PokemonTrie, t *timer.Timer) {
+	for k, v := range categories.Keys {
+		fmt.Printf("%s (%d)\n", k, len(v))
 	}
+	t.Mark("ListCategories")
+}
 
-	if args.NameToken != "" {
-		matches := categories.MatchNameToken(args.NameToken)
-		t.Mark("matchNameToken")
-		if len(matches) == 0 {
-			log.Fatal(fmt.Sprintf("Not a valid name: '%s'", args.NameToken))
-		}
-		printSpeechBubble(bufio.NewScanner(os.Stdin), args)
-		t.Mark("printSpeechBubble")
-		printPokemon(chooseRandomPokemon(matches))
-		t.Mark("chooseRandomPokemon")
-		t.Stop()
-		t.PrintJson()
-		os.Exit(0)
+func runPrintByName(categories pokedex.PokemonTrie, args Args, t *timer.Timer) {
+	matches := categories.MatchNameToken(args.NameToken)
+	t.Mark("matchNameToken")
+	if len(matches) == 0 {
+		log.Fatal(fmt.Sprintf("Not a valid name: '%s'", args.NameToken))
 	}
+	printSpeechBubble(bufio.NewScanner(os.Stdin), args)
+	t.Mark("printSpeechBubble")
+	printPokemon(chooseRandomPokemon(matches))
+	t.Mark("chooseRandomPokemon")
+}
 
+func runPrintByCategory(categories pokedex.PokemonTrie, args Args, t *timer.Timer) {
 	category := []string{}
 	if args.Category == "" {
 		category = categories.Keys[randomInt(len(categories.Keys)-1)]
@@ -183,7 +173,22 @@ func main() {
 	}
 	printPokemon(chooseRandomPokemon(matches))
 	t.Mark("chooseRandomPokemon")
+}
 
+func main() {
+	args := parseFlags()
+	t := timer.NewTimer()
+
+	categories := pokedex.ReadStructFromBytes(GOBCategory)
+	t.Mark("ReadCategoriesFromBytes")
+
+	if args.ListCategories {
+		runCategoryList(categories, t)
+	} else if args.NameToken != "" {
+		runPrintByName(categories, args, t)
+	} else {
+		runPrintByCategory(categories, args, t)
+	}
 	t.Stop()
 	t.PrintJson()
 }
