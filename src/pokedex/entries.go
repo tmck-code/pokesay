@@ -135,8 +135,8 @@ func TokenizeName(name string) []string {
 	return strings.Split(name, "-")
 }
 
-func matchPokemon(p []*PokemonEntry, nameToken string) ([]*PokemonEntry, bool) {
-	matches := make([]*PokemonEntry, 0)
+func matchPokemon(p []*PokemonEntry, nameToken string) []*PokemonEntry {
+	matches := []*PokemonEntry{}
 	for _, pk := range p {
 		fmt.Println(nameToken, pk)
 		for _, tk := range TokenizeName(pk.Name) {
@@ -145,25 +145,32 @@ func matchPokemon(p []*PokemonEntry, nameToken string) ([]*PokemonEntry, bool) {
 			}
 		}
 	}
-	if len(matches) > 0 {
-		return matches, true
-	} else {
-		return nil, false
-	}
+	return matches
 }
 
-func (t PokemonTrie) MatchNameToken(s string) []*PokemonEntry {
-	current := t.Root
-	matches := make([]*PokemonEntry, 0)
-	for _, key := range t.Keys {
-		fmt.Println("checking", key)
-		for _, char := range key {
-			if _, ok := current.Children[char]; ok {
-				current = current.Children[char]
-				if m, ok := matchPokemon(current.Data, s); ok {
-					matches = append(matches, m...)
-				}
+type PokemonMatch struct {
+	Entry      *PokemonEntry
+	Categories []string
+}
+
+func (t PokemonTrie) MatchNameToken(s string) []*PokemonMatch {
+	return t.Root.MatchNameToken(s, []string{})
+}
+
+func (current Node) MatchNameToken(s string, keys []string) []*PokemonMatch {
+	matches := []*PokemonMatch{}
+
+	for _, entry := range current.Data {
+		for _, tk := range TokenizeName(entry.Name) {
+			if tk == s {
+				matches = append(matches, &PokemonMatch{Entry: entry, Categories: keys})
 			}
+		}
+	}
+	for k, node := range current.Children {
+		more := node.MatchNameToken(s, append(keys, k))
+		if len(more) > 0 {
+			matches = append(matches, more...)
 		}
 	}
 	return matches
