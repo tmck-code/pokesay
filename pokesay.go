@@ -157,7 +157,9 @@ func runPrintByCategory(categories pokedex.PokemonTrie, args Args, t *timer.Time
 		category = categories.Keys[randomInt(len(categories.Keys)-1)]
 		t.Mark("RandomCategory")
 	} else {
-		category = categories.GetCategoryPath(args.Category)
+		matches := categories.GetCategoryPaths(args.Category)
+		category = matches[randomInt(len(matches)-1)]
+
 		t.Mark("LookupCategory")
 		if len(category) == 0 {
 			log.Fatal(fmt.Sprintf("Category not found: %s", category))
@@ -180,6 +182,10 @@ func main() {
 	t := timer.NewTimer()
 
 	categories := pokedex.ReadStructFromBytes(GOBCategory)
+
+	for _, k := range categories.Keys {
+		fmt.Println(k)
+	}
 	t.Mark("ReadCategoriesFromBytes")
 
 	if args.ListCategories {
