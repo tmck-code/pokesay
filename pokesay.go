@@ -3,7 +3,6 @@ package main
 import (
 	"bufio"
 	"embed"
-	_ "encoding/binary"
 	"flag"
 	"fmt"
 	"log"
