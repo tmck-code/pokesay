@@ -72,15 +72,13 @@ func randomInt(n int) int {
 
 func printPokemon(choice pokedex.PokemonEntry) {
 	d, _ := GOBCowData.ReadFile(pokedex.EntryFpath(choice.Index))
-	fmt.Printf("%s\nchoice: %s\n", pokedex.Decompress(d), choice.Name, choice.Index)
+	fmt.Printf("%s\nchoice: %s\n", pokedex.Decompress(d), choice.Name)
 }
 
-func chooseRandomCategory(entries pokedex.PokemonTrie) []*pokedex.PokemonEntry {
-	categoryChoice := entries.Keys[randomInt(len(entries.Keys)-1)]
-	category, ok := entries.GetCategory(categoryChoice)
-	if !ok {
-		log.Fatal("Couldn't choose random category")
-	}
+func chooseRandomCategory(keys [][]string, categories pokedex.PokemonTrie) []*pokedex.PokemonEntry {
+	categoryChoice := keys[randomInt(len(keys)-1)]
+	category, err := categories.GetCategory(categoryChoice)
+	check(err)
 	return category
 }
 
@@ -134,7 +132,7 @@ func parseFlags() Args {
 
 func runCategoryList(categories pokedex.PokemonTrie, t *timer.Timer) {
 	for k, v := range categories.Keys {
-		fmt.Printf("%s (%d)\n", k, len(v))
+		fmt.Printf("%d (%d)\n", k, len(v))
 	}
 	t.Mark("ListCategories")
 }
@@ -152,28 +150,20 @@ func runPrintByName(categories pokedex.PokemonTrie, args Args, t *timer.Timer) {
 }
 
 func runPrintByCategory(categories pokedex.PokemonTrie, args Args, t *timer.Timer) {
-	category := []string{}
+	category := []*pokedex.PokemonEntry{}
 	if args.Category == "" {
-		category = categories.Keys[randomInt(len(categories.Keys)-1)]
+		category = chooseRandomCategory(categories.Keys, categories)
 		t.Mark("RandomCategory")
 	} else {
-		matches := categories.GetCategoryPaths(args.Category)
-		category = matches[randomInt(len(matches)-1)]
-
+		matches, err := categories.GetCategoryPaths(args.Category)
+		check(err)
+		category = chooseRandomCategory(matches, categories)
 		t.Mark("LookupCategory")
-		if len(category) == 0 {
-			log.Fatal(fmt.Sprintf("Category not found: %s", category))
-		}
 	}
 
 	printSpeechBubble(bufio.NewScanner(os.Stdin), args)
 	t.Mark("printSpeechBubble")
-	matches, ok := categories.GetCategory(category)
-	t.Mark("GetCategory")
-	if !ok {
-		log.Fatal(fmt.Sprintf("No pokemon found for category: %s", category))
-	}
-	printPokemon(chooseRandomPokemon(matches))
+	printPokemon(chooseRandomPokemon(category))
 	t.Mark("chooseRandomPokemon")
 }
 
@@ -182,10 +172,6 @@ func main() {
 	t := timer.NewTimer()
 
 	categories := pokedex.ReadStructFromBytes(GOBCategory)
-
-	for _, k := range categories.Keys {
-		fmt.Println(k)
-	}
 	t.Mark("ReadCategoriesFromBytes")
 
 	if args.ListCategories {
