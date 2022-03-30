@@ -21,7 +21,7 @@ var (
 	//go:embed build/cows.gob
 	GOBCategory []byte
 	//go:embed build/*cow
-	cows embed.FS
+	GOBCowData embed.FS
 )
 
 func check(e error) {
@@ -71,50 +71,21 @@ func randomInt(n int) int {
 }
 
 func printPokemon(choice pokedex.PokemonEntry) {
-	d, _ := cows.ReadFile(choice.Index)
-	fmt.Println(string(d))
-	fmt.Printf("choice: %s\n", choice.Name, choice.Index)
+	d, _ := GOBCowData.ReadFile(pokedex.EntryFpath(choice.Index))
+	fmt.Printf("%s\nchoice: %s\n", d, choice.Name, choice.Index)
 }
 
-func chooseRandomCategory(entries pokedex.PokemonEntryMap) []*pokedex.PokemonEntry {
-	nCategories := 0
-	for _, _ = range entries.Categories {
-		nCategories++
+func chooseRandomCategory(entries pokedex.PokemonTrie) []*pokedex.PokemonEntry {
+	categoryChoice := entries.Keys[randomInt(len(entries.Keys)-1)]
+	category, ok := entries.GetCategory(categoryChoice)
+	if !ok {
+		log.Fatal("Couldn't choose random category")
 	}
-	categoryChoice := randomInt(nCategories)
-	var choice []*pokedex.PokemonEntry
-	var defaultChoice []*pokedex.PokemonEntry
-	idx := 0
-
-	for category, _ := range entries.Categories {
-		defaultChoice = entries.Categories[category]
-		if idx == categoryChoice {
-			choice = entries.Categories[category]
-		}
-		idx++
-	}
-	// If something goes wrong, just return the first category by default
-	choice = defaultChoice
-	return choice
+	return category
 }
 
 func chooseRandomPokemon(pokemon []*pokedex.PokemonEntry) pokedex.PokemonEntry {
 	return *pokemon[randomInt(len(pokemon))]
-}
-
-func collectPokemonWithToken(entries pokedex.PokemonEntryMap, token string) []*pokedex.PokemonEntry {
-	found := []*pokedex.PokemonEntry{}
-
-	for _, entries := range entries.Categories {
-		for _, entry := range entries {
-			for _, t := range entry.NameTokens {
-				if t == token {
-					found = append(found, entry)
-				}
-			}
-		}
-	}
-	return found
 }
 
 type Args struct {
@@ -169,7 +140,7 @@ func main() {
 	t.Mark("ReadCategoriesFromBytes")
 
 	if args.ListCategories {
-		for k, v := range categories.Categories {
+		for k, v := range categories.Keys {
 			fmt.Printf("%s (%d)\n", k, len(v))
 		}
 		t.Mark("ListCategories")
@@ -177,8 +148,8 @@ func main() {
 	}
 
 	if args.NameToken != "" {
-		matches := collectPokemonWithToken(categories, args.NameToken)
-		t.Mark("collectPokemonWithToken")
+		matches := categories.MatchNameToken(args.NameToken)
+		t.Mark("matchNameToken")
 		if len(matches) == 0 {
 			log.Fatal(fmt.Sprintf("Not a valid name: '%s'", args.NameToken))
 		}
@@ -191,22 +162,26 @@ func main() {
 		os.Exit(0)
 	}
 
-	categoryName := args.Category
-	var category []*pokedex.PokemonEntry
-	var ok bool
-
-	if categoryName == "" {
-		category = chooseRandomCategory(categories)
-		t.Mark("chooseRandomCategory")
+	category := []string{}
+	if args.Category == "" {
+		category = categories.Keys[randomInt(len(categories.Keys)-1)]
+		t.Mark("RandomCategory")
 	} else {
-		if category, ok = categories.Categories[categoryName]; !ok {
-			log.Fatal(fmt.Sprintf("Not a valid category: '%s'", args.Category))
+		category = categories.GetCategoryPath(args.Category)
+		t.Mark("LookupCategory")
+		if len(category) == 0 {
+			log.Fatal(fmt.Sprintf("Category not found: %s", category))
 		}
 	}
 
 	printSpeechBubble(bufio.NewScanner(os.Stdin), args)
 	t.Mark("printSpeechBubble")
-	printPokemon(chooseRandomPokemon(category))
+	matches, ok := categories.GetCategory(category)
+	t.Mark("GetCategory")
+	if !ok {
+		log.Fatal(fmt.Sprintf("No pokemon found for category: %s", category))
+	}
+	printPokemon(chooseRandomPokemon(matches))
 	t.Mark("chooseRandomPokemon")
 
 	t.Stop()
