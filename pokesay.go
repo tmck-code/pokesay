@@ -17,7 +17,7 @@ import (
 )
 
 var (
-	//go:embed build/cows.gob
+	//go:embed build/pokedex.gob
 	GOBCategory []byte
 	//go:embed build/*cow
 	GOBCowData embed.FS
@@ -28,6 +28,10 @@ func check(e error) {
 	if e != nil {
 		log.Fatal(e)
 	}
+}
+
+func randomInt(n int) int {
+	return rand.New(Rand).Intn(n)
 }
 
 func printSpeechBubbleLine(line string, width int) {
@@ -66,18 +70,13 @@ func printSpeechBubble(scanner *bufio.Scanner, args Args) {
 	}
 }
 
-func randomInt(n int) int {
-	return rand.New(Rand).Intn(n)
-}
-
 func printPokemon(choice *pokedex.PokemonEntry) {
 	d, _ := GOBCowData.ReadFile(pokedex.EntryFpath(choice.Index))
 	fmt.Printf("%s\nchoice: %s\n", pokedex.Decompress(d), choice.Name)
 }
 
 func chooseRandomCategory(keys [][]string, categories pokedex.PokemonTrie) []*pokedex.PokemonEntry {
-	categoryChoice := keys[randomInt(len(keys)-1)]
-	category, err := categories.GetCategory(categoryChoice)
+	category, err := categories.GetCategory(keys[randomInt(len(keys)-1)])
 	check(err)
 	return category
 }

@@ -100,8 +100,8 @@ go build src/pokedex.go
 tar xzf build/cows.tar.gz -C build/
 
 # Generate a encoding/gob data file from the cowfiles
-./pokedex -from build/cows -to build/cows.gob
+./pokedex -from build/cows -to build/pokedex.gob
 
-# Finally, build the pokesay tool (this builds and uses the build/cows.gob file automatically)
+# Finally, build the pokesay tool (this builds and uses the build/pokedex.gob file automatically)
 go build pokesay.go
 ```
