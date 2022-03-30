@@ -136,7 +136,7 @@ func main() {
 	args := parseFlags()
 	t := timer.NewTimer()
 
-	categories := pokedex.ReadFromBytes(GOBCategory)
+	categories := pokedex.ReadStructFromBytes(GOBCategory)
 	t.Mark("ReadCategoriesFromBytes")
 
 	if args.ListCategories {
