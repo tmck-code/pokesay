@@ -70,15 +70,16 @@ func printSpeechBubble(scanner *bufio.Scanner, args Args) {
 	}
 }
 
-func printPokemon(choice *pokedex.PokemonEntry) {
+func printPokemon(choice *pokedex.PokemonEntry, categoryKeys []string) {
 	d, _ := GOBCowData.ReadFile(pokedex.EntryFpath(choice.Index))
-	fmt.Printf("%s\nchoice: %s\n", pokedex.Decompress(d), choice.Name)
+	fmt.Printf("%s\nchoice: %s / categories: %s\n", pokedex.Decompress(d), choice.Name, categoryKeys)
 }
 
-func chooseRandomCategory(keys [][]string, categories pokedex.PokemonTrie) []*pokedex.PokemonEntry {
-	category, err := categories.GetCategory(keys[randomInt(len(keys)-1)])
+func chooseRandomCategory(keys [][]string, categories pokedex.PokemonTrie) ([]string, []*pokedex.PokemonEntry) {
+	choice := keys[randomInt(len(keys)-1)]
+	category, err := categories.GetCategory(choice)
 	check(err)
-	return category
+	return choice, category
 }
 
 func chooseRandomPokemon(pokemon []*pokedex.PokemonEntry) *pokedex.PokemonEntry {
@@ -131,7 +132,6 @@ func parseFlags() Args {
 
 func runCategoryList(categories pokedex.PokemonTrie, t *timer.Timer) {
 	ukm := map[string]bool{}
-
 	for _, v := range categories.Keys {
 		for _, k := range v {
 			ukm[k] = true
@@ -151,25 +151,28 @@ func runPrintByName(categories pokedex.PokemonTrie, args Args, t *timer.Timer) {
 	}
 	printSpeechBubble(bufio.NewScanner(os.Stdin), args)
 	t.Mark("printSpeechBubble")
-	printPokemon(chooseRandomPokemon(matches))
+	match := matches[randomInt(len(matches))]
 	t.Mark("chooseRandomPokemon")
+	printPokemon(match.Entry, match.Categories)
+	t.Mark("printPokemon")
 }
 
 func runPrintByCategory(categories pokedex.PokemonTrie, args Args, t *timer.Timer) {
 	category := []*pokedex.PokemonEntry{}
+	keys := []string{}
 	if args.Category == "" {
-		category = chooseRandomCategory(categories.Keys, categories)
+		keys, category = chooseRandomCategory(categories.Keys, categories)
 		t.Mark("RandomCategory")
 	} else {
 		matches, err := categories.GetCategoryPaths(args.Category)
 		check(err)
-		category = chooseRandomCategory(matches, categories)
+		keys, category = chooseRandomCategory(matches, categories)
 		t.Mark("LookupCategory")
 	}
 
 	printSpeechBubble(bufio.NewScanner(os.Stdin), args)
 	t.Mark("printSpeechBubble")
-	printPokemon(chooseRandomPokemon(category))
+	printPokemon(chooseRandomPokemon(category), keys)
 	t.Mark("chooseRandomPokemon")
 }
 
