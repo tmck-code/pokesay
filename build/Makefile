@@ -16,7 +16,6 @@ build/cows:
 		--name pokebuilder \
 		pokesay-go:latest
 	@docker cp pokebuilder:$(DOCKER_OUTPUT_DIR)/ cows/
-	@docker cp pokebuilder:$(DOCKER_BUILD_DIR)/build/cows.gob .
 	@tar czf cows.tar.gz cows/
 	@rm -rf cows/
 	@docker rm -f pokebuilder
@@ -26,7 +25,7 @@ install: build/bin
 	cp -v pokesay-$(TARGET_GOOS)-$(TARGET_GOARCH) $(HOME)/bin/pokesay
 
 build/release:
-	@docker create --name pokesay pokesay-go:latest
+	@docker run --name pokesay pokesay-go:latest build/build.sh
 	docker cp pokesay:/usr/local/src/pokesay-linux-amd64 .
 	docker cp pokesay:/usr/local/src/pokesay-darwin-amd64 .
 	docker cp pokesay:/usr/local/src/pokesay-darwin-arm64 .

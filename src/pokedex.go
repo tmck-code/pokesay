@@ -19,8 +19,16 @@ func check(e error) {
 	}
 }
 
-func findFiles(dirpath string, ext string, skip []string) pokedex.PokemonEntryMap {
-	categories := &pokedex.PokemonEntryMap{Categories: make(map[string][]*pokedex.PokemonEntry)}
+type Metadata struct {
+	Data  []byte
+	Index int
+}
+
+func findFiles(dirpath string, ext string, skip []string) (pokedex.PokemonTrie, []Metadata) {
+	categories := pokedex.NewTrie()
+	metadata := []Metadata{}
+
+	idx := 0
 	err := filepath.Walk(dirpath, func(fpath string, f os.FileInfo, err error) error {
 		for _, s := range skip {
 			if strings.Contains(fpath, s) {
@@ -28,33 +36,22 @@ func findFiles(dirpath string, ext string, skip []string) pokedex.PokemonEntryMa
 			}
 		}
 		if !f.IsDir() && filepath.Ext(f.Name()) == ext {
+			idx += 1
 			data, err := os.ReadFile(fpath)
 			check(err)
 
-			pokemonCategories := createCategories(fpath)
-			p := pokedex.NewPokemonEntry(
-				data,
-				createName(fpath),
-				tokenizeName(fpath),
+			categories.Insert(
 				createCategories(fpath),
+				pokedex.NewPokemonEntry(idx, createName(fpath)),
 			)
-
-			for _, c := range pokemonCategories {
-				if val, ok := categories.Categories[c]; ok {
-					val = append(val, p)
-				} else {
-					categories.Categories[c] = []*pokedex.PokemonEntry{p}
-				}
-				categories.Categories[c] = append(categories.Categories[c], p)
-			}
+			metadata = append(metadata, Metadata{data, idx})
 		}
 		return err
 	})
 	check(err)
+	fmt.Println("Wrote", idx, "pokemon to file")
 
-	categories.NCategories = len(categories.Categories)
-
-	return *categories
+	return *categories, metadata
 }
 
 func createName(fpath string) string {
@@ -62,19 +59,15 @@ func createName(fpath string) string {
 	return strings.Split(parts[len(parts)-1], ".")[0]
 }
 
-func tokenizeName(fpath string) []string {
-	return strings.Split(createName(fpath), "-")
-}
-
 func createCategories(fpath string) []string {
 	parts := strings.Split(fpath, "/")
-	return parts[3 : len(parts)-1]
+	return append([]string{"pokemon"}, parts[3:len(parts)-1]...)
 }
 
 type CowBuildArgs struct {
-	FromDir  string
-	ToFpath  string
-	SkipDirs []string
+	FromDir    string
+	ToFpath    string
+	SkipDirs   []string
 	DebugTimer bool
 }
 
@@ -94,14 +87,23 @@ func parseArgs() CowBuildArgs {
 
 func main() {
 	args := parseArgs()
-	fmt.Println("starting at", args.FromDir)
 	t := timer.NewTimer()
+	fmt.Println("starting at", args.FromDir)
 
-	categories := findFiles(args.FromDir, ".cow", args.SkipDirs)
+	// categories is a PokemonTrie struct that will be written to a file using encoding/gob
+	// metadata is a list of pokemon data and an index to use when writing them to a file
+	// - this index matches a corresponding one in the categories struct
+	// - these files are embedded into the build binary using go:embed and then loaded at runtime
+	categories, metadata := findFiles(args.FromDir, ".cow", args.SkipDirs)
 	t.Mark("CreateEntriesFromFiles")
 
-	pokedex.WriteToFile(categories, args.ToFpath)
-	t.Mark("WriteToFile")
+	pokedex.WriteStructToFile(categories, args.ToFpath)
+	t.Mark("WriteCategoriesToFile")
+
+	for _, m := range metadata {
+		pokedex.WriteCompressedToFile(m.Data, pokedex.EntryFpath(m.Index))
+	}
+	t.Mark("WriteDataToFiles")
 
 	if args.DebugTimer {
 		t.Stop()
