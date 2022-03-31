@@ -7,6 +7,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 
 	"github.com/tmck-code/pokesay-go/src/pokedex"
@@ -19,14 +20,15 @@ func check(e error) {
 	}
 }
 
-type Metadata struct {
-	Data  []byte
-	Index int
+type Data struct {
+	Data     []byte
+	Index    int
+	Metadata pokedex.PokemonMetadata
 }
 
-func findFiles(dirpath string, ext string, skip []string) (pokedex.PokemonTrie, []Metadata) {
-	categories := pokedex.NewTrie()
-	metadata := []Metadata{}
+func findFiles(dirpath string, ext string, skip []string) (pokedex.PokemonTrie, []Data) {
+	trie := pokedex.NewTrie()
+	metadata := []Data{}
 
 	idx := 0
 	err := filepath.Walk(dirpath, func(fpath string, f os.FileInfo, err error) error {
@@ -36,22 +38,21 @@ func findFiles(dirpath string, ext string, skip []string) (pokedex.PokemonTrie, 
 			}
 		}
 		if !f.IsDir() && filepath.Ext(f.Name()) == ext {
-			idx += 1
 			data, err := os.ReadFile(fpath)
 			check(err)
 
-			categories.Insert(
-				createCategories(fpath),
-				pokedex.NewPokemonEntry(idx, createName(fpath)),
-			)
-			metadata = append(metadata, Metadata{data, idx})
+			name := createName(fpath)
+			categories := createCategories(fpath)
+			trie.Insert(categories, pokedex.NewPokemonEntry(idx, name))
+			metadata = append(metadata, Data{data, idx, pokedex.PokemonMetadata{Name: name, Categories: strings.Join(categories, "-")}})
+			idx += 1
 		}
 		return err
 	})
 	check(err)
 	fmt.Println("Wrote", idx, "pokemon to file")
 
-	return *categories, metadata
+	return *trie, metadata
 }
 
 func createName(fpath string) string {
@@ -101,9 +102,12 @@ func main() {
 	t.Mark("WriteCategoriesToFile")
 
 	for _, m := range metadata {
-		pokedex.WriteCompressedToFile(m.Data, pokedex.EntryFpath(m.Index))
+		pokedex.WriteBytesToFile(m.Data, pokedex.EntryFpath(m.Index), true)
+		pokedex.WriteStructToFile(m.Metadata, fmt.Sprintf("build/%d.metadata", m.Index))
 	}
 	t.Mark("WriteDataToFiles")
+
+	pokedex.WriteBytesToFile([]byte(strconv.Itoa(len(metadata))), "build/total.txt", false)
 
 	if args.DebugTimer {
 		t.Stop()
