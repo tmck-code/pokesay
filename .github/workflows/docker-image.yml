@@ -14,4 +14,4 @@ jobs:
 
     steps:
     - name: Build the Docker image
-      run: docker build -f Dockerfile -t pokesay:latest .
+      run: docker build -f build/Dockerfile -t pokesay:latest .
