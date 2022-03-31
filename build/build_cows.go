@@ -18,7 +18,14 @@ import (
 
 var (
 	failures []string
+	COLOUR_RESET string = fmt.Sprintf("%s[%dm\n", "\x1b", 39)
 )
+
+func check(e error) {
+	if e != nil {
+		log.Fatal(e)
+	}
+}
 
 type CowBuildArgs struct {
 	FromDir  string
@@ -52,17 +59,12 @@ func findFiles(dirpath string, ext string, skip []string) []string {
 		}
 		return err
 	})
-	if err != nil {
-		fmt.Println("Fatal!")
-		log.Fatal(err)
-	}
+	check(err)
 	return fpaths
 }
 
-func img2xterm(sourceFpath string) (error, []byte) {
-	out, err := exec.Command("bash", "-c", fmt.Sprintf("/usr/local/bin/img2xterm %s | grep \"\\S\" | tail -n +2", sourceFpath)).Output()
-
-	return err, out
+func img2xterm(sourceFpath string) ([]byte, error) {
+	return exec.Command("bash", "-c", fmt.Sprintf("/usr/local/bin/img2xterm %s", sourceFpath)).Output()
 }
 
 func countLineLeftPadding(line string) int {
@@ -129,31 +131,24 @@ func convertPngToCow(sourceDirpath string, sourceFpath string, destDirpath strin
 
 	// Some conversions are failing with something about colour channels
 	// Can't be bothered resolving atm, so just skip past any failed conversions
-	imgErr, converted := img2xterm(sourceFpath)
+ 	converted, _ := img2xterm(sourceFpath)
 	pbar.Add(1)
 
-	err := os.WriteFile(destFpath+".debug", converted, 0644)
-
-	if imgErr == nil && len(converted) == 0 {
+	if len(converted) == 0 {
 		failures = append(failures, sourceFpath)
 		return
 	}
 
 	ostream, err := os.Create(destFpath)
+	check(err)
 	defer ostream.Close()
-	if err != nil {
-		log.Fatal(err)
-	}
 	writer := bufio.NewWriter(ostream)
 
 	final := stripPadding(converted, countCowfileLeftPadding(converted)-extraPadding)
 
-	// Join all of the lines back together, and add a colour reset sequence at
-	// the end
-	_, err = writer.WriteString(strings.Join(final, "\n") + fmt.Sprintf("%s[%dm\n", "\x1b", 39))
-	if err != nil {
-		log.Fatal(err)
-	}
+	// Join all of the lines back together, add colour reset sequence at the end
+	_, err = writer.WriteString(strings.Join(final, "\n") + COLOUR_RESET)
+	check(err)
 
 	writer.Flush()
 	pbar.Add(1)
