@@ -147,7 +147,7 @@ func runCategoryList(categories pokedex.PokemonTrie) {
 	}
 }
 
-func runPrintByName(categories pokedex.PokemonTrie, args Args) {
+func runPrintByName(args Args, categories pokedex.PokemonTrie) {
 	matches, err := categories.MatchNameToken(args.NameToken)
 	check(err)
 	match := matches[randomInt(len(matches))]
@@ -156,16 +156,13 @@ func runPrintByName(categories pokedex.PokemonTrie, args Args) {
 	printPokemon(match.Entry.Index, match.Entry.Name, match.Categories)
 }
 
-func runPrintByCategory(categories pokedex.PokemonTrie, args Args) {
+func runPrintByCategory(args Args, categories pokedex.PokemonTrie) {
 	category := []*pokedex.PokemonEntry{}
 	keys := []string{}
-	if args.Category == "" {
-		keys, category = chooseRandomCategory(categories.Keys, categories)
-	} else {
-		matches, err := categories.GetCategoryPaths(args.Category)
-		check(err)
-		keys, category = chooseRandomCategory(matches, categories)
-	}
+
+	matches, err := categories.GetCategoryPaths(args.Category)
+	check(err)
+	keys, category = chooseRandomCategory(matches, categories)
 	choice := chooseRandomPokemon(category)
 
 	printSpeechBubble(bufio.NewScanner(os.Stdin), args)
@@ -180,18 +177,18 @@ func runPrintRandom(args Args) {
 	metadata := pokedex.ReadMetadataFromBytes(m)
 
 	printSpeechBubble(bufio.NewScanner(os.Stdin), args)
-	printPokemon(choice, metadata.Name, strings.Split(metadata.Categories, "-"))
+	printPokemon(choice, metadata.Name, strings.Split(metadata.Categories, "/"))
 }
 
 func main() {
 	args := parseFlags()
 
 	if args.ListCategories {
-		categories := pokedex.ReadTrieFromBytes(GOBCategory)
-		runCategoryList(categories)
+		runCategoryList(pokedex.ReadTrieFromBytes(GOBCategory))
 	} else if args.NameToken != "" {
-		categories := pokedex.ReadTrieFromBytes(GOBCategory)
-		runPrintByName(categories, args)
+		runPrintByName(args, pokedex.ReadTrieFromBytes(GOBCategory))
+	} else if args.Category != "" {
+		runPrintByCategory(args, pokedex.ReadTrieFromBytes(GOBCategory))
 	} else {
 		runPrintRandom(args)
 	}
