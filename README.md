@@ -1,7 +1,19 @@
 # pokesay-go
 A (much) faster go version of tmck-code/pokesay
 
+---
+
+- [pokesay-go](#pokesay-go)
+  - [One-line installs](#one-line-installs)
+  - [How it works](#how-it-works)
+  - [TODO](#todo)
+  - [Building binaries](#building-binaries)
+    - [In docker](#in-docker)
+    - [On your host OS](#on-your-host-os)
+
 ![pokesay-demo-3](https://user-images.githubusercontent.com/9894426/160840120-f45be867-7427-4f19-862c-46e6a4b396c3.png)
+
+---
 
 ## One-line installs
 
@@ -68,16 +80,13 @@ Navigate to the Releases and download the latest binary.
 
 ## TODO
 
-### Short-term
-
-- [x] Fix bad whitespace stripping when building assets
-- [ ] List all names
-
-### Longer-term
-
-- [x] Make data structure to hold categories, names and pokemon
-- [x] Increase speed
-- [ ] Improve categories to be more specific than shiny/regular
+- Short-term
+  - [x] Fix bad whitespace stripping when building assets
+  - [ ] List all names
+- Longer-term
+  - [x] Make data structure to hold categories, names and pokemon
+  - [x] Increase speed
+  - [ ] Improve categories to be more specific than shiny/regular
 
 ## Building binaries
 
