@@ -1,8 +1,6 @@
 # pokesay-go
 A (much) faster go version of tmck-code/pokesay
 
----
-
 - [pokesay-go](#pokesay-go)
   - [One-line installs](#one-line-installs)
   - [How it works](#how-it-works)
@@ -10,6 +8,8 @@ A (much) faster go version of tmck-code/pokesay
   - [Building binaries](#building-binaries)
     - [In docker](#in-docker)
     - [On your host OS](#on-your-host-os)
+
+---
 
 ![pokesay-demo-3](https://user-images.githubusercontent.com/9894426/160840120-f45be867-7427-4f19-862c-46e6a4b396c3.png)
 
