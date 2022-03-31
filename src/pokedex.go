@@ -44,7 +44,7 @@ func findFiles(dirpath string, ext string, skip []string) (pokedex.PokemonTrie, 
 			name := createName(fpath)
 			categories := createCategories(fpath)
 			trie.Insert(categories, pokedex.NewPokemonEntry(idx, name))
-			metadata = append(metadata, Data{data, idx, pokedex.PokemonMetadata{Name: name, Categories: strings.Join(categories, "-")}})
+			metadata = append(metadata, Data{data, idx, pokedex.PokemonMetadata{Name: name, Categories: strings.Join(categories, "/")}})
 			idx += 1
 		}
 		return err
