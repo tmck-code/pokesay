@@ -5,6 +5,9 @@ A (much) faster go version of tmck-code/pokesay
 
 ## One-line installs
 
+<details>
+  <summary>Click to expand!</summary>
+
 - OSX / darwin
     ```shell
     bash -c "$(curl https://raw.githubusercontent.com/tmck-code/pokesay-go/master/scripts/install.sh)" bash darwin amd64
@@ -21,6 +24,7 @@ A (much) faster go version of tmck-code/pokesay
     ```shell
     bash -c "$(curl https://raw.githubusercontent.com/tmck-code/pokesay-go/master/scripts/install.sh)" bash android arm64
     ```
+</details>
 
 ---
 
