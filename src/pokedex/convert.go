@@ -1,11 +1,8 @@
-package main
+package pokedex
 
 import (
-	"encoding/json"
 	"bufio"
-	"flag"
 	"fmt"
-	"log"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -17,39 +14,14 @@ import (
 )
 
 var (
-	failures []string
+	failures     []string
 	COLOUR_RESET string = fmt.Sprintf("%s[%dm\n", "\x1b", 39)
 )
 
-func check(e error) {
-	if e != nil {
-		log.Fatal(e)
-	}
-}
-
-type CowBuildArgs struct {
-	FromDir  string
-	ToDir    string
-	SkipDirs []string
-}
-
-func parseArgs() CowBuildArgs {
-	fromDir := flag.String("from", ".", "from dir")
-	toDir := flag.String("to", ".", "to dir")
-	skipDirs := flag.String("skip", "'[\"resources\"]'", "JSON array of dir patterns to skip converting")
-
-	flag.Parse()
-
-	args := CowBuildArgs{FromDir: *fromDir, ToDir: *toDir}
-	json.Unmarshal([]byte(*skipDirs), &args.SkipDirs)
-
-	return args
-}
-
-func findFiles(dirpath string, ext string, skip []string) []string {
+func FindFiles(dirpath string, ext string, skip []string) []string {
 	fpaths := []string{}
 	err := filepath.Walk(dirpath, func(path string, f os.FileInfo, err error) error {
-		for _, s := range(skip) {
+		for _, s := range skip {
 			if strings.Contains(path, s) {
 				return err
 			}
@@ -115,7 +87,7 @@ func stripPadding(cowfile []byte, n int) []string {
 	return converted
 }
 
-func convertPngToCow(sourceDirpath string, sourceFpath string, destDirpath string, extraPadding int, wg *sync.WaitGroup, pbar *progressbar.ProgressBar) {
+func ConvertPngToCow(sourceDirpath string, sourceFpath string, destDirpath string, extraPadding int, wg *sync.WaitGroup, pbar *progressbar.ProgressBar) {
 	defer wg.Done()
 	destDir := filepath.Join(
 		destDirpath,
@@ -131,7 +103,7 @@ func convertPngToCow(sourceDirpath string, sourceFpath string, destDirpath strin
 
 	// Some conversions are failing with something about colour channels
 	// Can't be bothered resolving atm, so just skip past any failed conversions
- 	converted, _ := img2xterm(sourceFpath)
+	converted, _ := img2xterm(sourceFpath)
 	pbar.Add(1)
 
 	if len(converted) == 0 {
@@ -152,42 +124,4 @@ func convertPngToCow(sourceDirpath string, sourceFpath string, destDirpath strin
 
 	writer.Flush()
 	pbar.Add(1)
-}
-
-func newProgressBar(max int) progressbar.ProgressBar {
-	return *progressbar.NewOptions(
-		max,
-		progressbar.OptionSetWriter(os.Stderr),
-		progressbar.OptionSetWidth(40),
-		progressbar.OptionThrottle(100*time.Millisecond),
-		progressbar.OptionShowCount(),
-		progressbar.OptionShowIts(),
-		progressbar.OptionOnCompletion(func() { fmt.Fprint(os.Stderr, "\n") }),
-		progressbar.OptionSetTheme(progressbar.Theme{Saucer: "█", SaucerPadding: "░", BarStart: "╢", BarEnd: "╟"}),
-	)
-}
-
-func main() {
-	args := parseArgs()
-	fmt.Println("starting at", args.FromDir)
-
-	fpaths := findFiles(args.FromDir, ".png", args.SkipDirs)
-	fpathChan := make(chan string, len(fpaths))
-
-	go func() {
-		for _, f := range fpaths {
-			fpathChan <- f
-		}
-	}()
-
-	var wg sync.WaitGroup
-	pbar := newProgressBar(len(fpaths))
-
-	for i := 0; i < len(fpaths) ; i++ {
-		go convertPngToCow(args.FromDir, <-fpathChan, args.ToDir, 2, &wg, &pbar)
-		wg.Add(1)
-	}
-	wg.Wait()
-	fmt.Println("Finished converting", len(fpaths), "pokesprite -> cowfiles")
-	fmt.Println("Failures:", len(failures), "/", len(fpaths), "-", failures)
 }
