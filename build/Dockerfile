@@ -18,18 +18,14 @@ WORKDIR /tmp/original
 RUN git clone --depth 1 https://github.com/msikma/pokesprite
 
 WORKDIR /usr/local/src/
-ADD build/build_cows.go /usr/local/src/build/
+ADD src/ /usr/local/src/src/
 ADD go.* /usr/local/src/
 RUN go mod tidy \
     && go get -v github.com/mitchellh/go-wordwrap
 
 # Convert all of the pokesprite .pngs -> cowfiles for the terminal
-RUN go run /usr/local/src/build/build_cows.go \
+# Also build up a map of category -> pokemon, and write it as a "encoding/gob" file
+RUN go run /usr/local/src/src/pokedex.go \
         -from /tmp/original/pokesprite/ \
         -to /tmp/cows/ \
         -skip '["resources/", "misc/", "icons/", "items/", "items-outline/"]'
-
-# Now, build up a map of category -> pokemon, and write it as a "encoding/gob" file
-ADD . .
-RUN go build src/pokedex.go && \
-    ./pokedex -from /tmp/cows/ -to build/pokedex.gob
