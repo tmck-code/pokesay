@@ -87,6 +87,11 @@ func stripPadding(cowfile []byte, n int) []string {
 	return converted
 }
 
+type Metadata struct {
+	Data  []byte
+	Index int
+}
+
 func ConvertPngToCow(sourceDirpath string, sourceFpath string, destDirpath string, extraPadding int, wg *sync.WaitGroup, pbar *progressbar.ProgressBar) {
 	defer wg.Done()
 	destDir := filepath.Join(
@@ -125,3 +130,7 @@ func ConvertPngToCow(sourceDirpath string, sourceFpath string, destDirpath strin
 	writer.Flush()
 	pbar.Add(1)
 }
+
+// func createStructs(fpaths []string) (PokemonTrie, []Metadata) {
+
+// }
