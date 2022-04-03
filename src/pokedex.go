@@ -20,46 +20,10 @@ func check(e error) {
 	}
 }
 
-type Metadata struct {
-	Data  []byte
-	Index int
-}
-
-// func findFiles(dirpath string, ext string, skip []string) (pokedex.PokemonTrie, []Metadata) {
-// 	categories := pokedex.NewTrie()
-// 	metadata := []Metadata{}
-
-// 	idx := 0
-// 	err := filepath.Walk(dirpath, func(fpath string, f os.FileInfo, err error) error {
-// 		for _, s := range skip {
-// 			if strings.Contains(fpath, s) {
-// 				return err
-// 			}
-// 		}
-// 		if !f.IsDir() && filepath.Ext(f.Name()) == ext {
-// 			idx += 1
-// 			data, err := os.ReadFile(fpath)
-// 			check(err)
-
-// 			categories.Insert(
-// 				createCategories(fpath),
-// 				pokedex.NewPokemonEntry(idx, createName(fpath)),
-// 			)
-// 			metadata = append(metadata, Metadata{data, idx})
-// 		}
-// 		return err
-// 	})
-// 	check(err)
-// 	fmt.Println("Wrote", idx, "pokemon to file")
-
-// 	return *categories, metadata
-// }
-
-func convertFiles(fpaths []string) (pokedex.PokemonTrie, []Metadata) {
+func convertFiles(fpaths []string, pbar *progressbar.ProgressBar) (pokedex.PokemonTrie, []pokedex.Metadata) {
 	categories := pokedex.NewTrie()
-	metadata := []Metadata{}
+	metadata := []pokedex.Metadata{}
 	for idx, fpath := range fpaths {
-		idx += 1
 		data, err := os.ReadFile(fpath)
 		check(err)
 
@@ -67,7 +31,7 @@ func convertFiles(fpaths []string) (pokedex.PokemonTrie, []Metadata) {
 			createCategories(fpath),
 			pokedex.NewPokemonEntry(idx, createName(fpath)),
 		)
-		metadata = append(metadata, Metadata{data, idx})
+		metadata = append(metadata, pokedex.Metadata{Data: data, Index: idx})
 	}
 	return *categories, metadata
 }
@@ -126,15 +90,15 @@ func parseArgs() CowBuildArgs {
 // 	// - this index matches a corresponding one in the categories struct
 // 	// - these files are embedded into the build binary using go:embed and then loaded at runtime
 // 	categories, metadata := convertFiles(
-// 		pokedex.FindFiles(args.FromDir, ".cow", args.SkipDirs),
+// 		FindFiles(args.FromDir, ".cow", args.SkipDirs),
 // 	)
 // 	t.Mark("CreateEntriesFromFiles")
 
-// 	pokedex.WriteStructToFile(categories, args.ToFpath)
+// 	WriteStructToFile(categories, args.ToFpath)
 // 	t.Mark("WriteCategoriesToFile")
 
 // 	for _, m := range metadata {
-// 		pokedex.WriteCompressedToFile(m.Data, pokedex.EntryFpath(m.Index))
+// 		WriteCompressedToFile(m.Data, EntryFpath(m.Index))
 // 	}
 // 	t.Mark("WriteDataToFiles")
 
@@ -166,5 +130,14 @@ func main() {
 	}
 	wg.Wait()
 	fmt.Println("Finished converting", len(fpaths), "pokesprite -> cowfiles")
-	fmt.Println("Failures:", len(failures), "/", len(fpaths), "-", failures)
+
+	pbar = newProgressBar(len(fpaths))
+	categories, metadata := convertFiles(fpaths, &pbar)
+	fmt.Println("Writing categories to build/gob")
+	pokedex.WriteStructToFile(categories, "build/gob")
+
+	fmt.Println("Writing data files to build/*cow")
+	for _, m := range metadata {
+		pokedex.WriteCompressedToFile(m.Data, pokedex.EntryFpath(m.Index))
+	}
 }
