@@ -57,31 +57,35 @@ func parseArgs() CowBuildArgs {
 
 func main() {
 	args := parseArgs()
-	fmt.Println("starting at", args.FromDir)
 
 	fpaths := pokedex.FindFiles(args.FromDir, ".png", args.SkipDirs)
 
+	fmt.Println("Converting PNGs -> cowfiles")
 	pbar := newProgressBar(len(fpaths))
 	for _, f := range fpaths {
-		pokedex.ConvertPngToCow(args.FromDir, f, args.ToDir, 2, &pbar)
+		pokedex.ConvertPngToCow(args.FromDir, f, args.ToDir, 2)
+		pbar.Add(1)
 	}
-	fmt.Println("Finished converting", len(fpaths), "pokesprite -> cowfiles")
 
-	fmt.Println("starting at", args.ToDir)
-	fpaths = pokedex.FindFiles(args.ToDir, ".cow", args.SkipDirs)
-
+	cowFpaths := pokedex.FindFiles(args.ToDir, ".cow", args.SkipDirs)
+	
 	// categories is a PokemonTrie struct that will be written to a file using encoding/gob
 	// metadata is a list of pokemon data and an index to use when writing them to a file
 	// - this index matches a corresponding one in the categories struct
 	// - these files are embedded into the build binary using go:embed and then loaded at runtime
-	categories, metadata := pokedex.CreateMetadata(fpaths)
+	categories, metadata := pokedex.CreateMetadata(cowFpaths)
 
-	fmt.Println("writing categories to", args.ToCategoryFpath)
 	pokedex.WriteStructToFile(categories, args.ToCategoryFpath)
 
+	fmt.Println("\nConverting cowfiles -> category & metadata GOB")
+	pbar = newProgressBar(len(cowFpaths))
 	for _, m := range metadata {
 		pokedex.WriteBytesToFile(m.Data, pokedex.EntryFpath(m.Index), true)
 		pokedex.WriteStructToFile(m.Metadata, pokedex.MetadataFpath(m.Index))
+		pbar.Add(1)
 	}
 	pokedex.WriteBytesToFile([]byte(strconv.Itoa(len(metadata))), "build/total.txt", false)
+
+	fmt.Println("Finished converting", len(fpaths), "pokesprite", len(cowFpaths), "-> cowfiles")
+	fmt.Println("Wrote categories to", args.ToCategoryFpath)
 }
