@@ -7,8 +7,6 @@ import (
 	"path/filepath"
 	"strings"
 	"time"
-
-	"github.com/schollz/progressbar/v3"
 )
 
 var (
@@ -85,7 +83,7 @@ func stripPadding(cowfile []byte, n int) []string {
 	return converted
 }
 
-func ConvertPngToCow(sourceDirpath string, sourceFpath string, destDirpath string, extraPadding int, pbar *progressbar.ProgressBar) {
+func ConvertPngToCow(sourceDirpath string, sourceFpath string, destDirpath string, extraPadding int) {
 	destDir := filepath.Join(
 		destDirpath,
 		// strip the root "source dirpath" from the source path
@@ -101,7 +99,6 @@ func ConvertPngToCow(sourceDirpath string, sourceFpath string, destDirpath strin
 	// Some conversions are failing with something about colour channels
 	// Can't be bothered resolving atm, so just skip past any failed conversions
 	converted, _ := img2xterm(sourceFpath)
-	pbar.Add(1)
 
 	if len(converted) == 0 {
 		failures = append(failures, sourceFpath)
@@ -120,7 +117,6 @@ func ConvertPngToCow(sourceDirpath string, sourceFpath string, destDirpath strin
 	check(err)
 
 	writer.Flush()
-	pbar.Add(1)
 }
 
 type Metadata struct {
