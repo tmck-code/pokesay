@@ -16,3 +16,14 @@ jobs:
     - uses: actions/checkout@v3
     - name: Build the Docker image
       run: docker build . --file build/Dockerfile --tag pokesay-go:$(date +%s)
+    - uses: addnab/docker-run-action@v3
+      with:
+        image: pokesay-go:pokesay-go:$(date +%s)
+        run: |
+          echo "Running Script"
+          pokesay-go:latest build/build.sh
+    - uses: shrink/actions-docker-extract@v1
+      with:
+        image: pokesay-go:pokesay-go:$(date +%s)
+        path: '/usr/local/src/build/pokesay-go-*'
+
