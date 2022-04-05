@@ -34,6 +34,11 @@ type PokemonTrie struct {
 	Keys [][]string
 }
 
+type PokemonMetadata struct {
+	Categories string
+	Name       string
+}
+
 func NewPokemonEntry(idx int, name string) *PokemonEntry {
 	return &PokemonEntry{
 		Index: idx,
@@ -57,6 +62,10 @@ func NewTrie() *PokemonTrie {
 
 func EntryFpath(idx int) string {
 	return fmt.Sprintf("build/%d.cow", idx)
+}
+
+func MetadataFpath(idx int) string {
+	return fmt.Sprintf("build/%d.metadata", idx)
 }
 
 func Equal(a, b []string) bool {
@@ -206,24 +215,40 @@ func WriteStructToFile(data interface{}, fpath string) {
 	ostream.Close()
 }
 
-func ReadStructFromBytes(data []byte) PokemonTrie {
+func ReadTrieFromBytes(data []byte) PokemonTrie {
 	buf := bytes.NewBuffer(data)
 	dec := gob.NewDecoder(buf)
 
-	categories := &PokemonTrie{}
+	d := &PokemonTrie{}
 
-	err := dec.Decode(&categories)
+	err := dec.Decode(&d)
 	check(err)
 
-	return *categories
+	return *d
 }
 
-func WriteCompressedToFile(data []byte, fpath string) {
+func ReadMetadataFromBytes(data []byte) PokemonMetadata {
+	buf := bytes.NewBuffer(data)
+	dec := gob.NewDecoder(buf)
+
+	d := &PokemonMetadata{}
+
+	err := dec.Decode(&d)
+	check(err)
+
+	return *d
+}
+
+func WriteBytesToFile(data []byte, fpath string, compress bool) {
 	ostream, err := os.Create(fpath)
 	check(err)
 
 	writer := bufio.NewWriter(ostream)
-	writer.WriteString(string(Compress(data)))
+	if compress {
+		writer.WriteString(string(Compress(data)))
+	} else {
+		writer.WriteString(string(data))
+	}
 	writer.Flush()
 	ostream.Close()
 }
