@@ -8,6 +8,7 @@ import (
 	"log"
 	"math/rand"
 	"os"
+	"strconv"
 	"strings"
 	"time"
 
@@ -18,9 +19,14 @@ import (
 var (
 	//go:embed build/pokedex.gob
 	GOBCategory []byte
+	//go:embed build/total.txt
+	GOBTotal []byte
 	//go:embed build/*cow
 	GOBCowData embed.FS
-	Rand       rand.Source = rand.NewSource(time.Now().UnixNano())
+	//go:embed build/*metadata
+	GOBCowNames embed.FS
+
+	Rand rand.Source = rand.NewSource(time.Now().UnixNano())
 )
 
 func check(e error) {
@@ -69,9 +75,9 @@ func printSpeechBubble(scanner *bufio.Scanner, args Args) {
 	}
 }
 
-func printPokemon(choice *pokedex.PokemonEntry, categoryKeys []string) {
-	d, _ := GOBCowData.ReadFile(pokedex.EntryFpath(choice.Index))
-	fmt.Printf("%schoice: %s / categories: %s\n", pokedex.Decompress(d), choice.Name, categoryKeys)
+func printPokemon(index int, name string, categoryKeys []string) {
+	d, _ := GOBCowData.ReadFile(pokedex.EntryFpath(index))
+	fmt.Printf("%schoice: %s / categories: %s\n", pokedex.Decompress(d), name, categoryKeys)
 }
 
 func chooseRandomCategory(keys [][]string, categories pokedex.PokemonTrie) ([]string, []*pokedex.PokemonEntry) {
@@ -141,39 +147,46 @@ func runCategoryList(categories pokedex.PokemonTrie) {
 	}
 }
 
-func runPrintByName(categories pokedex.PokemonTrie, args Args) {
+func runPrintByName(args Args, categories pokedex.PokemonTrie) {
 	matches, err := categories.MatchNameToken(args.NameToken)
 	check(err)
-	printSpeechBubble(bufio.NewScanner(os.Stdin), args)
 	match := matches[randomInt(len(matches))]
-	printPokemon(match.Entry, match.Categories)
+
+	printSpeechBubble(bufio.NewScanner(os.Stdin), args)
+	printPokemon(match.Entry.Index, match.Entry.Name, match.Categories)
 }
 
-func runPrintByCategory(categories pokedex.PokemonTrie, args Args) {
-	category := []*pokedex.PokemonEntry{}
-	keys := []string{}
-	if args.Category == "" {
-		keys, category = chooseRandomCategory(categories.Keys, categories)
-	} else {
-		matches, err := categories.GetCategoryPaths(args.Category)
-		check(err)
-		keys, category = chooseRandomCategory(matches, categories)
-	}
+func runPrintByCategory(args Args, categories pokedex.PokemonTrie) {
+	matches, err := categories.GetCategoryPaths(args.Category)
+	check(err)
+	keys, category := chooseRandomCategory(matches, categories)
+	choice := chooseRandomPokemon(category)
 
 	printSpeechBubble(bufio.NewScanner(os.Stdin), args)
-	printPokemon(chooseRandomPokemon(category), keys)
+	printPokemon(choice.Index, choice.Name, keys)
+}
+
+func runPrintRandom(args Args) {
+	total, _ := strconv.Atoi(string(GOBTotal))
+	choice := randomInt(total)
+	m, err := GOBCowNames.ReadFile(pokedex.MetadataFpath(choice))
+	check(err)
+	metadata := pokedex.ReadMetadataFromBytes(m)
+
+	printSpeechBubble(bufio.NewScanner(os.Stdin), args)
+	printPokemon(choice, metadata.Name, strings.Split(metadata.Categories, "/"))
 }
 
 func main() {
 	args := parseFlags()
 
-	categories := pokedex.ReadStructFromBytes(GOBCategory)
-
 	if args.ListCategories {
-		runCategoryList(categories)
+		runCategoryList(pokedex.ReadTrieFromBytes(GOBCategory))
 	} else if args.NameToken != "" {
-		runPrintByName(categories, args)
+		runPrintByName(args, pokedex.ReadTrieFromBytes(GOBCategory))
+	} else if args.Category != "" {
+		runPrintByCategory(args, pokedex.ReadTrieFromBytes(GOBCategory))
 	} else {
-		runPrintByCategory(categories, args)
+		runPrintRandom(args)
 	}
 }

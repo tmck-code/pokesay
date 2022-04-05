@@ -126,24 +126,7 @@ func ConvertPngToCow(sourceDirpath string, sourceFpath string, destDirpath strin
 type Metadata struct {
 	Data  []byte
 	Index int
-}
-
-func ConvertFiles(fpaths []string) (PokemonTrie, []Metadata) {
-	categories := NewTrie()
-	metadata := []Metadata{}
-	for idx, fpath := range fpaths {
-		idx += 1
-		fmt.Println("converting", idx, fpath)
-		data, err := os.ReadFile(fpath)
-		check(err)
-
-		categories.Insert(
-			createCategories(fpath),
-			NewPokemonEntry(idx, createName(fpath)),
-		)
-		metadata = append(metadata, Metadata{data, idx})
-	}
-	return *categories, metadata
+	Metadata PokemonMetadata
 }
 
 func CreateMetadata(fpaths []string) (PokemonTrie, []Metadata) {
@@ -153,11 +136,14 @@ func CreateMetadata(fpaths []string) (PokemonTrie, []Metadata) {
 		data, err := os.ReadFile(fpath)
 		check(err)
 
+		cats := createCategories(fpath)
+		name := createName(fpath)
+
 		categories.Insert(
-			createCategories(fpath),
-			NewPokemonEntry(i, createName(fpath)),
+			cats,
+			NewPokemonEntry(i,name),
 		)
-		metadata = append(metadata, Metadata{data, i})
+		metadata = append(metadata, Metadata{data, i,  PokemonMetadata{Name: name, Categories: strings.Join(cats, "/")}})
 	}
 	return *categories, metadata
 }
