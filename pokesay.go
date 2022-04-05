@@ -157,12 +157,9 @@ func runPrintByName(args Args, categories pokedex.PokemonTrie) {
 }
 
 func runPrintByCategory(args Args, categories pokedex.PokemonTrie) {
-	category := []*pokedex.PokemonEntry{}
-	keys := []string{}
-
 	matches, err := categories.GetCategoryPaths(args.Category)
 	check(err)
-	keys, category = chooseRandomCategory(matches, categories)
+	keys, category := chooseRandomCategory(matches, categories)
 	choice := chooseRandomPokemon(category)
 
 	printSpeechBubble(bufio.NewScanner(os.Stdin), args)
