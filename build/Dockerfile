@@ -24,8 +24,11 @@ RUN go mod tidy \
     && go get -v github.com/mitchellh/go-wordwrap
 
 # Convert all of the pokesprite .pngs -> cowfiles for the terminal
-# Also build up a map of category -> pokemon, and write it as a "encoding/gob" file
+# build up a map of category -> pokemon, and write it as a "encoding/gob" file
+ADD . .
 RUN go run /usr/local/src/src/pokedex.go \
         -from /tmp/original/pokesprite/ \
         -to /tmp/cows/ \
-        -skip '["resources/", "misc/", "icons/", "items/", "items-outline/"]'
+        -skip '["resources/", "misc/", "icons/", "items/", "items-outline/"]' \
+        -toCategoryFpath "build/pokedex.gob"
+
