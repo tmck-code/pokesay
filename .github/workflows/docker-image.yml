@@ -16,8 +16,5 @@ jobs:
     - uses: actions/checkout@v3
     - name: Build the Docker image
       run: docker build . --file build/Dockerfile --tag pokesay-go:$(date +%s)
-    - uses: shrink/actions-docker-extract@v1
-      with:
-        image: pokesay-go:pokesay-go:$(date +%s)
-        path: '/usr/local/src/build/bin/.'
-
+    - name: Copy the binaries
+      run: "docker create --name pokesay pokesay-go:pokesay-go:$(date +%s) && docker cp pokesay:/usr/local/src/pokesay-linux-amd64 . && docker rm pokesay"
