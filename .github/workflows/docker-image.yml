@@ -19,5 +19,5 @@ jobs:
     - uses: shrink/actions-docker-extract@v1
       with:
         image: pokesay-go:pokesay-go:$(date +%s)
-        path: '/usr/local/src/build/pokesay-go-*'
+        path: '/usr/local/src/build/bin/.'
 
