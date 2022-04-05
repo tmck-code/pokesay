@@ -1,5 +1,4 @@
 package pokedex
-
 import (
 	"bufio"
 	"fmt"
@@ -7,7 +6,6 @@ import (
 	"os/exec"
 	"path/filepath"
 	"strings"
-	"sync"
 	"time"
 
 	"github.com/schollz/progressbar/v3"
@@ -87,13 +85,7 @@ func stripPadding(cowfile []byte, n int) []string {
 	return converted
 }
 
-type Metadata struct {
-	Data  []byte
-	Index int
-}
-
-func ConvertPngToCow(sourceDirpath string, sourceFpath string, destDirpath string, extraPadding int, wg *sync.WaitGroup, pbar *progressbar.ProgressBar) {
-	defer wg.Done()
+func ConvertPngToCow(sourceDirpath string, sourceFpath string, destDirpath string, extraPadding int, pbar *progressbar.ProgressBar) {
 	destDir := filepath.Join(
 		destDirpath,
 		// strip the root "source dirpath" from the source path
@@ -131,6 +123,51 @@ func ConvertPngToCow(sourceDirpath string, sourceFpath string, destDirpath strin
 	pbar.Add(1)
 }
 
-// func createStructs(fpaths []string) (PokemonTrie, []Metadata) {
+type Metadata struct {
+	Data  []byte
+	Index int
+}
 
-// }
+func ConvertFiles(fpaths []string) (PokemonTrie, []Metadata) {
+	categories := NewTrie()
+	metadata := []Metadata{}
+	for idx, fpath := range fpaths {
+		idx += 1
+		fmt.Println("converting", idx, fpath)
+		data, err := os.ReadFile(fpath)
+		check(err)
+
+		categories.Insert(
+			createCategories(fpath),
+			NewPokemonEntry(idx, createName(fpath)),
+		)
+		metadata = append(metadata, Metadata{data, idx})
+	}
+	return *categories, metadata
+}
+
+func CreateMetadata(fpaths []string) (PokemonTrie, []Metadata) {
+	categories := NewTrie()
+	metadata := []Metadata{}
+	for i, fpath := range fpaths {
+		data, err := os.ReadFile(fpath)
+		check(err)
+
+		categories.Insert(
+			createCategories(fpath),
+			NewPokemonEntry(i, createName(fpath)),
+		)
+		metadata = append(metadata, Metadata{data, i})
+	}
+	return *categories, metadata
+}
+
+func createName(fpath string) string {
+	parts := strings.Split(fpath, "/")
+	return strings.Split(parts[len(parts)-1], ".")[0]
+}
+
+func createCategories(fpath string) []string {
+	parts := strings.Split(fpath, "/")
+	return append([]string{"pokemon"}, parts[3:len(parts)-1]...)
+}
