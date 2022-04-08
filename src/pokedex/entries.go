@@ -61,11 +61,11 @@ func NewTrie() *PokemonTrie {
 }
 
 func EntryFpath(idx int) string {
-	return fmt.Sprintf("build/%d.cow", idx)
+	return fmt.Sprintf("build/cows/%d.cow", idx)
 }
 
 func MetadataFpath(idx int) string {
-	return fmt.Sprintf("build/%d.metadata", idx)
+	return fmt.Sprintf("build/metadata/%d.metadata", idx)
 }
 
 func Equal(a, b []string) bool {
