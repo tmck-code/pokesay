@@ -68,7 +68,7 @@ func main() {
 	}
 
 	cowFpaths := pokedex.FindFiles(args.ToDir, ".cow", args.SkipDirs)
-	
+
 	// categories is a PokemonTrie struct that will be written to a file using encoding/gob
 	// metadata is a list of pokemon data and an index to use when writing them to a file
 	// - this index matches a corresponding one in the categories struct
@@ -84,7 +84,7 @@ func main() {
 		pokedex.WriteStructToFile(m.Metadata, pokedex.MetadataFpath(m.Index))
 		pbar.Add(1)
 	}
-	pokedex.WriteBytesToFile([]byte(strconv.Itoa(len(metadata))), "build/total.txt", false)
+	pokedex.WriteBytesToFile([]byte(strconv.Itoa(len(metadata))), "build/metadata/total.txt", false)
 
 	fmt.Println("Finished converting", len(fpaths), "pokesprite", len(cowFpaths), "-> cowfiles")
 	fmt.Println("Wrote categories to", args.ToCategoryFpath)

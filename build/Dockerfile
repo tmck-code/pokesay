@@ -30,6 +30,5 @@ RUN go run /usr/local/src/src/pokedex.go \
         -from /tmp/original/pokesprite/ \
         -to /tmp/cows/ \
         -skip '["resources/", "misc/", "icons/", "items/", "items-outline/"]' \
-        -toCategoryFpath "build/pokedex.gob"
+        -toCategoryFpath "build/metadata/pokedex.gob"
 
-RUN build/build.sh
