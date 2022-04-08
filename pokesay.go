@@ -12,8 +12,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/mitchellh/go-wordwrap"
 	"github.com/tmck-code/pokesay-go/src/pokedex"
+
+	"github.com/mitchellh/go-wordwrap"
+	"github.com/fatih/color"
 )
 
 var (
@@ -77,7 +79,11 @@ func printSpeechBubble(scanner *bufio.Scanner, args Args) {
 
 func printPokemon(index int, name string, categoryKeys []string) {
 	d, _ := GOBCowData.ReadFile(pokedex.EntryFpath(index))
-	fmt.Printf("%schoice: %s / categories: %s\n", pokedex.Decompress(d), name, categoryKeys)
+    choice := color.New(color.FgRed).SprintFunc()
+fmt.Printf("This is a %s and this is %s.\n", yellow("warning"), red("error"))
+
+
+	fmt.Printf("%schoice: %s / categories: %s\n", pokedex.Decompress(d), choice(name), categoryKeys)
 }
 
 func chooseRandomCategory(keys [][]string, categories pokedex.PokemonTrie) ([]string, []*pokedex.PokemonEntry) {
