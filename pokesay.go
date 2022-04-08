@@ -19,13 +19,13 @@ import (
 )
 
 var (
-	//go:embed build/pokedex.gob
+	//go:embed build/metadata/pokedex.gob
 	GOBCategory []byte
-	//go:embed build/total.txt
+	//go:embed build/metadata/total.txt
 	GOBTotal []byte
-	//go:embed build/*cow
+	//go:embed build/cows/*cow
 	GOBCowData embed.FS
-	//go:embed build/*metadata
+	//go:embed build/metadata/*metadata
 	GOBCowNames embed.FS
 
 	Rand rand.Source = rand.NewSource(time.Now().UnixNano())
@@ -80,8 +80,6 @@ func printSpeechBubble(scanner *bufio.Scanner, args Args) {
 func printPokemon(index int, name string, categoryKeys []string) {
 	d, _ := GOBCowData.ReadFile(pokedex.EntryFpath(index))
     choice := color.New(color.FgRed).SprintFunc()
-fmt.Printf("This is a %s and this is %s.\n", yellow("warning"), red("error"))
-
 
 	fmt.Printf("%schoice: %s / categories: %s\n", pokedex.Decompress(d), choice(name), categoryKeys)
 }
