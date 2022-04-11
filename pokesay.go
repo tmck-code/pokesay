@@ -14,18 +14,18 @@ import (
 
 	"github.com/tmck-code/pokesay-go/src/pokedex"
 
-	"github.com/mitchellh/go-wordwrap"
 	"github.com/fatih/color"
+	"github.com/mitchellh/go-wordwrap"
 )
 
 var (
-	//go:embed build/metadata/pokedex.gob
+	//go:embed build/assets/metadata/pokedex.gob
 	GOBCategory []byte
-	//go:embed build/metadata/total.txt
+	//go:embed build/assets/metadata/total.txt
 	GOBTotal []byte
-	//go:embed build/cows/*cow
+	//go:embed build/assets/cows/*cow
 	GOBCowData embed.FS
-	//go:embed build/metadata/*metadata
+	//go:embed build/assets/metadata/*metadata
 	GOBCowNames embed.FS
 
 	Rand rand.Source = rand.NewSource(time.Now().UnixNano())
@@ -78,8 +78,8 @@ func printSpeechBubble(scanner *bufio.Scanner, args Args) {
 }
 
 func printPokemon(index int, name string, categoryKeys []string) {
-	d, _ := GOBCowData.ReadFile(pokedex.EntryFpath(index))
-    choice := color.New(color.FgRed).SprintFunc()
+	d, _ := GOBCowData.ReadFile(pokedex.EntryFpath("build/assets/cows", index))
+	choice := color.New(color.FgRed).SprintFunc()
 
 	fmt.Printf("%schoice: %s / categories: %s\n", pokedex.Decompress(d), choice(name), categoryKeys)
 }
@@ -173,7 +173,7 @@ func runPrintByCategory(args Args, categories pokedex.PokemonTrie) {
 func runPrintRandom(args Args) {
 	total, _ := strconv.Atoi(string(GOBTotal))
 	choice := randomInt(total)
-	m, err := GOBCowNames.ReadFile(pokedex.MetadataFpath(choice))
+	m, err := GOBCowNames.ReadFile(pokedex.MetadataFpath("build/assets/metadata", choice))
 	check(err)
 	metadata := pokedex.ReadMetadataFromBytes(m)
 
