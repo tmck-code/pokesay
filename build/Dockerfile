@@ -24,11 +24,19 @@ RUN go mod tidy \
     && go get -v github.com/mitchellh/go-wordwrap
 
 ADD . .
+RUN mkdir -p build/metadata build/cows
+
 # Convert all of the pokesprite .pngs -> cowfiles for the terminal
-# build up a map of category -> pokemon, and write it as a "encoding/gob" file
-RUN go run /usr/local/src/src/pokedex.go \
+RUN go run /usr/local/src/src/bin/convert/png_convert.go \
         -from /tmp/original/pokesprite/ \
         -to /tmp/cows/ \
-        -skip '["resources/", "misc/", "icons/", "items/", "items-outline/"]' \
-        -toCategoryFpath "build/metadata/pokedex.gob"
+        -skip '["resources/", "misc/", "icons/", "items/", "items-outline/"]'
 
+# build up a map of category -> pokemon, and write it as a "encoding/gob" file
+RUN go run /usr/local/src/src/bin/pokedex/pokedex.go \
+    -from /tmp/cows/ \
+    -to build/assets/ \
+    -toCategoryFpath pokedex.gob \
+    -toDataSubDir cows/ \
+    toMedatadataSubDir metadata \
+    -toTotalFname total.txt

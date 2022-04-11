@@ -1,4 +1,5 @@
 package pokedex
+
 import (
 	"bufio"
 	"fmt"
@@ -120,8 +121,8 @@ func ConvertPngToCow(sourceDirpath string, sourceFpath string, destDirpath strin
 }
 
 type Metadata struct {
-	Data  []byte
-	Index int
+	Data     []byte
+	Index    int
 	Metadata PokemonMetadata
 }
 
@@ -137,9 +138,9 @@ func CreateMetadata(fpaths []string) (PokemonTrie, []Metadata) {
 
 		categories.Insert(
 			cats,
-			NewPokemonEntry(i,name),
+			NewPokemonEntry(i, name),
 		)
-		metadata = append(metadata, Metadata{data, i,  PokemonMetadata{Name: name, Categories: strings.Join(cats, "/")}})
+		metadata = append(metadata, Metadata{data, i, PokemonMetadata{Name: name, Categories: strings.Join(cats, "/")}})
 	}
 	return *categories, metadata
 }
