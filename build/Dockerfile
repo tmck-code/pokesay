@@ -38,5 +38,5 @@ RUN go run /usr/local/src/src/bin/pokedex/pokedex.go \
     -to build/assets/ \
     -toCategoryFpath pokedex.gob \
     -toDataSubDir cows/ \
-    toMedatadataSubDir metadata \
+    -toMetadataSubDir metadata/ \
     -toTotalFname total.txt
