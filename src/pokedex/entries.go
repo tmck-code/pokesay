@@ -8,6 +8,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"path"
 	"os"
 	"strings"
 )
@@ -61,11 +62,11 @@ func NewTrie() *PokemonTrie {
 }
 
 func EntryFpath(subdir string, idx int) string {
-	return fmt.Sprintf("%s/%d.cow", subdir, idx)
+	return path.Join(subdir, fmt.Sprintf("%d.cow", idx))
 }
 
 func MetadataFpath(subdir string, idx int) string {
-	return fmt.Sprintf("%s/%d.metadata", subdir, idx)
+	return path.Join(subdir, fmt.Sprintf("%d.metadata", idx))
 }
 
 func Equal(a, b []string) bool {

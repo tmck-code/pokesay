@@ -24,7 +24,7 @@ RUN go mod tidy \
     && go get -v github.com/mitchellh/go-wordwrap
 
 ADD . .
-RUN mkdir -p build/metadata build/cows
+RUN mkdir -p build/assets/metadata build/assets/cows
 
 # Convert all of the pokesprite .pngs -> cowfiles for the terminal
 RUN go run /usr/local/src/src/bin/convert/png_convert.go \
