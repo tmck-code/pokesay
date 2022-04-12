@@ -20,7 +20,7 @@ build/cows:
 
 build/release:
 	docker run \
-		-v $(PWD)/../:/usr/local/src/ \
+		-v $(PWD)/bin:/usr/local/src/build/bin \
 		--rm --name pokesay pokesay-go:latest build/build.sh
 	tree
 
