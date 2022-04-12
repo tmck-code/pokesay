@@ -19,9 +19,9 @@ import (
 )
 
 var (
-	//go:embed build/assets/metadata/pokedex.gob
+	//go:embed build/assets/pokedex.gob
 	GOBCategory []byte
-	//go:embed build/assets/metadata/total.txt
+	//go:embed build/assets/total.txt
 	GOBTotal []byte
 	//go:embed build/assets/cows/*cow
 	GOBCowData embed.FS
