@@ -9,10 +9,6 @@ RUN apt-get update \
 RUN git clone --depth 1 https://github.com/denilsonsa/img2xterm \
     && (cd img2xterm && make && make install)
 
-ENV DOCKER_BUILD_DIR /tmp/original
-ENV DOCKER_OUTPUT_DIR /tmp/cows
-
-RUN mkdir -p /tmp/original /tmp/cows
 WORKDIR /tmp/original
 
 RUN git clone --depth 1 https://github.com/msikma/pokesprite
@@ -23,12 +19,11 @@ ADD go.* /usr/local/src/
 RUN go mod tidy \
     && go get -v github.com/mitchellh/go-wordwrap
 
-ADD . .
-RUN mkdir -p build/assets/metadata build/assets/cows
-
 # Convert all of the pokesprite .pngs -> cowfiles for the terminal
 RUN go run /usr/local/src/src/bin/convert/png_convert.go \
         -from /tmp/original/pokesprite/ \
         -to /tmp/cows/ \
+        -padding 4 \
         -skip '["resources/", "misc/", "icons/", "items/", "items-outline/"]'
 
+ADD . .
