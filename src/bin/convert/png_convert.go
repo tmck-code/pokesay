@@ -43,6 +43,9 @@ func parseArgs() CowBuildArgs {
 	args := CowBuildArgs{FromDir: *fromDir, ToDir: *toDir, Padding: *padding}
 	json.Unmarshal([]byte(*skipDirs), &args.SkipDirs)
 
+	if DEBUG {
+		fmt.Println("%+v", args)
+	}
 	return args
 }
 
