@@ -5,9 +5,10 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"os"
 
-	"github.com/tmck-code/pokesay-go/src/pokedex"
 	"github.com/tmck-code/pokesay-go/src/bin"
+	"github.com/tmck-code/pokesay-go/src/pokedex"
 )
 
 func check(e error) {

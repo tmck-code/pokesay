@@ -29,6 +29,9 @@ var (
 	GOBCowNames embed.FS
 
 	Rand rand.Source = rand.NewSource(time.Now().UnixNano())
+
+	textStyleItalic *color.Color = color.New(color.Italic)
+	textStyleBold   *color.Color = color.New(color.Bold)
 )
 
 func check(e error) {
@@ -79,9 +82,15 @@ func printSpeechBubble(scanner *bufio.Scanner, args Args) {
 
 func printPokemon(index int, name string, categoryKeys []string) {
 	d, _ := GOBCowData.ReadFile(pokedex.EntryFpath("build/assets/cows", index))
-	choice := color.New(color.FgRed).SprintFunc()
 
-	fmt.Printf("%schoice: %s / categories: %s\n", pokedex.Decompress(d), choice(name), categoryKeys)
+	fmt.Printf(
+		"%s%s: %s | %s: %s\n",
+		pokedex.Decompress(d),
+		"choice",
+		textStyleBold.Sprint(name),
+		"categories",
+		textStyleItalic.Sprint(strings.Join(categoryKeys, ", ")),
+	)
 }
 
 func chooseRandomCategory(keys [][]string, categories pokedex.PokemonTrie) ([]string, []*pokedex.PokemonEntry) {
