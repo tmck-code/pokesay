@@ -1,8 +1,8 @@
 #!/bin/bash
 
-set -euxo pipefail
+set -euo pipefail
 
-tar xvf build/cows.tar.gz
+tar xzf build/cows.tar.gz
 go run ./src/bin/pokedex/pokedex.go \
   -from ./cows/ \
   -to ./build/assets/ \
@@ -10,5 +10,6 @@ go run ./src/bin/pokedex/pokedex.go \
   -toDataSubDir cows/ \
   -toMetadataSubDir metadata/ \
   -toTotalFname total.txt
+
 rm -rf cows
 ls -alh build/assets

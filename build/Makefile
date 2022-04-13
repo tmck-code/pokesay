@@ -34,7 +34,8 @@ build/assets:
 build/release:
 	docker run \
 		-v $(PWD)/bin:/usr/local/src/build/bin \
+		-v $(PWD)/assets:/usr/local/src/build/assets \
 		--rm --name pokesay pokesay-go:latest build/build.sh
-	tree
+	tree bin/
 
 .PHONY: all build/docker build/cows install build/release
