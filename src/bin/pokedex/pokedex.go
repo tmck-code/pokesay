@@ -18,10 +18,6 @@ func check(e error) {
 	}
 }
 
-var (
-	DEBUG bool = false
-)
-
 type PokedexArgs struct {
 	FromDir          string
 	ToDir            string
@@ -40,20 +36,22 @@ func parseArgs() PokedexArgs {
 	toMetadataSubDir := flag.String("toMetadataSubDir", "metadata/", "dir to write all binary (metadata) data to")
 	toCategoryFname := flag.String("toCategoryFpath", "pokedex.gob", "to fpath")
 	toTotalFname := flag.String("toTotalFname", "total.txt", "file to write the number of available entries to")
-	debug := flag.Bool("debug", DEBUG, "show debug logs")
+	debug := flag.Bool("debug", false, "show debug logs")
 
 	flag.Parse()
 
-	DEBUG = *debug
 	args := PokedexArgs{
-		FromDir:          *fromDir,
-		ToDir:            *toDir,
+		FromDir:          pokedex.NormaliseRelativeDir(*fromDir),
+		ToDir:            pokedex.NormaliseRelativeDir(*toDir),
 		ToCategoryFname:  *toCategoryFname,
-		ToDataSubDir:     *toDataSubDir,
-		ToMetadataSubDir: *toMetadataSubDir,
+		ToDataSubDir:     pokedex.NormaliseRelativeDir(*toDataSubDir),
+		ToMetadataSubDir: pokedex.NormaliseRelativeDir(*toMetadataSubDir),
 		ToTotalFname:     *toTotalFname,
+		Debug:            *debug,
 	}
-
+	if args.Debug {
+		fmt.Printf("%+v\n", args)
+	}
 	return args
 }
 

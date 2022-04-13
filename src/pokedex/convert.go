@@ -152,5 +152,10 @@ func createName(fpath string) string {
 
 func createCategories(fpath string) []string {
 	parts := strings.Split(fpath, "/")
-	return append([]string{"pokemon"}, parts[0:len(parts)-1]...)
+	return parts[0 : len(parts)-1]
+}
+
+// Strips the leading "./" from a path e.g. "./cows/ -> cows/"
+func NormaliseRelativeDir(dirPath string) string {
+	return strings.TrimPrefix(dirPath, "./")
 }
