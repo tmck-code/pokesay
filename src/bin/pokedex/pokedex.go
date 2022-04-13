@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"os"
 	"path"
 	"strconv"
 
@@ -64,11 +65,16 @@ func main() {
 
 	fpaths := pokedex.FindFiles(args.FromDir, ".cow", make([]string, 0))
 
+	err := os.MkdirAll(path.Join(args.ToDir, args.ToDataSubDir), 0755)
+	check(err)
+	err = os.MkdirAll(path.Join(args.ToDir, args.ToMetadataSubDir), 0755)
+	check(err)
+
 	// categories is a PokemonTrie struct that will be written to a file using encoding/gob
 	// metadata is a list of pokemon data and an index to use when writing them to a file
 	// - this index matches a corresponding one in the categories struct
 	// - these files are embedded into the build binary using go:embed and then loaded at runtime
-	categories, metadata := pokedex.CreateMetadata(fpaths)
+	categories, metadata := pokedex.CreateMetadata(args.FromDir, fpaths)
 
 	pokedex.WriteStructToFile(categories, categoryFpath)
 

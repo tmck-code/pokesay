@@ -18,6 +18,19 @@ build/cows:
 	@docker rm -f pokebuilder
 	@du -sh cows.tar.gz
 
+# generate embedded bin files for category/metadata/the actual pokemon
+build/assets:
+	docker run \
+		-v $(PWD)/assets:/usr/local/src/build/assets \
+		--rm --name pokesay pokesay-go:latest \
+			go run /usr/local/src/src/bin/pokedex/pokedex.go \
+				-from /tmp/cows/ \
+				-to /usr/local/src/build/assets/ \
+				-toCategoryFpath pokedex.gob \
+				-toDataSubDir cows/ \
+				-toMetadataSubDir metadata/ \
+				-toTotalFname total.txt
+
 build/release:
 	docker run \
 		-v $(PWD)/bin:/usr/local/src/build/bin \
