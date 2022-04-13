@@ -6,31 +6,30 @@ DOCKER_OUTPUT_DIR ?= /tmp/cows
 all: build/docker build/cows build/release
 
 build/docker:
-	docker build \
-		-f Dockerfile \
-		-t pokesay-go:latest ..
+	docker build -f Dockerfile -t pokesay-go:latest ..
 
 build/cows:
 	@rm -rf cows.tar.gz cows/
-	docker create \
-		--name pokebuilder \
-		pokesay-go:latest
+	docker rm -f pokebuilder
+	docker create --name pokebuilder pokesay-go:latest
 	@docker cp pokebuilder:$(DOCKER_OUTPUT_DIR)/ cows/
 	@tar czf cows.tar.gz cows/
 	@rm -rf cows/
 	@docker rm -f pokebuilder
 	@du -sh cows.tar.gz
 
-install: build/bin
-	cp -v pokesay-$(TARGET_GOOS)-$(TARGET_GOARCH) $(HOME)/bin/pokesay
+# generate embedded bin files for category/metadata/the actual pokemon
+build/assets:
+	docker run \
+		-v $(PWD)/assets:/usr/local/src/build/assets \
+		--rm --name pokesay pokesay-go:latest \
+			build/build_assets.sh
 
 build/release:
-	@docker create --name pokesay pokesay-go:latest
-	docker cp pokesay:/usr/local/src/pokesay-linux-amd64 .
-	docker cp pokesay:/usr/local/src/pokesay-darwin-amd64 .
-	docker cp pokesay:/usr/local/src/pokesay-darwin-arm64 .
-	docker cp pokesay:/usr/local/src/pokesay-windows-amd64.exe .
-	docker cp pokesay:/usr/local/src/pokesay-android-arm64 .
-	@docker rm -f pokesay
+	docker run \
+		-v $(PWD)/bin:/usr/local/src/build/bin \
+		-v $(PWD)/assets:/usr/local/src/build/assets \
+		--rm --name pokesay pokesay-go:latest build/build.sh
+	tree bin/
 
 .PHONY: all build/docker build/cows install build/release

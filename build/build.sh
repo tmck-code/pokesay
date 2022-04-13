@@ -1,13 +1,14 @@
 #!/bin/bash
 
-set -euo pipefail
+set -euxo pipefail
+
+OUTPUT_DIR="build/bin"
+mkdir -p "$OUTPUT_DIR"
 
 function build() {
     echo "building $1 / $2"
-    GOOS=$1 GOARCH=$2 go build -o bin/pokesay-${1}-${2}${3:-} pokesay.go
+    GOOS=$1 GOARCH=$2 go build -o "${OUTPUT_DIR}/pokesay-${1}-${2}${3:-}" pokesay.go
 }
-
-mkdir bin/
 
 build darwin  amd64 &
 build darwin  arm64 &
