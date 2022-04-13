@@ -32,7 +32,7 @@ RUN go run /usr/local/src/src/bin/convert/png_convert.go \
         -to /tmp/cows/ \
         -skip '["resources/", "misc/", "icons/", "items/", "items-outline/"]'
 
-# build up a map of category -> pokemon, and write it as a "encoding/gob" file
+# generate embedded bin files for category/metadata/the actual pokemon
 RUN go run /usr/local/src/src/bin/pokedex/pokedex.go \
     -from /tmp/cows/ \
     -to build/assets/ \
