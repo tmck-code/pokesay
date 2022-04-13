@@ -98,24 +98,19 @@ In order to re/build the binaries from scratch, along with all the cowfile conve
 Makefile tasks
 
 ```shell
-cd build && make build/docker build/release
+cd build && make build/docker build/assets build/release
 ```
 
-This will produce 4 executable bin files inside the build/ directory
+This will produce 4 executable bin files inside the `build/bin` directory, and a heap of binary asset files in `build/assets`.
 
 ### On your host OS
 
 You'll have to install a golang version that matches the go.mod, and ensure that other package
 dependencies are installed (see the dockerfile for the dependencies)
 
-```
-# Build the pokedex build tool
-go build src/pokedex.go
-# Extract the cowfiles into a directory
-tar xzf build/cows.tar.gz -C build/
-
-# Generate a encoding/gob data file from the cowfiles
-./pokedex -from build/cows -to build/pokedex.gob
+```shell
+# Generate binary asset files from the cowfiles
+./build/build_assets.sh
 
 # Finally, build the pokesay tool (this builds and uses the build/pokedex.gob file automatically)
 go build pokesay.go

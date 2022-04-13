@@ -1,4 +1,5 @@
 package pokedex
+
 import (
 	"bufio"
 	"fmt"
@@ -6,7 +7,6 @@ import (
 	"os/exec"
 	"path/filepath"
 	"strings"
-	"time"
 )
 
 var (
@@ -92,9 +92,6 @@ func ConvertPngToCow(sourceDirpath string, sourceFpath string, destDirpath strin
 	)
 	// Ensure that the destination dir exists
 	os.MkdirAll(destDir, 0755)
-	time.Sleep(0)
-
-	destFpath := filepath.Join(destDir, strings.ReplaceAll(filepath.Base(sourceFpath), ".png", ".cow"))
 
 	// Some conversions are failing with something about colour channels
 	// Can't be bothered resolving atm, so just skip past any failed conversions
@@ -105,6 +102,7 @@ func ConvertPngToCow(sourceDirpath string, sourceFpath string, destDirpath strin
 		return
 	}
 
+	destFpath := filepath.Join(destDir, strings.ReplaceAll(filepath.Base(sourceFpath), ".png", ".cow"))
 	ostream, err := os.Create(destFpath)
 	check(err)
 	defer ostream.Close()
@@ -120,26 +118,26 @@ func ConvertPngToCow(sourceDirpath string, sourceFpath string, destDirpath strin
 }
 
 type Metadata struct {
-	Data  []byte
-	Index int
+	Data     []byte
+	Index    int
 	Metadata PokemonMetadata
 }
 
-func CreateMetadata(fpaths []string) (PokemonTrie, []Metadata) {
+func CreateMetadata(rootDir string, fpaths []string, debug bool) (PokemonTrie, []Metadata) {
 	categories := NewTrie()
 	metadata := []Metadata{}
 	for i, fpath := range fpaths {
 		data, err := os.ReadFile(fpath)
 		check(err)
 
-		cats := createCategories(fpath)
+		cats := createCategories(strings.TrimPrefix(fpath, rootDir))
 		name := createName(fpath)
 
 		categories.Insert(
 			cats,
-			NewPokemonEntry(i,name),
+			NewPokemonEntry(i, name),
 		)
-		metadata = append(metadata, Metadata{data, i,  PokemonMetadata{Name: name, Categories: strings.Join(cats, "/")}})
+		metadata = append(metadata, Metadata{data, i, PokemonMetadata{Name: name, Categories: strings.Join(cats, "/")}})
 	}
 	return *categories, metadata
 }
@@ -151,5 +149,10 @@ func createName(fpath string) string {
 
 func createCategories(fpath string) []string {
 	parts := strings.Split(fpath, "/")
-	return append([]string{"pokemon"}, parts[3:len(parts)-1]...)
+	return parts[0 : len(parts)-1]
+}
+
+// Strips the leading "./" from a path e.g. "./cows/ -> cows/"
+func NormaliseRelativeDir(dirPath string) string {
+	return strings.TrimPrefix(dirPath, "./")
 }
