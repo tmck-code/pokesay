@@ -23,13 +23,7 @@ build/assets:
 	docker run \
 		-v $(PWD)/assets:/usr/local/src/build/assets \
 		--rm --name pokesay pokesay-go:latest \
-			go run /usr/local/src/src/bin/pokedex/pokedex.go \
-				-from /tmp/cows/ \
-				-to /usr/local/src/build/assets/ \
-				-toCategoryFpath pokedex.gob \
-				-toDataSubDir cows/ \
-				-toMetadataSubDir metadata/ \
-				-toTotalFname total.txt
+			build/build_assets.sh
 
 build/release:
 	docker run \
