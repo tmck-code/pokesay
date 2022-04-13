@@ -10,7 +10,7 @@ build/docker:
 
 build/cows:
 	@rm -rf cows.tar.gz cows/
-	docker rm -f --name pokebuilder
+	docker rm -f pokebuilder
 	docker create --name pokebuilder pokesay-go:latest
 	@docker cp pokebuilder:$(DOCKER_OUTPUT_DIR)/ cows/
 	@tar czf cows.tar.gz cows/
