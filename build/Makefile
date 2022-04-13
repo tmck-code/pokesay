@@ -6,7 +6,7 @@ DOCKER_OUTPUT_DIR ?= /tmp/cows
 all: build/docker build/cows build/release
 
 build/docker:
-	docker build --no-cache -f Dockerfile -t pokesay-go:latest ..
+	docker build -f Dockerfile -t pokesay-go:latest ..
 
 build/cows:
 	@rm -rf cows.tar.gz cows/
