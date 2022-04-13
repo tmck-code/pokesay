@@ -12,9 +12,9 @@ import (
 	"strings"
 	"time"
 
+	"github.com/fatih/color"
 	"github.com/tmck-code/pokesay-go/src/pokedex"
 
-	"github.com/fatih/color"
 	"github.com/mitchellh/go-wordwrap"
 )
 

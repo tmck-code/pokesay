@@ -126,14 +126,15 @@ type Metadata struct {
 	Metadata PokemonMetadata
 }
 
-func CreateMetadata(rootDir string, fpaths []string) (PokemonTrie, []Metadata) {
+func CreateMetadata(rootDir string, fpaths []string, debug bool) (PokemonTrie, []Metadata) {
 	categories := NewTrie()
 	metadata := []Metadata{}
 	for i, fpath := range fpaths {
 		data, err := os.ReadFile(fpath)
 		check(err)
 
-		cats := createCategories(strings.TrimPrefix(rootDir, fpath))
+		fmt.Println(fpath, rootDir, strings.TrimPrefix(fpath, rootDir))
+		cats := createCategories(strings.TrimPrefix(fpath, rootDir))
 		name := createName(fpath)
 
 		categories.Insert(

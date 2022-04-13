@@ -72,7 +72,7 @@ func main() {
 	// metadata is a list of pokemon data and an index to use when writing them to a file
 	// - this index matches a corresponding one in the categories struct
 	// - these files are embedded into the build binary using go:embed and then loaded at runtime
-	categories, metadata := pokedex.CreateMetadata(args.FromDir, fpaths)
+	categories, metadata := pokedex.CreateMetadata(args.FromDir, fpaths, args.Debug)
 
 	pokedex.WriteStructToFile(categories, categoryFpath)
 
