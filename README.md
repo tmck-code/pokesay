@@ -1,5 +1,6 @@
 # pokesay-go
-A (much) faster go version of tmck-code/pokesay
+
+Print pokemon in the CLI! An adaptation of the classic "cowsay"
 
 - [pokesay-go](#pokesay-go)
   - [One-line installs](#one-line-installs)
