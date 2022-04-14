@@ -110,6 +110,7 @@ type Args struct {
 	TabSpaces      string
 	NoTabSpaces    bool
 	ListCategories bool
+	ListNames      bool
 	Category       string
 	NameToken      string
 }
@@ -123,6 +124,7 @@ func parseFlags() Args {
 	category := flag.String("category", "", "choose a pokemon from a specific category")
 	name := flag.String("name", "", "choose a pokemon from a specific name")
 	listCategories := flag.Bool("category-list", false, "list all available categories")
+	listNames := flag.Bool("name-list", false, "list all available names")
 
 	flag.Parse()
 	var args Args
@@ -141,6 +143,7 @@ func parseFlags() Args {
 			TabSpaces:      strings.Repeat(" ", *tabWidth),
 			NoTabSpaces:    *noTabSpaces,
 			ListCategories: *listCategories,
+			ListNames:      *listNames,
 			Category:       *category,
 			NameToken:      *name,
 		}
@@ -157,6 +160,15 @@ func runCategoryList(categories pokedex.PokemonTrie) {
 	}
 	for k, _ := range ukm {
 		fmt.Println(k)
+	}
+}
+
+func runNamesList() {
+	total, _ := strconv.Atoi(string(GOBTotal))
+	for i := 0; i < total; i++ {
+		m, err := GOBCowNames.ReadFile(pokedex.MetadataFpath("build/assets/metadata", i))
+		check(err)
+		fmt.Println(m)
 	}
 }
 
@@ -195,6 +207,8 @@ func main() {
 
 	if args.ListCategories {
 		runCategoryList(pokedex.ReadTrieFromBytes(GOBCategory))
+	} else if args.ListNames {
+		runNamesList()
 	} else if args.NameToken != "" {
 		runPrintByName(args, pokedex.ReadTrieFromBytes(GOBCategory))
 	} else if args.Category != "" {
