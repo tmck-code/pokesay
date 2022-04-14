@@ -8,6 +8,7 @@ import (
 	"log"
 	"math/rand"
 	"os"
+	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -158,17 +159,36 @@ func runCategoryList(categories pokedex.PokemonTrie) {
 			ukm[k] = true
 		}
 	}
-	for k, _ := range ukm {
+	for k := range ukm {
 		fmt.Println(k)
 	}
 }
 
 func runNamesList() {
 	total, _ := strconv.Atoi(string(GOBTotal))
+	names := map[string]int{}
+
 	for i := 0; i < total; i++ {
 		m, err := GOBCowNames.ReadFile(pokedex.MetadataFpath("build/assets/metadata", i))
 		check(err)
-		fmt.Println(m)
+
+		metadata := pokedex.ReadMetadataFromBytes(m)
+
+		for _, k := range strings.Split(metadata.Name, "-") {
+			if _, ok := names[k]; ok {
+				names[k] = names[k] + 1
+			} else {
+				names[k] = 1
+			}
+		}
+		keys := []string{}
+		for k := range names {
+			keys = append(keys, k)
+		}
+		sort.Strings(keys)
+		for _, k := range keys {
+			fmt.Println(k, names[k])
+		}
 	}
 }
 
