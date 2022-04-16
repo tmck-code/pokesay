@@ -20,4 +20,10 @@ fi
 
 export PATH="$HOME/bin:$PATH"
 echo "hello world!" | pokesay
-echo -e "\nInstall complete! Location: $HOME/bin/pokesay"
+echo -e "\nInstall complete for v${VERSION} of pokesay! Installed at: $HOME/bin/pokesay"
+echo -e "\nTo use, either
+- edit your .bashrc file to add 'fortune | pokesay' at the bottom of the file
+- or, run this command
+
+    echo fortune | pokesay >> \$HOME/.bashrc
+"
