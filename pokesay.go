@@ -13,7 +13,7 @@ import (
 	"time"
 
 	"github.com/fatih/color"
-	"github.com/tmck-code/pokesay-go/src/pokedex"
+	"github.com/tmck-code/pokesay/src/pokedex"
 
 	"github.com/mitchellh/go-wordwrap"
 )

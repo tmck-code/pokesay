@@ -8,8 +8,8 @@ import (
 	"path"
 	"strconv"
 
-	"github.com/tmck-code/pokesay-go/src/bin"
-	"github.com/tmck-code/pokesay-go/src/pokedex"
+	"github.com/tmck-code/pokesay/src/bin"
+	"github.com/tmck-code/pokesay/src/pokedex"
 )
 
 func check(e error) {
