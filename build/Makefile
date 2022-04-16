@@ -1,6 +1,9 @@
 DOCKER_OUTPUT_DIR ?= /tmp/cows
-DOCKER_IMAGE ?= "ghcr.io/tmck-code"
+DOCKER_REPO ?= "tmckcode"
 DOCKER_TAG ?= "latest"
+
+DOCKER_IMAGE=$(DOCKER_REPO)/pokesay:$(DOCKER_TAG)
+
 
 all: build/docker build/cows build/assets build/release
 
@@ -10,7 +13,7 @@ build/docker:
 build/cows:
 	@rm -rf cows.tar.gz cows/
 	docker rm -f pokebuilder
-	docker create --name pokebuilder pokesay:latest
+	docker create --name pokebuilder $(DOCKER_IMAGE)
 	@docker cp pokebuilder:$(DOCKER_OUTPUT_DIR)/ cows/
 	@tar czf cows.tar.gz cows/
 	@rm -rf cows/
@@ -28,7 +31,8 @@ build/release: build/assets
 	docker run \
 		-v $(PWD)/bin:/usr/local/src/build/bin \
 		-v $(PWD)/assets:/usr/local/src/build/assets \
-		--rm --name pokesay $(DOCKER_IMAGE) build/build.sh
+		--rm --name pokesay $(DOCKER_IMAGE) \
+		  build/build.sh
 	tree bin/
 
 .PHONY: all build/docker build/cows build/assets build/release

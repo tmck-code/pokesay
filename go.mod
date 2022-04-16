@@ -1,4 +1,4 @@
-module github.com/tmck-code/pokesay-go
+module github.com/tmck-code/pokesay
 
 go 1.17
 
