@@ -7,7 +7,7 @@ GOOS=$1
 GOARCH=$2
 
 mkdir -p $HOME/bin
-curl -sL -o pokesay https://github.com/tmck-code/pokesay-go/releases/download/v${VERSION}/pokesay-$GOOS-$GOARCH
+curl -sL -o pokesay https://github.com/tmck-code/pokesay/releases/download/v${VERSION}/pokesay-$GOOS-$GOARCH
 
 if [ "${TERMUX:-}" == 1 ]; then
   mv -v ./pokesay $HOME/bin/
