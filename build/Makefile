@@ -27,7 +27,7 @@ build/assets:
 		-v $(PWD)/assets:/usr/local/src/build/assets \
 		--rm --name pokesay \
 	    $(DOCKER_IMAGE) \
-			build/build_assets.sh
+			build/scripts/build_assets.sh
 
 build/release: build/assets
 	docker run \
@@ -35,7 +35,7 @@ build/release: build/assets
 		-v $(PWD)/assets:/usr/local/src/build/assets \
 		--rm --name pokesay \
 		  $(DOCKER_IMAGE) \
-		  build/build.sh
+		  build/scripts/build.sh
 	tree bin/
 
 .PHONY: all build/docker build/cows build/assets build/release

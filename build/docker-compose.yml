@@ -2,7 +2,7 @@ version: '3'
 
 services:
   pokesay:
-    image: tmck-code/pokesay:${TAG:-latest}
+    image: docker.io/tmckcode/pokesay:${TAG:-latest}
     build:
       context: ..
       dockerfile: build/Dockerfile
@@ -11,7 +11,7 @@ services:
       - .:/usr/local/src
       - vscode-pokesay:/root/.vscode-server
   pokesay-vscode:
-    image: pokesay-vscode:${TAG:-latest}
+    image: docker.io/tmckcode/pokesay-vscode:${TAG:-latest}
     depends_on:
       - pokesay
     build:
