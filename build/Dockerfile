@@ -1,4 +1,4 @@
-FROM golang:latest
+FROM golang:1.18-bullseye
 
 WORKDIR /usr/local/src
 
@@ -11,12 +11,16 @@ RUN BUILD_DEPS="parallel make gcc libmagickwand-dev ncurses-dev fortune-mod fort
     && apt-get purge -y --auto-remove ${BUILD_DEPS} \
     && rm -rf /var/lib/apt/lists/*
 
-ADD go.mod go.sum src/ /usr/local/src/
 
 # Convert all of the pokesprite .pngs -> cowfiles for the terminal
-RUN git clone --depth 1 https://github.com/msikma/pokesprite /tmp/original/pokesprite \
-    && go mod tidy \
-    && go run /usr/local/src/src/bin/convert/png_convert.go \
+RUN git clone --depth 1 https://github.com/msikma/pokesprite /tmp/original/pokesprite
+
+ADD go.* /usr/local/src/
+ADD src/ /usr/local/src/
+RUN go mod tidy \
+    && go get -v github.com/mitchellh/go-wordwrap
+
+RUN go run /usr/local/src/src/bin/convert/png_convert.go \
         -from /tmp/original/pokesprite/ \
         -to /tmp/cows/ \
         -padding 4 \

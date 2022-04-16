@@ -8,6 +8,7 @@ DOCKER_IMAGE=$(DOCKER_REPO)/pokesay:$(DOCKER_TAG)
 all: build/docker build/cows build/assets build/release
 
 build/docker:
+	echo "Building $(DOCKER_IMAGE)"
 	docker build -f Dockerfile -t $(DOCKER_IMAGE) ..
 
 build/cows:
@@ -24,14 +25,16 @@ build/cows:
 build/assets:
 	docker run \
 		-v $(PWD)/assets:/usr/local/src/build/assets \
-		--rm --name pokesay $(DOCKER_IMAGE) \
+		--rm --name pokesay \
+	    $(DOCKER_IMAGE) \
 			build/build_assets.sh
 
 build/release: build/assets
 	docker run \
 		-v $(PWD)/bin:/usr/local/src/build/bin \
 		-v $(PWD)/assets:/usr/local/src/build/assets \
-		--rm --name pokesay $(DOCKER_IMAGE) \
+		--rm --name pokesay \
+		  $(DOCKER_IMAGE) \
 		  build/build.sh
 	tree bin/
 
