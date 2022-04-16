@@ -83,7 +83,7 @@ Navigate to the Releases and download the latest binary.
 
 - Short-term
   - [x] Fix bad whitespace stripping when building assets
-  - [ ] List all names
+  - [x] List all names
 - Longer-term
   - [x] Make data structure to hold categories, names and pokemon
   - [x] Increase speed
