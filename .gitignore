@@ -4,7 +4,6 @@
 *.dylib
 
 # All binaries
-build/pokesay-*
 build/assets
 build/bin
 
