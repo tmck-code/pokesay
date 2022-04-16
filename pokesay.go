@@ -159,7 +159,7 @@ func runListCategories(categories pokedex.PokemonTrie) {
 		i++
 	}
 	fmt.Println(strings.Join(keys, " "))
-	fmt.Println("\n", len(keys), "total categories")
+	fmt.Printf("\n%d %s\n", len(keys), "total names")
 }
 
 func runListNames() {
@@ -174,7 +174,7 @@ func runListNames() {
 		names[i] = metadata.Name
 	}
 	fmt.Println(strings.Join(names, " "))
-	fmt.Println("\n", len(names), "total names")
+	fmt.Printf("\n%d %s\n", len(names), "total names")
 }
 
 func runPrintByName(args Args, categories pokedex.PokemonTrie) {
