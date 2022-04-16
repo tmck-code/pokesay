@@ -106,7 +106,7 @@ In order to re/build the binaries from scratch, along with all the cowfile conve
 Makefile tasks
 
 ```shell
-cd build && make build/docker build/assets build/release
+make -C build build/docker build/assets build/release
 ```
 
 This will produce 4 executable bin files inside the `build/bin` directory, and a heap of binary asset files in `build/assets`.
