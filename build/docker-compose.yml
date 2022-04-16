@@ -2,7 +2,7 @@ version: '3'
 
 services:
   pokesay:
-    image: tmck-code/pokesay:${TAG:-latest}
+    image: tmckcode/pokesay:${TAG:-latest}
     build:
       context: ..
       dockerfile: build/Dockerfile
