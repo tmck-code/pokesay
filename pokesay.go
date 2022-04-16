@@ -159,8 +159,8 @@ func runCategoryList(categories pokedex.PokemonTrie) {
 			ukm[k] = true
 		}
 	}
-	for k := range ukm {
-		fmt.Println(k)
+	for k, _ := range ukm {
+		fmt.Printf("%s ", k)
 	}
 }
 
@@ -169,26 +169,12 @@ func runNamesList() {
 	names := map[string]int{}
 
 	for i := 0; i < total; i++ {
-		m, err := GOBCowNames.ReadFile(pokedex.MetadataFpath("build/assets/metadata", i))
+		data:= pokedex.MetadataFpath("build/assets/metadata", i)
+		m, err := GOBCowNames.ReadFile(data)
 		check(err)
-
 		metadata := pokedex.ReadMetadataFromBytes(m)
-
-		for _, k := range strings.Split(metadata.Name, "-") {
-			if _, ok := names[k]; ok {
-				names[k] = names[k] + 1
-			} else {
-				names[k] = 1
-			}
-		}
-		keys := []string{}
-		for k := range names {
-			keys = append(keys, k)
-		}
-		sort.Strings(keys)
-		for _, k := range keys {
-			fmt.Println(k, names[k])
-		}
+		// fmt.Printf("%d %+v\n", i, metadata)
+		fmt.Printf("%s ", metadata.Name)
 	}
 }
 
