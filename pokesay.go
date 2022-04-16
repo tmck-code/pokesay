@@ -8,7 +8,6 @@ import (
 	"log"
 	"math/rand"
 	"os"
-	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -87,10 +86,8 @@ func printPokemon(index int, name string, categoryKeys []string) {
 	fmt.Printf(
 		"%s%s: %s | %s: %s\n",
 		pokedex.Decompress(d),
-		"choice",
-		textStyleBold.Sprint(name),
-		"categories",
-		textStyleItalic.Sprint(strings.Join(categoryKeys, ", ")),
+		"choice", textStyleBold.Sprint(name),
+		"categories", textStyleItalic.Sprint(strings.Join(categoryKeys, ", ")),
 	)
 }
 
@@ -99,10 +96,6 @@ func chooseRandomCategory(keys [][]string, categories pokedex.PokemonTrie) ([]st
 	category, err := categories.GetCategory(choice)
 	check(err)
 	return choice, category
-}
-
-func chooseRandomPokemon(pokemon []*pokedex.PokemonEntry) *pokedex.PokemonEntry {
-	return pokemon[randomInt(len(pokemon))]
 }
 
 type Args struct {
@@ -124,8 +117,8 @@ func parseFlags() Args {
 	fastest := flag.Bool("fastest", false, "run with the fastest possible configuration (-nowrap -notabspaces)")
 	category := flag.String("category", "", "choose a pokemon from a specific category")
 	name := flag.String("name", "", "choose a pokemon from a specific name")
-	listCategories := flag.Bool("category-list", false, "list all available categories")
-	listNames := flag.Bool("name-list", false, "list all available names")
+	listCategories := flag.Bool("list-categories", false, "list all available categories")
+	listNames := flag.Bool("list-names", false, "list all available names")
 
 	flag.Parse()
 	var args Args
@@ -159,23 +152,28 @@ func runCategoryList(categories pokedex.PokemonTrie) {
 			ukm[k] = true
 		}
 	}
-	for k, _ := range ukm {
-		fmt.Printf("%s ", k)
+	keys := make([]string, len(ukm))
+	i := 0
+	for k := range ukm {
+		keys[i] = k
+		i++
 	}
+	fmt.Println(strings.Join(keys, " "))
 }
 
 func runNamesList() {
 	total, _ := strconv.Atoi(string(GOBTotal))
-	names := map[string]int{}
+	names := make([]string, total)
 
 	for i := 0; i < total; i++ {
-		data:= pokedex.MetadataFpath("build/assets/metadata", i)
+		data := pokedex.MetadataFpath("build/assets/metadata", i)
 		m, err := GOBCowNames.ReadFile(data)
 		check(err)
 		metadata := pokedex.ReadMetadataFromBytes(m)
-		// fmt.Printf("%d %+v\n", i, metadata)
-		fmt.Printf("%s ", metadata.Name)
+		names[i] = metadata.Name
 	}
+
+	fmt.Println(strings.Join(names, " "))
 }
 
 func runPrintByName(args Args, categories pokedex.PokemonTrie) {
@@ -191,7 +189,7 @@ func runPrintByCategory(args Args, categories pokedex.PokemonTrie) {
 	matches, err := categories.GetCategoryPaths(args.Category)
 	check(err)
 	keys, category := chooseRandomCategory(matches, categories)
-	choice := chooseRandomPokemon(category)
+	choice := category[randomInt(len(category))]
 
 	printSpeechBubble(bufio.NewScanner(os.Stdin), args)
 	printPokemon(choice.Index, choice.Name, keys)
