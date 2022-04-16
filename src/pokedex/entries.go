@@ -145,6 +145,10 @@ func TokenizeName(name string) []string {
 	return strings.Split(name, "-")
 }
 
+func TokenizeCategories(categories string) []string {
+	return strings.Split(categories, "/")
+}
+
 type PokemonMatch struct {
 	Entry      *PokemonEntry
 	Categories []string
