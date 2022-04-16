@@ -8,6 +8,7 @@ mkdir -p "$OUTPUT_DIR"
 function build() {
     echo "building $1 / $2"
     GOOS=$1 GOARCH=$2 go build -o "${OUTPUT_DIR}/pokesay-${1}-${2}${3:-}" pokesay.go
+    echo "- built as ${OUTPUT_DIR}/pokesay-${1}-${2}${3:-}"
 }
 
 build darwin  amd64 &
