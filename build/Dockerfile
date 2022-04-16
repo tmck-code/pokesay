@@ -9,7 +9,7 @@ RUN apt-get update \
 RUN git clone --depth 1 https://github.com/denilsonsa/img2xterm \
     && (cd img2xterm && make && make install) \
     && rm -rf img2xterm \
-    && apt purge "${BUILD_DEPS}" \
+    && apt purge -y "${BUILD_DEPS}" \
     && apt-get purge -y --auto-remove \
     && rm -rf /var/lib/apt/lists/* \
     && rm -rf /tmp/* /var/tmp/*
@@ -27,6 +27,7 @@ RUN go run /usr/local/src/src/bin/convert/png_convert.go \
         -from /tmp/original/pokesprite/ \
         -to /tmp/cows/ \
         -padding 4 \
-        -skip '["resources/", "misc/", "icons/", "items/", "items-outline/"]'
+        -skip '["resources/", "misc/", "icons/", "items/", "items-outline/"]' \
+    && rm -rf /tmp/original/pokesprite
 
 ADD . .
