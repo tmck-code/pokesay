@@ -145,7 +145,7 @@ func parseFlags() Args {
 	return args
 }
 
-func runCategoryList(categories pokedex.PokemonTrie) {
+func runListCategories(categories pokedex.PokemonTrie) {
 	ukm := map[string]bool{}
 	for _, v := range categories.Keys {
 		for _, k := range v {
@@ -159,9 +159,10 @@ func runCategoryList(categories pokedex.PokemonTrie) {
 		i++
 	}
 	fmt.Println(strings.Join(keys, " "))
+	fmt.Println("\n", len(keys), "total categories")
 }
 
-func runNamesList() {
+func runListNames() {
 	total, _ := strconv.Atoi(string(GOBTotal))
 	names := make([]string, total)
 
@@ -172,8 +173,8 @@ func runNamesList() {
 		metadata := pokedex.ReadMetadataFromBytes(m)
 		names[i] = metadata.Name
 	}
-
 	fmt.Println(strings.Join(names, " "))
+	fmt.Println("\n", len(names), "total names")
 }
 
 func runPrintByName(args Args, categories pokedex.PokemonTrie) {
@@ -210,9 +211,9 @@ func main() {
 	args := parseFlags()
 
 	if args.ListCategories {
-		runCategoryList(pokedex.ReadTrieFromBytes(GOBCategory))
+		runListCategories(pokedex.ReadTrieFromBytes(GOBCategory))
 	} else if args.ListNames {
-		runNamesList()
+		runListNames()
 	} else if args.NameToken != "" {
 		runPrintByName(args, pokedex.ReadTrieFromBytes(GOBCategory))
 	} else if args.Category != "" {
