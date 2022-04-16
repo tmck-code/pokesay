@@ -1,8 +1,8 @@
-# pokesay-go
+# pokesay
 
 Print pokemon in the CLI! An adaptation of the classic "cowsay"
 
-- [pokesay-go](#pokesay-go)
+- [pokesay](#pokesay)
   - [One-line installs](#one-line-installs)
   - [How it works](#how-it-works)
   - [TODO](#todo)
@@ -23,19 +23,19 @@ Print pokemon in the CLI! An adaptation of the classic "cowsay"
 
 - OSX / darwin
     ```shell
-    bash -c "$(curl https://raw.githubusercontent.com/tmck-code/pokesay-go/master/scripts/install.sh)" bash darwin amd64
+    bash -c "$(curl https://raw.githubusercontent.com/tmck-code/pokesay/master/scripts/install.sh)" bash darwin amd64
     ```
 - OSX / darwin (M1)
     ```shell
-    bash -c "$(curl https://raw.githubusercontent.com/tmck-code/pokesay-go/master/scripts/install.sh)" bash darwin arm64
+    bash -c "$(curl https://raw.githubusercontent.com/tmck-code/pokesay/master/scripts/install.sh)" bash darwin arm64
     ```
 - Linux x64
     ```shell
-    bash -c "$(curl https://raw.githubusercontent.com/tmck-code/pokesay-go/master/scripts/install.sh)" bash linux amd64
+    bash -c "$(curl https://raw.githubusercontent.com/tmck-code/pokesay/master/scripts/install.sh)" bash linux amd64
     ```
 - Android ARM64 (Termux)
     ```shell
-    bash -c "$(curl https://raw.githubusercontent.com/tmck-code/pokesay-go/master/scripts/install.sh)" bash android arm64
+    bash -c "$(curl https://raw.githubusercontent.com/tmck-code/pokesay/master/scripts/install.sh)" bash android arm64
     ```
 </details>
 
