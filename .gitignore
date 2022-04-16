@@ -5,6 +5,12 @@
 
 # All binaries
 build/pokesay-*
+build/assets
+build/bin
+
+# Built binaries
+pokesay
+pokedex
 
 # Test binary, built with `go test -c`
 *.test
