@@ -5,10 +5,10 @@ Print pokemon in the CLI! An adaptation of the classic "cowsay"
 - [pokesay](#pokesay)
   - [One-line installs](#one-line-installs)
   - [How it works](#how-it-works)
-  - [TODO](#todo)
   - [Building binaries](#building-binaries)
-    - [In docker](#in-docker)
     - [On your host OS](#on-your-host-os)
+    - [In docker](#in-docker)
+  - [TODO](#todo)
 
 ---
 
@@ -79,17 +79,24 @@ easily popped into a directory in the user's $PATH
 If all you are after is installing the program to use, then there are no dependencies required!
 Navigate to the Releases and download the latest binary.
 
-## TODO
-
-- Short-term
-  - [x] Fix bad whitespace stripping when building assets
-  - [x] List all names
-- Longer-term
-  - [x] Make data structure to hold categories, names and pokemon
-  - [x] Increase speed
-  - [ ] Improve categories to be more specific than shiny/regular
+---
 
 ## Building binaries
+
+### On your host OS
+
+_Dependencies_: `Go 1.18`
+
+You'll have to install a golang version that matches the go.mod, and ensure that other package
+dependencies are installed (see the dockerfile for the dependencies)
+
+```shell
+# Generate binary asset files from the cowfiles
+./build/build_assets.sh
+
+# Finally, build the pokesay tool (this builds and uses the build/pokedex.gob file automatically)
+go build pokesay.go
+```
 
 ### In docker
 
@@ -104,15 +111,14 @@ cd build && make build/docker build/assets build/release
 
 This will produce 4 executable bin files inside the `build/bin` directory, and a heap of binary asset files in `build/assets`.
 
-### On your host OS
+---
 
-You'll have to install a golang version that matches the go.mod, and ensure that other package
-dependencies are installed (see the dockerfile for the dependencies)
+## TODO
 
-```shell
-# Generate binary asset files from the cowfiles
-./build/build_assets.sh
-
-# Finally, build the pokesay tool (this builds and uses the build/pokedex.gob file automatically)
-go build pokesay.go
-```
+- Short-term
+  - [x] Fix bad whitespace stripping when building assets
+  - [x] List all names
+- Longer-term
+  - [x] Make data structure to hold categories, names and pokemon
+  - [x] Increase speed
+  - [ ] Improve categories to be more specific than shiny/regular
