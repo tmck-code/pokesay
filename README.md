@@ -116,10 +116,3 @@ dependencies are installed (see the dockerfile for the dependencies)
 # Finally, build the pokesay tool (this builds and uses the build/pokedex.gob file automatically)
 go build pokesay.go
 ```
-
-## Dependencies
-
-The real dependencies here are the amazing repos/databases of this pokesprite that's hosted by a few different places
-
-- gen 7 & 8: https://www.pokencyclopedia.info/en/index.php?id=sprites
-- gen 1-5:   https://veekun.com/dex/downloads
