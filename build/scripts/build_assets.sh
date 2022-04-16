@@ -5,7 +5,7 @@ set -euo pipefail
 tar xzf build/cows.tar.gz
 go run ./src/bin/pokedex/pokedex.go \
   -from ./cows/ \
-  -to ./build/assets/ \
+  -to src/build/assets/ \
   -toCategoryFpath pokedex.gob \
   -toDataSubDir cows/ \
   -toMetadataSubDir metadata/ \

@@ -7,7 +7,7 @@ mkdir -p "$OUTPUT_DIR"
 
 function build() {
     echo "building $1 / $2"
-    GOOS=$1 GOARCH=$2 go build -o "${OUTPUT_DIR}/pokesay-${1}-${2}${3:-}" pokesay.go
+    GOOS=$1 GOARCH=$2 go build -o "${OUTPUT_DIR}/pokesay-${1}-${2}${3:-}" src/pokesay.go
 }
 
 build darwin  amd64 &
