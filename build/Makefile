@@ -5,7 +5,7 @@ DOCKER_TAG ?= "latest"
 all: build/docker build/cows build/assets build/release
 
 build/docker:
-	docker build -f Dockerfile -t $(DOCKER_IMAGE)/pokesay:$(DOCKER_TAG) ..
+	docker build -f Dockerfile -t $(DOCKER_IMAGE) ..
 
 build/cows:
 	@rm -rf cows.tar.gz cows/
@@ -21,14 +21,14 @@ build/cows:
 build/assets:
 	docker run \
 		-v $(PWD)/assets:/usr/local/src/build/assets \
-		--rm --name pokesay pokesay:latest \
+		--rm --name pokesay $(DOCKER_IMAGE) \
 			build/build_assets.sh
 
 build/release: build/assets
 	docker run \
 		-v $(PWD)/bin:/usr/local/src/build/bin \
 		-v $(PWD)/assets:/usr/local/src/build/assets \
-		--rm --name pokesay pokesay:latest build/build.sh
+		--rm --name pokesay $(DOCKER_IMAGE) build/build.sh
 	tree bin/
 
 .PHONY: all build/docker build/cows build/assets build/release
