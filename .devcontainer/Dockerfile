@@ -1,4 +1,4 @@
-FROM github.com/tmck-code/pokesay-go:latest
+FROM github.com/tmck-code/pokesay:latest
 
 WORKDIR /go
 RUN go install github.com/ramya-rao-a/go-outline@latest \
