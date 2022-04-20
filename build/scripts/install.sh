@@ -25,5 +25,5 @@ echo -e "\nTo use, either
 - edit your .bashrc file to add 'fortune | pokesay' at the bottom of the file
 - or, run this command
 
-    echo fortune | pokesay >> \$HOME/.bashrc
+    echo 'fortune | pokesay' >> \$HOME/.bashrc
 "
