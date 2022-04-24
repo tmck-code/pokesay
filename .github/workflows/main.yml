@@ -19,7 +19,7 @@ jobs:
       - name: Build go binaries
         run: docker run -v ${PWD}/build/bin:/usr/local/src/build/bin -v ${PWD}/build/assets:/usr/local/src/build/assets ghcr.io/tmck-code/pokesay:latest build/scripts/build.sh
       - name: Check build
-        run: ls -alhR
+        run: ls -alh build/bin
       - name: Demo build
-        run: echo w | ./build/bin/pokesay-linux/amd64
+        run: echo w | ./build/bin/pokesay-linux-amd64
 
