@@ -26,6 +26,7 @@ type PokedexArgs struct {
 	ToDataSubDir     string
 	ToMetadataSubDir string
 	ToTotalFname     string
+	NewLineMode		 bool
 }
 
 func parseArgs() PokedexArgs {
@@ -36,6 +37,7 @@ func parseArgs() PokedexArgs {
 	toMetadataSubDir := flag.String("toMetadataSubDir", "metadata/", "dir to write all binary (metadata) data to")
 	toCategoryFname := flag.String("toCategoryFpath", "pokedex.gob", "to fpath")
 	toTotalFname := flag.String("toTotalFname", "total.txt", "file to write the number of available entries to")
+	newlineMode := flag.Bool("newlineMode", false, "print progress via newlines, for use in CI/CD")
 	debug := flag.Bool("debug", false, "show debug logs")
 
 	flag.Parse()
@@ -48,6 +50,7 @@ func parseArgs() PokedexArgs {
 		ToMetadataSubDir: pokedex.NormaliseRelativeDir(*toMetadataSubDir),
 		ToTotalFname:     *toTotalFname,
 		Debug:            *debug,
+		NewLineMode:	  *newlineMode,
 	}
 	if args.Debug {
 		fmt.Printf("%+v\n", args)
@@ -77,7 +80,7 @@ func main() {
 	pokedex.WriteStructToFile(categories, categoryFpath)
 
 	fmt.Println("\nConverting cowfiles -> category & metadata GOB")
-	pbar := bin.NewProgressBar(len(fpaths))
+	pbar := bin.NewProgressBar(len(fpaths), args.NewLineMode)
 	for _, m := range metadata {
 		pokedex.WriteBytesToFile(m.Data, pokedex.EntryFpath(path.Join(args.ToDir, args.ToDataSubDir), m.Index), true)
 		pokedex.WriteStructToFile(m.Metadata, pokedex.MetadataFpath(path.Join(args.ToDir, args.ToMetadataSubDir), m.Index))

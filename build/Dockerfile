@@ -28,6 +28,7 @@ RUN go run /usr/local/src/src/bin/convert/png_convert.go \
         -to /tmp/cows/ \
         -padding 4 \
         -skip '["resources/", "misc/", "icons/", "items/", "items-outline/"]' \
+        -newlineMode \
     && rm -rf /tmp/original/pokesprite
 
 ADD . .
