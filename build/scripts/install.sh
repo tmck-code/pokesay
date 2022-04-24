@@ -22,6 +22,9 @@ function download_bin() {
     echo "- No specific release version given, finding latest version..."
     release_version=$(get_latest_version)
   fi
+  if [ "$GOOS" == "windows" ]; then
+    pokesay_bin="${pokesay_bin}.exe"
+  fi
   url="https://github.com/tmck-code/pokesay/releases/download/${release_version}/${pokesay_bin}"
   echo "- VERSION: $release_version, GOOS=$GOOS, GOARCH=$GOARCH"
   echo "- Downloading $url"
