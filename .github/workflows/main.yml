@@ -17,11 +17,9 @@ jobs:
       - name: Build go binary assets
         run: docker run -v ${PWD}/build/assets:/usr/local/src/build/assets ghcr.io/tmck-code/pokesay:latest ./build/scripts/build_assets.sh
       - name: Build go binaries
-        run: docker run \
-          -v ${PWD}/build/bin:/usr/local/src/build/bin \
-          -v ${PWD}/build/assets:/usr/local/src/build/assets \
-            ghcr.io/tmck-code/pokesay:latest \
-            build/scripts/build.sh
+        run: docker run -v ${PWD}/build/bin:/usr/local/src/build/bin -v ${PWD}/build/assets:/usr/local/src/build/assets ghcr.io/tmck-code/pokesay:latest build/scripts/build.sh
       - name: Check build
         run: ls -alhR
+      - name: Demo build
+        run: echo w | ./build/bin/pokesay-linux/amd64
 
