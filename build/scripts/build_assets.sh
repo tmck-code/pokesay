@@ -2,11 +2,6 @@
 
 set -euo pipefail
 
-extras=""
-if [ "${ENV:-}" == "dev" ]; then
-  extras="-newlineMode"
-fi
-
 tar xzf build/cows.tar.gz
 go run ./src/bin/pokedex/pokedex.go \
   -from ./cows/ \
@@ -15,7 +10,7 @@ go run ./src/bin/pokedex/pokedex.go \
   -toDataSubDir cows/ \
   -toMetadataSubDir metadata/ \
   -toTotalFname total.txt \
-  "${extras}"
+  -newlineMode
 
 rm -rf cows
 ls -alh build/assets
