@@ -16,3 +16,4 @@ jobs:
         run: docker pull ghcr.io/tmck-code/pokesay:latest
       - name: Build go binary assets
         run: docker run -v ${PWD}/build/assets:/usr/local/src/build/assets ghcr.io/tmck-code/pokesay:latest ./build/scripts/build_assets.sh
+
