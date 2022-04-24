@@ -9,8 +9,7 @@ go run ./src/bin/pokedex/pokedex.go \
   -toCategoryFpath pokedex.gob \
   -toDataSubDir cows/ \
   -toMetadataSubDir metadata/ \
-  -toTotalFname total.txt \
-  -newlineMode
+  -toTotalFname total.txt
 
 rm -rf cows
 ls -alh build/assets
