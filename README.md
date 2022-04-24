@@ -37,6 +37,10 @@ Print pokemon in the CLI! An adaptation of the classic "cowsay"
     ```shell
     bash -c "$(curl https://raw.githubusercontent.com/tmck-code/pokesay/master/build/scripts/install.sh)" bash android arm64
     ```
+- Windows x64 (.exe)
+    ```shell
+    bash -c "$(curl https://raw.githubusercontent.com/tmck-code/pokesay/master/build/scripts/install.sh)" bash windows amd64
+    ```
 </details>
 
 ---
