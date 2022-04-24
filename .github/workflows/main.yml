@@ -1,5 +1,8 @@
 on: [push]
 
+env:
+  ENV: dev
+
 jobs:
   build:
     runs-on: ubuntu-latest

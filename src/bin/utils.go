@@ -7,7 +7,10 @@ import (
 	"github.com/schollz/progressbar/v3"
 )
 
-func NewProgressBar(max int) progressbar.ProgressBar {
+func NewProgressBar(max int, newlineMode bool) progressbar.ProgressBar {
+	if newlineMode {
+		max = -1
+	}
 	return *progressbar.NewOptions(
 		max,
 		progressbar.OptionSetWriter(os.Stderr),

@@ -27,6 +27,7 @@ type CowBuildArgs struct {
 	SkipDirs []string
 	Padding  int
 	Debug    bool
+	NewLineMode bool
 }
 
 func parseArgs() CowBuildArgs {
@@ -35,12 +36,13 @@ func parseArgs() CowBuildArgs {
 	skipDirs := flag.String("skip", "'[\"resources\"]'", "JSON array of dir patterns to skip converting")
 	padding := flag.Int("padding", 2, "the number of spaces to pad from the left")
 	debug := flag.Bool("debug", DEBUG, "show debug logs")
+	newlineMode := flag.Bool("newlineMode", false, "print progress via newlines, for use in CI/CD")
 
 	flag.Parse()
 
 	DEBUG = *debug
 
-	args := CowBuildArgs{FromDir: *fromDir, ToDir: *toDir, Padding: *padding}
+	args := CowBuildArgs{FromDir: *fromDir, ToDir: *toDir, Padding: *padding, NewLineMode: *newlineMode}
 	json.Unmarshal([]byte(*skipDirs), &args.SkipDirs)
 
 	if DEBUG {
@@ -58,7 +60,7 @@ func main() {
 	os.MkdirAll(args.ToDir, 0755)
 
 	fmt.Println("Converting PNGs -> cowfiles")
-	pbar := bin.NewProgressBar(len(fpaths))
+	pbar := bin.NewProgressBar(len(fpaths), args.NewLineMode)
 	for _, f := range fpaths {
 		pokedex.ConvertPngToCow(args.FromDir, f, args.ToDir, args.Padding)
 		pbar.Add(1)
