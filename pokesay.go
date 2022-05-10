@@ -83,6 +83,8 @@ func printSpeechBubble(scanner *bufio.Scanner, args Args) {
 func printPokemon(index int, name string, categoryKeys []string) {
 	d, _ := GOBCowData.ReadFile(pokedex.EntryFpath("build/assets/cows", index))
 
+	lines := strings.Split(string(pokedex.Decompress(d)), "\n")
+	fmt.Println(len(lines), pokedex.SizeCategory(len(lines)))
 	fmt.Printf(
 		"%s%s: %s | %s: %s\n",
 		pokedex.Decompress(d),
