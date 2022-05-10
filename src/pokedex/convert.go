@@ -130,7 +130,7 @@ func CreateMetadata(rootDir string, fpaths []string, debug bool) (PokemonTrie, [
 		data, err := os.ReadFile(fpath)
 		check(err)
 
-		cats := createCategories(strings.TrimPrefix(fpath, rootDir))
+		cats := createCategories(strings.TrimPrefix(fpath, rootDir), data)
 		name := createName(fpath)
 
 		categories.Insert(
@@ -147,9 +147,20 @@ func createName(fpath string) string {
 	return strings.Split(parts[len(parts)-1], ".")[0]
 }
 
-func createCategories(fpath string) []string {
+func SizeCategory(height int) string {
+	if height <= 13 {
+		return "small"
+	} else if height <= 19 {
+		return "medium"
+	}
+	return "big"
+}
+
+func createCategories(fpath string, data []byte) []string {
 	parts := strings.Split(fpath, "/")
-	return parts[0 : len(parts)-1]
+	height := SizeCategory(len(strings.Split(string(data), "\n")))
+
+	return append(parts[0:len(parts)-1], []string{height}...)
 }
 
 // Strips the leading "./" from a path e.g. "./cows/ -> cows/"
