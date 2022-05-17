@@ -160,7 +160,7 @@ func createCategories(fpath string, data []byte) []string {
 	parts := strings.Split(fpath, "/")
 	height := SizeCategory(len(strings.Split(string(data), "\n")))
 
-	return append(parts[0:len(parts)-1], []string{height}...)
+	return append([]string{height}, parts[0:len(parts)-1]...)
 }
 
 // Strips the leading "./" from a path e.g. "./cows/ -> cows/"
