@@ -125,4 +125,4 @@ This will produce 4 executable bin files inside the `build/bin` directory, and a
 - Longer-term
   - [x] Make data structure to hold categories, names and pokemon
   - [x] Increase speed
-  - [ ] Improve categories to be more specific than shiny/regular
+  - [x] Improve categories to be more specific than shiny/regular
