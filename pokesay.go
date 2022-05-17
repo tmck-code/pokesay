@@ -168,8 +168,8 @@ func ListCategories(categories pokedex.PokemonTrie) []string {
 }
 
 func runListCategories(categories pokedex.PokemonTrie) {
-	keys := fmt.Sprintf(strings.Join(ListCategories(categories), " "))
-	fmt.Printf("%s\n%d %s\n", keys, len(keys), "total names")
+	keys := ListCategories(categories)
+	fmt.Printf("%s\n%d %s\n", strings.Join(keys, " "), len(keys), "total categories")
 }
 
 func runListNames() {
