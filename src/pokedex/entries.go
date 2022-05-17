@@ -24,6 +24,11 @@ type PokemonEntry struct {
 	Index int
 }
 
+func (p PokemonEntry) String() string {
+	return fmt.Sprintf("{Index: %d, Name: %s}", p.Index, p.Name)
+}
+
+
 type Node struct {
 	Children map[string]*Node
 	Data     []*PokemonEntry
@@ -109,13 +114,9 @@ func (t *PokemonTrie) Insert(s []string, data *PokemonEntry) {
 func (t PokemonTrie) GetCategoryPaths(s string) ([][]string, error) {
 	matches := [][]string{}
 	for _, k := range t.Keys {
-		for i, el := range k {
+		for _, el := range k {
 			if el == s {
-				if i == 0 {
-					matches = append(matches, []string{s})
-				} else {
-					matches = append(matches, k)
-				}
+				matches = append(matches, k)
 			}
 		}
 	}
@@ -137,6 +138,9 @@ func (t PokemonTrie) GetCategory(s []string) ([]*PokemonEntry, error) {
 		} else {
 			return nil, errors.New(fmt.Sprintf("Could not find category: %s", s))
 		}
+	}
+	if len(matches) == 0 {
+		return nil, errors.New(fmt.Sprintf("Could not find category: %s", s))
 	}
 	return matches, nil
 }

@@ -2,9 +2,10 @@
 
 set -euo pipefail
 
-tar xzf build/cows.tar.gz
+FROM="${1:-/tmp/cows/}"
+
 go run ./src/bin/pokedex/pokedex.go \
-  -from ./cows/ \
+  -from "${FROM}" \
   -to ./build/assets/ \
   -toCategoryFpath pokedex.gob \
   -toDataSubDir cows/ \
