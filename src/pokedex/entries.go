@@ -114,13 +114,9 @@ func (t *PokemonTrie) Insert(s []string, data *PokemonEntry) {
 func (t PokemonTrie) GetCategoryPaths(s string) ([][]string, error) {
 	matches := [][]string{}
 	for _, k := range t.Keys {
-		for i, el := range k {
+		for _, el := range k {
 			if el == s {
-				if i == 0 {
-					matches = append(matches, []string{s})
-				} else {
-					matches = append(matches, k)
-				}
+				matches = append(matches, k)
 			}
 		}
 	}
