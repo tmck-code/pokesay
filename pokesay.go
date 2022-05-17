@@ -3,15 +3,16 @@ package main
 import (
 	"bufio"
 	"embed"
+	"errors"
 	"flag"
 	"fmt"
 	"log"
 	"math/rand"
 	"os"
+	"sort"
 	"strconv"
 	"strings"
 	"time"
-	"errors"
 
 	"github.com/fatih/color"
 	"github.com/tmck-code/pokesay/src/pokedex"
@@ -149,7 +150,7 @@ func parseFlags() Args {
 	return args
 }
 
-func runListCategories(categories pokedex.PokemonTrie) {
+func ListCategories(categories pokedex.PokemonTrie) []string {
 	ukm := map[string]bool{}
 	for _, v := range categories.Keys {
 		for _, k := range v {
@@ -162,8 +163,13 @@ func runListCategories(categories pokedex.PokemonTrie) {
 		keys[i] = k
 		i++
 	}
-	fmt.Println(strings.Join(keys, " "))
-	fmt.Printf("\n%d %s\n", len(keys), "total names")
+	sort.Strings(keys)
+	return keys
+}
+
+func runListCategories(categories pokedex.PokemonTrie) {
+	keys := fmt.Sprintf(strings.Join(ListCategories(categories), " "))
+	fmt.Printf("%s\n%d %s\n", keys, len(keys), "total names")
 }
 
 func runListNames() {
