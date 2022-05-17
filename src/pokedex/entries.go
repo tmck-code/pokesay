@@ -24,6 +24,11 @@ type PokemonEntry struct {
 	Index int
 }
 
+func (p PokemonEntry) String() string {
+	return fmt.Sprintf("{Index: %d, Name: %s}", p.Index, p.Name)
+}
+
+
 type Node struct {
 	Children map[string]*Node
 	Data     []*PokemonEntry
