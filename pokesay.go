@@ -11,6 +11,7 @@ import (
 	"strconv"
 	"strings"
 	"time"
+	"errors"
 
 	"github.com/fatih/color"
 	"github.com/tmck-code/pokesay/src/pokedex"
@@ -41,6 +42,9 @@ func check(e error) {
 }
 
 func randomInt(n int) int {
+	if n <= 0 {
+		log.Fatal(errors.New("randomInt arg must be >0"))
+	}
 	return rand.New(Rand).Intn(n)
 }
 
