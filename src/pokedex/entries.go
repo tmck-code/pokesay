@@ -133,13 +133,10 @@ func (t PokemonTrie) GetCategoryPaths(s string) ([][]string, error) {
 func (t PokemonTrie) GetCategory(s []string) ([]*PokemonEntry, error) {
 	current := t.Root
 	matches := make([]*PokemonEntry, 0)
-	found := false
 	for _, char := range s {
-		if _, ok := current.Children[char]; ok || found {
-			found = true
+		if _, ok := current.Children[char]; ok {
 			current = current.Children[char]
 			for _, p := range current.Children {
-				fmt.Println(p)
 				matches = append(matches, p.Data...)
 			}
 		} else {
