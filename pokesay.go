@@ -89,10 +89,10 @@ func printPokemon(index int, name string, categoryKeys []string) {
 	d, _ := GOBCowData.ReadFile(pokedex.EntryFpath("build/assets/cows", index))
 
 	fmt.Printf(
-		"%s%s: %s | %s: %s\n",
+		"%s> %s | %s\n",
 		pokedex.Decompress(d),
-		"choice", textStyleBold.Sprint(name),
-		"categories", textStyleItalic.Sprint(strings.Join(categoryKeys, ", ")),
+		textStyleBold.Sprint(name),
+		textStyleItalic.Sprint(strings.Join(categoryKeys, "/")),
 	)
 }
 
