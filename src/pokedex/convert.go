@@ -78,7 +78,9 @@ func stripPadding(cowfile []byte, n int) []string {
 				convertedLine += string(ch)
 			}
 		}
-		converted = append(converted, convertedLine)
+		if len(convertedLine) > 0 {
+			converted = append(converted, convertedLine)
+		}
 	}
 	return converted
 }
