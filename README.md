@@ -12,7 +12,7 @@ Print pokemon in the CLI! An adaptation of the classic "cowsay"
 
 ---
 
-![pokesay-demo-3](https://user-images.githubusercontent.com/9894426/160840120-f45be867-7427-4f19-862c-46e6a4b396c3.png)
+<img width="1386" alt="Screen Shot 2022-05-28 at 8 32 23 pm" src="https://user-images.githubusercontent.com/9894426/170821592-9036b68c-bb42-4fcc-9022-f71b34fc9259.png">
 
 ---
 
