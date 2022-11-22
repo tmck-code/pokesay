@@ -19,9 +19,6 @@ Print pokemon in the CLI! An adaptation of the classic "cowsay"
 
 ## One-line installs
 
-<details>
-  <summary>Click to expand!</summary>
-
 - OSX / darwin
     ```shell
     bash -c "$(curl https://raw.githubusercontent.com/tmck-code/pokesay/master/build/scripts/install.sh)" bash darwin amd64
@@ -42,7 +39,6 @@ Print pokemon in the CLI! An adaptation of the classic "cowsay"
     ```shell
     bash -c "$(curl https://raw.githubusercontent.com/tmck-code/pokesay/master/build/scripts/install.sh)" bash windows amd64
     ```
-</details>
 
 ---
 
