@@ -4,6 +4,7 @@ Print pokemon in the CLI! An adaptation of the classic "cowsay"
 
 - [pokesay](#pokesay)
   - [One-line installs](#one-line-installs)
+  - [Usage](#usage)
   - [How it works](#how-it-works)
   - [Building binaries](#building-binaries)
     - [On your host OS](#on-your-host-os)
@@ -17,9 +18,6 @@ Print pokemon in the CLI! An adaptation of the classic "cowsay"
 ---
 
 ## One-line installs
-
-<details>
-  <summary>Click to expand!</summary>
 
 - OSX / darwin
     ```shell
@@ -41,7 +39,18 @@ Print pokemon in the CLI! An adaptation of the classic "cowsay"
     ```shell
     bash -c "$(curl https://raw.githubusercontent.com/tmck-code/pokesay/master/build/scripts/install.sh)" bash windows amd64
     ```
-</details>
+
+---
+
+## Usage
+
+Just pipe some text! e.g.
+
+```shell
+echo yolo | pokesay
+```
+
+> _Note: The pokesay tool is intended to only be used with piped text input from STDIN, entering text by typing (or other methods) might not work as expected!_
 
 ---
 
