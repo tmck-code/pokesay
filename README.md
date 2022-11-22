@@ -19,6 +19,8 @@ Print pokemon in the CLI! An adaptation of the classic "cowsay"
 
 ## One-line installs
 
+_(These commands can also be used to update your existing pokesay)_
+
 - OSX / darwin
     ```shell
     bash -c "$(curl https://raw.githubusercontent.com/tmck-code/pokesay/master/build/scripts/install.sh)" bash darwin amd64
