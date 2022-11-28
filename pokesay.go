@@ -53,7 +53,7 @@ func printSpeechBubbleLine(line string, width int) {
 	if len(line) > width {
 		fmt.Println("|", line)
 	} else {
-		fmt.Println("|", line, strings.Repeat(" ", width-len(line)), "|")
+		fmt.Println("|", line, strings.Repeat(" ", width-len(line)-1), "|")
 	}
 }
 
