@@ -76,20 +76,22 @@ your .bashrc to give you a random message spoken by a cow every time you open a 
                 ||     ||
 ```
 
-These pokemon sprites used here are sourced from the awesome repo
+As a personal project, this has been lovingly over-engineered with a focus on the lowest latency possible, so that it doesn't slow down your terminal experience.
+
+1. These pokemon sprites used here are sourced from the awesome repo
 [msikma/pokesprite](https://github.com/msikma/pokesprite)
 
-![sprits](https://github.com/msikma/pokesprite/raw/master/resources/images/banner_gen8_2x.png)
+    ![sprits](https://github.com/msikma/pokesprite/raw/master/resources/images/banner_gen8_2x.png)
 
-All of these sprites are converted into a form that can be rendered in a terminal (unicode
+2. All of these sprites are converted into a form that can be rendered in a terminal (unicode
 characters and colour control sequences) by the `img2xterm` tool, found at
 [rossy/img2xterm](https://github.com/rossy/img2xterm)
 
-The last pre-compile step is to use `encoding/gob` and `go:embed` to generate a go source code file
-that encodes all of the converted unicode sprites as gzipped text.
+3. Use some go tools (`encoding/gob` and `go:embed`) to generate a go source code file
+that encodes all of the converted unicode sprites as gzipped text and some search-optimised data structures.
 
-Finally, this is built with the main CLI logic in `pokesay.go` into an single executable that can be
-easily popped into a directory in the user's $PATH
+4. Finally, this is built with the main CLI logic in `pokesay.go` into an single executable that can be
+easily popped into a directory in the user's `$PATH`
 
 If all you are after is installing the program to use, then there are no dependencies required!
 Navigate to the Releases and download the latest binary.
