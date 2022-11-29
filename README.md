@@ -52,6 +52,13 @@ Just pipe some text! e.g.
 echo yolo | pokesay
 ```
 
+To see it every time you open a terminal, add it to your `.bashrc` file!   
+_(This requires that you have `fortune` installed)_
+
+```shell
+echo 'fortune | pokesay' >> $HOME/.bashrc
+```
+
 > _Note: The pokesay tool is intended to only be used with piped text input from STDIN, entering text by typing (or other methods) might not work as expected!_
 
 ---
