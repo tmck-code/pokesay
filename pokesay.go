@@ -52,6 +52,8 @@ func randomInt(n int) int {
 func printSpeechBubbleLine(line string, width int) {
 	if len(line) > width {
 		fmt.Printf("| %s\n", line)
+	} else if len(line) == width {
+		fmt.Printf("| %s |\n", line)
 	} else {
 		fmt.Printf("| %s%s |\n", line, strings.Repeat(" ", width-len(line)))
 	}
