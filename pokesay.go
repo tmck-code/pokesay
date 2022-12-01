@@ -184,6 +184,7 @@ func runListNames() {
 		check(err)
 		metadata := pokedex.ReadMetadataFromBytes(m)
 		names[i] = metadata.Name
+		names[i] = metadata.JapaneseName
 	}
 	fmt.Println(strings.Join(names, " "))
 	fmt.Printf("\n%d %s\n", len(names), "total names")
@@ -216,7 +217,7 @@ func runPrintRandom(args Args) {
 	metadata := pokedex.ReadMetadataFromBytes(m)
 
 	printSpeechBubble(bufio.NewScanner(os.Stdin), args)
-	printPokemon(choice, metadata.Name, strings.Split(metadata.Categories, "/"))
+	printPokemon(choice, metadata.JapaneseName, strings.Split(metadata.Categories, "/"))
 }
 
 func main() {

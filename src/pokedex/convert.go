@@ -125,7 +125,7 @@ type Metadata struct {
 	Metadata PokemonMetadata
 }
 
-func CreateMetadata(rootDir string, fpaths []string, debug bool) (PokemonTrie, []Metadata) {
+func CreateMetadata(rootDir string, fpaths []string, pokemonNames map[string]PokemonName, debug bool) (PokemonTrie, []Metadata) {
 	categories := NewTrie()
 	metadata := []Metadata{}
 	for i, fpath := range fpaths {
@@ -135,9 +135,11 @@ func CreateMetadata(rootDir string, fpaths []string, debug bool) (PokemonTrie, [
 		cats := createCategories(strings.TrimPrefix(fpath, rootDir), data)
 		name := createName(fpath)
 
+		v, _ := pokemonNames[name]
+
 		categories.Insert(
 			cats,
-			NewPokemonEntry(i, name),
+			NewPokemonEntry(i, name, v.Jpn),
 		)
 		metadata = append(metadata, Metadata{data, i, PokemonMetadata{Name: name, Categories: strings.Join(cats, "/")}})
 	}
