@@ -19,17 +19,19 @@ func check(e error) {
 }
 
 type PokedexArgs struct {
-	FromDir          string
-	ToDir            string
-	Debug            bool
-	ToCategoryFname  string
-	ToDataSubDir     string
-	ToMetadataSubDir string
-	ToTotalFname     string
+	FromDir           string
+	FromMetadataFname string
+	ToDir             string
+	Debug             bool
+	ToCategoryFname   string
+	ToDataSubDir      string
+	ToMetadataSubDir  string
+	ToTotalFname      string
 }
 
 func parseArgs() PokedexArgs {
 	fromDir := flag.String("from", "/tmp/cows", "from dir")
+	fromMetadataFname := flag.String("fromMetadata", "/tmp/cows/pokemon.json", "metadata file")
 	toDir := flag.String("to", "build/assets/", "to dir")
 
 	toDataSubDir := flag.String("toDataSubDir", "cows/", "dir to write all binary (image) data to")
@@ -41,13 +43,14 @@ func parseArgs() PokedexArgs {
 	flag.Parse()
 
 	args := PokedexArgs{
-		FromDir:          pokedex.NormaliseRelativeDir(*fromDir),
-		ToDir:            pokedex.NormaliseRelativeDir(*toDir),
-		ToCategoryFname:  *toCategoryFname,
-		ToDataSubDir:     pokedex.NormaliseRelativeDir(*toDataSubDir),
-		ToMetadataSubDir: pokedex.NormaliseRelativeDir(*toMetadataSubDir),
-		ToTotalFname:     *toTotalFname,
-		Debug:            *debug,
+		FromDir:           pokedex.NormaliseRelativeDir(*fromDir),
+		FromMetadataFname: *fromMetadataFname,
+		ToDir:             pokedex.NormaliseRelativeDir(*toDir),
+		ToCategoryFname:   *toCategoryFname,
+		ToDataSubDir:      pokedex.NormaliseRelativeDir(*toDataSubDir),
+		ToMetadataSubDir:  pokedex.NormaliseRelativeDir(*toMetadataSubDir),
+		ToTotalFname:      *toTotalFname,
+		Debug:             *debug,
 	}
 	if args.Debug {
 		fmt.Printf("%+v\n", args)
@@ -61,6 +64,8 @@ func main() {
 	totalFpath := path.Join(args.ToDir, args.ToTotalFname)
 	categoryFpath := path.Join(args.ToDir, args.ToCategoryFname)
 
+	pokemonNames := pokedex.ReadNames(args.FromMetadataFname)
+	fmt.Printf("%+v\n", pokemonNames)
 	fpaths := pokedex.FindFiles(args.FromDir, ".cow", make([]string, 0))
 
 	err := os.MkdirAll(path.Join(args.ToDir, args.ToDataSubDir), 0755)
@@ -72,7 +77,7 @@ func main() {
 	// metadata is a list of pokemon data and an index to use when writing them to a file
 	// - this index matches a corresponding one in the categories struct
 	// - these files are embedded into the build binary using go:embed and then loaded at runtime
-	categories, metadata := pokedex.CreateMetadata(args.FromDir, fpaths, args.Debug)
+	categories, metadata := pokedex.CreateMetadata(args.FromDir, fpaths, pokemonNames, args.Debug)
 
 	pokedex.WriteStructToFile(categories, categoryFpath)
 
