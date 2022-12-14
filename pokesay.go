@@ -87,13 +87,13 @@ func printSpeechBubble(scanner *bufio.Scanner, args Args) {
 	}
 }
 
-func printPokemon(index int, name string, categoryKeys []string) {
+func printPokemon(index int, names []string, categoryKeys []string) {
 	d, _ := GOBCowData.ReadFile(pokedex.EntryFpath("build/assets/cows", index))
 
 	fmt.Printf(
 		"%s> %s | %s\n",
 		pokedex.Decompress(d),
-		textStyleBold.Sprint(name),
+		textStyleBold.Sprint(strings.Join(names, " / ")),
 		textStyleItalic.Sprint(strings.Join(categoryKeys, "/")),
 	)
 }
@@ -114,6 +114,7 @@ type Args struct {
 	ListNames      bool
 	Category       string
 	NameToken      string
+	JapaneseName   bool
 }
 
 func parseFlags() Args {
@@ -126,6 +127,7 @@ func parseFlags() Args {
 	name := flag.String("name", "", "choose a pokemon from a specific name")
 	listCategories := flag.Bool("list-categories", false, "list all available categories")
 	listNames := flag.Bool("list-names", false, "list all available names")
+	japaneseName := flag.Bool("japanese-name", false, "print the japanese name")
 
 	flag.Parse()
 	var args Args
@@ -147,6 +149,7 @@ func parseFlags() Args {
 			ListNames:      *listNames,
 			Category:       *category,
 			NameToken:      *name,
+			JapaneseName:   *japaneseName,
 		}
 	}
 	return args
@@ -196,7 +199,11 @@ func runPrintByName(args Args, categories pokedex.PokemonTrie) {
 	match := matches[randomInt(len(matches))]
 
 	printSpeechBubble(bufio.NewScanner(os.Stdin), args)
-	printPokemon(match.Entry.Index, match.Entry.Name, match.Categories)
+	if args.JapaneseName {
+		printPokemon(match.Entry.Index, []string{match.Entry.Name, match.Entry.JapaneseName}, match.Categories)
+	} else {
+		printPokemon(match.Entry.Index, []string{match.Entry.Name}, match.Categories)
+	}
 }
 
 func runPrintByCategory(args Args, categories pokedex.PokemonTrie) {
@@ -206,7 +213,11 @@ func runPrintByCategory(args Args, categories pokedex.PokemonTrie) {
 	choice := category[randomInt(len(category))]
 
 	printSpeechBubble(bufio.NewScanner(os.Stdin), args)
-	printPokemon(choice.Index, choice.Name, keys)
+	if args.JapaneseName {
+		printPokemon(choice.Index, []string{choice.Name, choice.JapaneseName}, keys)
+	} else {
+		printPokemon(choice.Index, []string{choice.Name}, keys)
+	}
 }
 
 func runPrintRandom(args Args) {
@@ -217,7 +228,11 @@ func runPrintRandom(args Args) {
 	metadata := pokedex.ReadMetadataFromBytes(m)
 
 	printSpeechBubble(bufio.NewScanner(os.Stdin), args)
-	printPokemon(choice, metadata.JapaneseName, strings.Split(metadata.Categories, "/"))
+	if args.JapaneseName {
+		printPokemon(choice, []string{metadata.Name, metadata.JapaneseName}, strings.Split(metadata.Categories, "/"))
+	} else {
+		printPokemon(choice, []string{metadata.Name}, strings.Split(metadata.Categories, "/"))
+	}
 }
 
 func main() {
