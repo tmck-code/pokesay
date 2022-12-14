@@ -143,7 +143,7 @@ func CreateMetadata(rootDir string, fpaths []string, pokemonNames map[string]Pok
 			cats,
 			NewPokemonEntry(i, name, v.Jpn),
 		)
-		metadata = append(metadata, Metadata{data, i, PokemonMetadata{Name: name, Categories: strings.Join(cats, "/")}})
+		metadata = append(metadata, Metadata{data, i, PokemonMetadata{Name: name, JapaneseName: v.Jpn, Categories: strings.Join(cats, "/")}})
 	}
 	return *categories, metadata
 }
