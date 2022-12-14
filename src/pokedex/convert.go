@@ -135,7 +135,9 @@ func CreateMetadata(rootDir string, fpaths []string, pokemonNames map[string]Pok
 		cats := createCategories(strings.TrimPrefix(fpath, rootDir), data)
 		name := createName(fpath)
 
-		v, _ := pokemonNames[name]
+		v, _ := pokemonNames[strings.Split(name, "-")[0]]
+
+		fmt.Println("name:", name, "found:", v)
 
 		categories.Insert(
 			cats,
