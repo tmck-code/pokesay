@@ -8,8 +8,8 @@ build/assets
 build/bin
 
 # Built binaries
-pokesay
-pokedex
+# pokesay
+# pokedex
 
 # Test binary, built with `go test -c`
 *.test
