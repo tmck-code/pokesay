@@ -6,6 +6,7 @@ import (
 	"bufio"
 	"encoding/json"
 	"fmt"
+	"strings"
 )
 
 type PokemonName struct {
@@ -42,7 +43,7 @@ func ReadNames(fpath string) map[string]PokemonName {
 		if jsonErr != nil {
 			fmt.Println(jsonErr)
 		}
-		entries[entry.Name.Eng] = entry.Name
+		entries[strings.ToLower(entry.Name.Eng)] = entry.Name
     }
     if err := scanner.Err(); err != nil {
         log.Fatal(err)
