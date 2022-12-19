@@ -16,14 +16,14 @@ func assert(expected interface{}, result interface{}, obj interface{}, test *tes
 }
 
 func TestNewPokemonEntry(test *testing.T) {
-	p := pokedex.NewPokemonEntry(1, "yo")
+	p := pokedex.NewPokemonEntry(1, "yo", "スイクン")
 	assert(1, p.Index, p, test)
 }
 
 func TestTrieInsert(test *testing.T) {
 	t := pokedex.NewTrie()
-	t.Insert([]string{"p", "g1", "r"}, pokedex.NewPokemonEntry(0, "pikachu"))
-	t.Insert([]string{"p", "g1", "r"}, pokedex.NewPokemonEntry(1, "bulbasaur"))
+	t.Insert([]string{"p", "g1", "r"}, pokedex.NewPokemonEntry(0, "pikachu", "ピカチュウ"))
+	t.Insert([]string{"p", "g1", "r"}, pokedex.NewPokemonEntry(1, "bulbasaur", "フシギダネ"))
 
 	result, err := t.GetCategory([]string{"p", "g1"})
 	check(err)
@@ -38,24 +38,24 @@ func TestTrieInsert(test *testing.T) {
 
 func TestCategoryPaths(test *testing.T) {
 	t := pokedex.NewTrie()
-	t.Insert([]string{"small", "g1", "r"}, pokedex.NewPokemonEntry(0, "pikachu"))
-	t.Insert([]string{"small", "g1", "o"}, pokedex.NewPokemonEntry(1, "bulbasaur"))
-	t.Insert([]string{"medium", "g1", "o"}, pokedex.NewPokemonEntry(2, "bulbasaur"))
-	t.Insert([]string{"big", "g1", "o"}, pokedex.NewPokemonEntry(3, "bulbasaur"))
-	t.Insert([]string{"big", "g1"}, pokedex.NewPokemonEntry(4, "charmander"))
+	t.Insert([]string{"small", "g1", "r"}, pokedex.NewPokemonEntry(0, "pikachu", "ピカチュウ"))
+	t.Insert([]string{"small", "g1", "o"}, pokedex.NewPokemonEntry(1, "bulbasaur", "フシギダネ"))
+	t.Insert([]string{"medium", "g1", "o"}, pokedex.NewPokemonEntry(2, "bulbasaur", "フシギダネ"))
+	t.Insert([]string{"big", "g1", "o"}, pokedex.NewPokemonEntry(3, "bulbasaur", "フシギダネ"))
+	t.Insert([]string{"big", "g1"}, pokedex.NewPokemonEntry(4, "charmander", "ヒトカゲ"))
 
 	expected := [][]string{
-		[]string{"small", "g1", "r"},
-		[]string{"small", "g1", "o"},
-		[]string{"medium", "g1", "o"},
-		[]string{"big", "g1", "o"},
-		[]string{"big", "g1"},
+		{"small", "g1", "r"},
+		{"small", "g1", "o"},
+		{"medium", "g1", "o"},
+		{"big", "g1", "o"},
+		{"big", "g1"},
 	}
 	assert(expected, t.Keys, t, test)
 
 	expected = [][]string{
-		[]string{"big", "g1", "o"},
-		[]string{"big", "g1"},
+		{"big", "g1", "o"},
+		{"big", "g1"},
 	}
 	result, err := t.GetCategoryPaths("big")
 	check(err)
@@ -64,11 +64,11 @@ func TestCategoryPaths(test *testing.T) {
 
 func TestListCategories(test *testing.T) {
 	t := pokedex.NewTrie()
-	t.Insert([]string{"small", "g1", "r"}, pokedex.NewPokemonEntry(0, "pikachu"))
-	t.Insert([]string{"small", "g1", "o"}, pokedex.NewPokemonEntry(1, "bulbasaur"))
-	t.Insert([]string{"medium", "g1", "o"}, pokedex.NewPokemonEntry(2, "bulbasaur"))
-	t.Insert([]string{"big", "g1", "o"}, pokedex.NewPokemonEntry(3, "bulbasaur"))
-	t.Insert([]string{"big", "g1"}, pokedex.NewPokemonEntry(4, "charmander"))
+	t.Insert([]string{"small", "g1", "r"}, pokedex.NewPokemonEntry(0, "pikachu", "ピカチュウ"))
+	t.Insert([]string{"small", "g1", "o"}, pokedex.NewPokemonEntry(1, "bulbasaur", "フシギダネ"))
+	t.Insert([]string{"medium", "g1", "o"}, pokedex.NewPokemonEntry(2, "bulbasaur", "フシギダネ"))
+	t.Insert([]string{"big", "g1", "o"}, pokedex.NewPokemonEntry(3, "bulbasaur", "フシギダネ"))
+	t.Insert([]string{"big", "g1"}, pokedex.NewPokemonEntry(4, "charmander", "ヒトカゲ"))
 
 	result := ListCategories(*t)
 	assert([]string{"big", "g1", "medium", "o", "r", "small"}, result, result, test)
