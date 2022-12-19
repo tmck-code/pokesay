@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/tmck-code/pokesay/src/pokedex"
+	"github.com/tmck-code/pokesay/src/pokesay"
 )
 
 // Made my own basic test helper. Takes in an expected & result object of any type, and asserts
@@ -26,7 +27,7 @@ func TestTrieInsert(test *testing.T) {
 	t.Insert([]string{"p", "g1", "r"}, pokedex.NewPokemonEntry(1, "bulbasaur", "フシギダネ"))
 
 	result, err := t.GetCategory([]string{"p", "g1"})
-	check(err)
+	pokesay.Check(err)
 
 	assert(2, len(result), result, test)
 	assert(
@@ -58,18 +59,18 @@ func TestCategoryPaths(test *testing.T) {
 		{"big", "g1"},
 	}
 	result, err := t.GetCategoryPaths("big")
-	check(err)
+	pokesay.Check(err)
 	assert(expected, result, result, test)
 }
 
-func TestListCategories(test *testing.T) {
-	t := pokedex.NewTrie()
-	t.Insert([]string{"small", "g1", "r"}, pokedex.NewPokemonEntry(0, "pikachu", "ピカチュウ"))
-	t.Insert([]string{"small", "g1", "o"}, pokedex.NewPokemonEntry(1, "bulbasaur", "フシギダネ"))
-	t.Insert([]string{"medium", "g1", "o"}, pokedex.NewPokemonEntry(2, "bulbasaur", "フシギダネ"))
-	t.Insert([]string{"big", "g1", "o"}, pokedex.NewPokemonEntry(3, "bulbasaur", "フシギダネ"))
-	t.Insert([]string{"big", "g1"}, pokedex.NewPokemonEntry(4, "charmander", "ヒトカゲ"))
+func TestReadNames(test *testing.T) {
+	result := pokedex.ReadNames("./data/pokemon.json")
 
-	result := ListCategories(*t)
-	assert([]string{"big", "g1", "medium", "o", "r", "small"}, result, result, test)
+	expected := map[string]pokedex.PokemonName{
+		"bulbasaur": {Eng: "Bulbasaur", Chs: "妙蛙种子", Jpn: "フシギダネ", Jpn_ro: "Fushigidane"},
+		"ivysaur":   {Eng: "Ivysaur", Chs: "妙蛙草", Jpn: "フシギソウ", Jpn_ro: "Fushigisou"},
+		"venusaur":  {Eng: "Venusaur", Chs: "妙蛙花", Jpn: "フシギバナ", Jpn_ro: "Fushigibana"},
+	}
+
+	assert(expected, result, result, test)
 }
