@@ -67,9 +67,9 @@ func TestReadNames(test *testing.T) {
 	result := pokedex.ReadNames("./data/pokemon.json")
 
 	expected := map[string]pokedex.PokemonName{
-		"bulbasaur": {Eng: "Bulbasaur", Chs: "妙蛙种子", Jpn: "フシギダネ", Jpn_ro: "Fushigidane"},
-		"ivysaur":   {Eng: "Ivysaur", Chs: "妙蛙草", Jpn: "フシギソウ", Jpn_ro: "Fushigisou"},
-		"venusaur":  {Eng: "Venusaur", Chs: "妙蛙花", Jpn: "フシギバナ", Jpn_ro: "Fushigibana"},
+		"bulbasaur": {English: "Bulbasaur", Japanese: "フシギダネ", JapaneseRomaji: "fushigidane"},
+		"ivysaur":   {English: "Ivysaur", Japanese: "フシギソウ", JapaneseRomaji: "fushigisou"},
+		"venusaur":  {English: "Venusaur", Japanese: "フシギバナ", JapaneseRomaji: "fushigibana"},
 	}
 
 	assert(expected, result, result, test)
