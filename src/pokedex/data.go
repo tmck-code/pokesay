@@ -9,23 +9,17 @@ import (
 	"strings"
 )
 
-// "name": {
-//   "eng": "Caterpie",
-//   "chs": "绿毛虫",
-//   "jpn": "キャタピー",
-//   "jpn_ro": "Caterpie"
-// },
+// {
+//   "name": { "eng": "Charizard", "chs": "喷火龙", "jpn": "リザードン", "jpn_ro": "Lizardon" }
+//   "slug": { "eng": "charizard",                  "jpn": "riza-don",   "jpn_ro": "lizardon" }
+// }
+// Out of all these names, we want the name.jpn, name.jpn_ro, slug.eng,
 type DataEntryName struct {
 	Eng string `json:"eng"`
-	Chs string `json:"chs"`
 	Jpn string `json:"jpn"`
 	Jpn_ro string `json:"jpn_ro"`
 }
-// "slug":{
-//   "eng":"bulbasaur","
-//   "jpn":"fushigidane",
-//   "jpn_ro":"fushigidane"
-// }
+
 type DataEntrySlug struct {
 	Eng string `json:"eng"`
 	Jpn string `json:"jpn"`
@@ -40,6 +34,7 @@ type DataEntry struct {
 type PokemonName struct {
 	English string
 	Japanese string
+	JapanesePhonetic string
 	JapaneseRomaji string
 }
 
@@ -48,6 +43,7 @@ func NewPokemonName(entry DataEntry) *PokemonName {
 	return &PokemonName{
 		English: entry.Name.Eng,
 		Japanese: entry.Name.Jpn,
+		JapanesePhonetic: entry.Slug.Jpn,
 		JapaneseRomaji: entry.Slug.Jpn_ro,
 	}
 }
