@@ -1,4 +1,4 @@
-package main
+package test
 
 import (
 	"fmt"
@@ -12,7 +12,7 @@ import (
 // that their Go syntax representations (%#v) are the same
 func assert(expected interface{}, result interface{}, obj interface{}, test *testing.T) {
 	if fmt.Sprintf("%#v", expected) != fmt.Sprintf("%#v", result) {
-		test.Fatalf(`expected = %#v, result = %#v, obj = %#v`, expected, result, obj)
+		test.Fatalf("\nexpected = %#v \nresult = %#v \nobj = %#v", expected, result, obj)
 	}
 }
 
