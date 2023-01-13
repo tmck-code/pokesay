@@ -41,16 +41,16 @@ type PokemonTrie struct {
 }
 
 type PokemonMetadata struct {
-	Categories   string
-	JapaneseName string
-	Name         string
+	Categories     string
+	JapaneseName   string
+	JapaneseRomaji string
+	Name           string
 }
 
-func NewPokemonEntry(idx int, name string, japaneseName string) *PokemonEntry {
+func NewPokemonEntry(idx int, name string) *PokemonEntry {
 	return &PokemonEntry{
-		Index:        idx,
-		JapaneseName: japaneseName,
-		Name:         name,
+		Index: idx,
+		Name:  name,
 	}
 }
 
