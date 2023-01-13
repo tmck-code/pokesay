@@ -58,6 +58,15 @@ func parseArgs() PokedexArgs {
 	return args
 }
 
+// This function reads in the files given by the PokedexArgs, and generates the data that pokesay will use when running
+// - The "category" struct
+//   - contains category information, and the index of the corresponding metadata file
+// - The "metadata" files
+//   - named like 1.metadata, contains pokemon info like name, categories, japanese name
+// - The "data" files
+//   - contain the pokemon as gzipped text
+// - The "total" file
+//   - contains the total number of pokemon files, used for random selection
 func main() {
 	args := parseArgs()
 
@@ -66,23 +75,26 @@ func main() {
 
 	pokemonNames := pokedex.ReadNames(args.FromMetadataFname)
 	fmt.Printf("%+v\n", pokemonNames)
-	fpaths := pokedex.FindFiles(args.FromDir, ".cow", make([]string, 0))
+	cowfileFpaths := pokedex.FindFiles(args.FromDir, ".cow", make([]string, 0))
 
 	err := os.MkdirAll(path.Join(args.ToDir, args.ToDataSubDir), 0755)
 	check(err)
 	err = os.MkdirAll(path.Join(args.ToDir, args.ToMetadataSubDir), 0755)
 	check(err)
 
+	// 1. Create the category struct using the cowfile paths, pokemon names and indexes
+	// 2. Create the metadata files, containing name/category/japanese name info for each pokemon
+
 	// categories is a PokemonTrie struct that will be written to a file using encoding/gob
 	// metadata is a list of pokemon data and an index to use when writing them to a file
 	// - this index matches a corresponding one in the categories struct
 	// - these files are embedded into the build binary using go:embed and then loaded at runtime
-	categories, metadata := pokedex.CreateMetadata(args.FromDir, fpaths, pokemonNames, args.Debug)
+	categories, metadata := pokedex.CreateMetadata(args.FromDir, cowfileFpaths, pokemonNames, args.Debug)
 
 	pokedex.WriteStructToFile(categories, categoryFpath)
 
 	fmt.Println("\nConverting cowfiles -> category & metadata GOB")
-	pbar := bin.NewProgressBar(len(fpaths))
+	pbar := bin.NewProgressBar(len(cowfileFpaths))
 	for _, m := range metadata {
 		pokedex.WriteBytesToFile(m.Data, pokedex.EntryFpath(path.Join(args.ToDir, args.ToDataSubDir), m.Index), true)
 		pokedex.WriteStructToFile(m.Metadata, pokedex.MetadataFpath(path.Join(args.ToDir, args.ToMetadataSubDir), m.Index))
@@ -90,6 +102,6 @@ func main() {
 	}
 	pokedex.WriteBytesToFile([]byte(strconv.Itoa(len(metadata))), totalFpath, false)
 
-	fmt.Println("Finished converting", len(fpaths), "pokesprite -> cowfiles")
+	fmt.Println("Finished converting", len(cowfileFpaths), "pokesprite -> cowfiles")
 	fmt.Println("Wrote categories to", path.Join(args.ToDir, args.ToCategoryFname))
 }
