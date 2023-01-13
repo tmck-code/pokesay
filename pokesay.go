@@ -131,7 +131,7 @@ func runPrintRandom(args Args) {
 
 	pokesay.PrintSpeechBubble(bufio.NewScanner(os.Stdin), args.Width, args.NoTabSpaces, args.TabSpaces, args.NoWrap)
 	if args.JapaneseName {
-		pokesay.PrintPokemon(choice, []string{metadata.Name, metadata.JapaneseName}, strings.Split(metadata.Categories, "/"), GOBCowData)
+		pokesay.PrintPokemon(choice, []string{metadata.Name, metadata.JapaneseName, metadata.JapaneseRomaji}, strings.Split(metadata.Categories, "/"), GOBCowData)
 	} else {
 		pokesay.PrintPokemon(choice, []string{metadata.Name}, strings.Split(metadata.Categories, "/"), GOBCowData)
 	}
