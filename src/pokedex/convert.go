@@ -125,8 +125,7 @@ type Metadata struct {
 	Metadata PokemonMetadata
 }
 
-func CreateMetadata(rootDir string, fpaths []string, pokemonNames map[string]PokemonName, debug bool) (PokemonTrie, []Metadata) {
-	categories := NewTrie()
+func CreateMetadata(rootDir string, fpaths []string, pokemonNames map[string]PokemonName, debug bool) []Metadata {
 	metadata := []Metadata{}
 	for i, fpath := range fpaths {
 		data, err := os.ReadFile(fpath)
@@ -139,13 +138,40 @@ func CreateMetadata(rootDir string, fpaths []string, pokemonNames map[string]Pok
 
 		fmt.Println("name:", name, "found:", v)
 
+		metadata = append(
+			metadata,
+			Metadata{
+				data,
+				i,
+				PokemonMetadata{
+					Name:           name,
+					JapaneseName:   v.Japanese,
+					JapaneseRomaji: v.JapaneseRomaji,
+					Categories:     strings.Join(cats, "/"),
+				},
+			},
+		)
+	}
+	return metadata
+}
+
+func CreateCategoryStruct(rootDir string, fpaths []string, debug bool) PokemonTrie {
+	categories := NewTrie()
+	for i, fpath := range fpaths {
+		data, err := os.ReadFile(fpath)
+		check(err)
+
+		cats := createCategories(strings.TrimPrefix(fpath, rootDir), data)
+		name := createName(fpath)
+
+		fmt.Println("name:", name)
+
 		categories.Insert(
 			cats,
-			NewPokemonEntry(i, name, v.Japanese),
+			NewPokemonEntry(i, name),
 		)
-		metadata = append(metadata, Metadata{data, i, PokemonMetadata{Name: name, JapaneseName: v.Japanese, Categories: strings.Join(cats, "/")}})
 	}
-	return *categories, metadata
+	return *categories
 }
 
 func createName(fpath string) string {

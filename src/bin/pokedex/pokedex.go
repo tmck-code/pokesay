@@ -83,13 +83,16 @@ func main() {
 	check(err)
 
 	// 1. Create the category struct using the cowfile paths, pokemon names and indexes
+	categories := pokedex.CreateCategoryStruct(args.FromDir, cowfileFpaths, args.Debug)
+
 	// 2. Create the metadata files, containing name/category/japanese name info for each pokemon
+	metadata := pokedex.CreateMetadata(args.FromDir, cowfileFpaths, pokemonNames, args.Debug)
 
 	// categories is a PokemonTrie struct that will be written to a file using encoding/gob
 	// metadata is a list of pokemon data and an index to use when writing them to a file
 	// - this index matches a corresponding one in the categories struct
 	// - these files are embedded into the build binary using go:embed and then loaded at runtime
-	categories, metadata := pokedex.CreateMetadata(args.FromDir, cowfileFpaths, pokemonNames, args.Debug)
+	// categories, metadata := pokedex.CreateMetadata(args.FromDir, cowfileFpaths, pokemonNames, args.Debug)
 
 	pokedex.WriteStructToFile(categories, categoryFpath)
 
