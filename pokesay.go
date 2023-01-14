@@ -89,7 +89,6 @@ func runListNames() {
 		pokesay.Check(err)
 		metadata := pokedex.ReadMetadataFromBytes(m)
 		names[i] = metadata.Name
-		names[i] = metadata.JapaneseName
 	}
 	fmt.Println(strings.Join(names, " "))
 	fmt.Printf("\n%d %s\n", len(names), "total names")
@@ -108,12 +107,12 @@ func runPrintByName(args Args, categories pokedex.PokemonTrie) {
 	pokesay.Check(err)
 	match := matches[pokesay.RandomInt(len(matches))]
 
+	m, err := GOBCowNames.ReadFile(pokedex.MetadataFpath("build/assets/metadata", match.Entry.Index))
+	pokesay.Check(err)
+	metadata := pokedex.ReadMetadataFromBytes(m)
+
 	pokesay.PrintSpeechBubble(bufio.NewScanner(os.Stdin), args.Width, args.NoTabSpaces, args.TabSpaces, args.NoWrap)
-	if args.JapaneseName {
-		pokesay.PrintPokemon(match.Entry.Index, []string{match.Entry.Name, match.Entry.JapaneseName}, match.Categories, GOBCowData)
-	} else {
-		pokesay.PrintPokemon(match.Entry.Index, []string{match.Entry.Name}, match.Categories, GOBCowData)
-	}
+	pokesay.PrintPokemon(match.Entry.Index, []string{GenerateName(metadata, args)}, match.Categories, GOBCowData)
 }
 
 func runPrintByCategory(args Args, categories pokedex.PokemonTrie) {
@@ -122,12 +121,14 @@ func runPrintByCategory(args Args, categories pokedex.PokemonTrie) {
 	keys, category := pokesay.ChooseRandomCategory(matches, categories)
 	choice := category[pokesay.RandomInt(len(category))]
 
+	fmt.Printf("+%v\n", choice)
+
+	m, err := GOBCowNames.ReadFile(pokedex.MetadataFpath("build/assets/metadata", choice.Index))
+	pokesay.Check(err)
+	metadata := pokedex.ReadMetadataFromBytes(m)
+
 	pokesay.PrintSpeechBubble(bufio.NewScanner(os.Stdin), args.Width, args.NoTabSpaces, args.TabSpaces, args.NoWrap)
-	if args.JapaneseName {
-		pokesay.PrintPokemon(choice.Index, []string{choice.Name, choice.JapaneseName}, keys, GOBCowData)
-	} else {
-		pokesay.PrintPokemon(choice.Index, []string{choice.Name}, keys, GOBCowData)
-	}
+	pokesay.PrintPokemon(choice.Index, []string{GenerateName(metadata, args)}, keys, GOBCowData)
 }
 
 func runPrintRandom(args Args) {
@@ -138,11 +139,7 @@ func runPrintRandom(args Args) {
 	metadata := pokedex.ReadMetadataFromBytes(m)
 
 	pokesay.PrintSpeechBubble(bufio.NewScanner(os.Stdin), args.Width, args.NoTabSpaces, args.TabSpaces, args.NoWrap)
-	if args.JapaneseName {
-		pokesay.PrintPokemon(choice, []string{GenerateName(metadata, args)}, strings.Split(metadata.Categories, "/"), GOBCowData)
-	} else {
-		pokesay.PrintPokemon(choice, []string{metadata.Name}, strings.Split(metadata.Categories, "/"), GOBCowData)
-	}
+	pokesay.PrintPokemon(choice, []string{GenerateName(metadata, args)}, strings.Split(metadata.Categories, "/"), GOBCowData)
 }
 
 func main() {
