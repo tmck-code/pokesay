@@ -20,9 +20,8 @@ func check(e error) {
 }
 
 type PokemonEntry struct {
-	Name         string
-	JapaneseName string
-	Index        int
+	Name  string
+	Index int
 }
 
 func (p PokemonEntry) String() string {
@@ -42,9 +41,9 @@ type PokemonTrie struct {
 
 type PokemonMetadata struct {
 	Categories       string
+	Name             string
 	JapaneseName     string
 	JapanesePhonetic string
-	Name             string
 }
 
 func NewPokemonEntry(idx int, name string) *PokemonEntry {
