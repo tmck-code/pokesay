@@ -41,10 +41,10 @@ type PokemonTrie struct {
 }
 
 type PokemonMetadata struct {
-	Categories     string
-	JapaneseName   string
-	JapaneseRomaji string
-	Name           string
+	Categories       string
+	JapaneseName     string
+	JapanesePhonetic string
+	Name             string
 }
 
 func NewPokemonEntry(idx int, name string) *PokemonEntry {

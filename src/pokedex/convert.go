@@ -146,7 +146,7 @@ func CreateMetadata(rootDir string, fpaths []string, pokemonNames map[string]Pok
 				PokemonMetadata{
 					Name:           name,
 					JapaneseName:   v.Japanese,
-					JapaneseRomaji: v.JapaneseRomaji,
+					JapanesePhonetic: v.JapanesePhonetic,
 					Categories:     strings.Join(cats, "/"),
 				},
 			},
