@@ -95,6 +95,14 @@ func runListNames() {
 	fmt.Printf("\n%d %s\n", len(names), "total names")
 }
 
+func GenerateName(metadata pokedex.PokemonMetadata, args Args) string {
+	if args.JapaneseName {
+		return fmt.Sprintf("%s / %s (%s)", metadata.Name, metadata.JapaneseName, metadata.JapanesePhonetic)
+	} else {
+		return metadata.Name
+	}
+}
+
 func runPrintByName(args Args, categories pokedex.PokemonTrie) {
 	matches, err := categories.MatchNameToken(args.NameToken)
 	pokesay.Check(err)
@@ -131,7 +139,7 @@ func runPrintRandom(args Args) {
 
 	pokesay.PrintSpeechBubble(bufio.NewScanner(os.Stdin), args.Width, args.NoTabSpaces, args.TabSpaces, args.NoWrap)
 	if args.JapaneseName {
-		pokesay.PrintPokemon(choice, []string{metadata.Name, metadata.JapaneseName, metadata.JapaneseRomaji}, strings.Split(metadata.Categories, "/"), GOBCowData)
+		pokesay.PrintPokemon(choice, []string{GenerateName(metadata, args)}, strings.Split(metadata.Categories, "/"), GOBCowData)
 	} else {
 		pokesay.PrintPokemon(choice, []string{metadata.Name}, strings.Split(metadata.Categories, "/"), GOBCowData)
 	}
