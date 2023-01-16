@@ -8,8 +8,8 @@ import (
 	"errors"
 	"fmt"
 	"log"
-	"path"
 	"os"
+	"path"
 	"strings"
 )
 
@@ -28,7 +28,6 @@ func (p PokemonEntry) String() string {
 	return fmt.Sprintf("{Index: %d, Name: %s}", p.Index, p.Name)
 }
 
-
 type Node struct {
 	Children map[string]*Node
 	Data     []*PokemonEntry
@@ -41,8 +40,10 @@ type PokemonTrie struct {
 }
 
 type PokemonMetadata struct {
-	Categories string
-	Name       string
+	Categories       string
+	Name             string
+	JapaneseName     string
+	JapanesePhonetic string
 }
 
 func NewPokemonEntry(idx int, name string) *PokemonEntry {
