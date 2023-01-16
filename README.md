@@ -13,7 +13,7 @@ Print pokemon in the CLI! An adaptation of the classic "cowsay"
 
 ---
 
-<img width="1386" alt="Screen Shot 2022-05-28 at 8 32 23 pm" src="https://user-images.githubusercontent.com/9894426/170821592-9036b68c-bb42-4fcc-9022-f71b34fc9259.png">
+![pokesay demo](https://user-images.githubusercontent.com/9894426/212685620-762e87be-248c-4276-bae6-282c2991db68.png)
 
 ---
 
@@ -109,7 +109,7 @@ Navigate to the Releases and download the latest binary.
 
 ### On your host OS
 
-_Dependencies_: `Go 1.18`
+_Dependencies_: `Go 1.19`
 
 You'll have to install a golang version that matches the go.mod, and ensure that other package
 dependencies are installed (see the dockerfile for the dependencies)
