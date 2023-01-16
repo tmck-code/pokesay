@@ -4,7 +4,7 @@ WORKDIR /usr/local/src
 
 RUN BUILD_DEPS="make gcc"
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends "${BUILD_DEPS}" libmagickwand-dev ncurses-dev
+    && apt-get install -y --no-install-recommends "${BUILD_DEPS}" libmagickwand-dev ncurses-dev jq
 
 RUN git clone --depth 1 https://github.com/denilsonsa/img2xterm \
     && (cd img2xterm && make && make install) \
@@ -29,6 +29,7 @@ RUN go run /usr/local/src/src/bin/convert/png_convert.go \
         -padding 4 \
         -skip '["resources/", "misc/", "icons/", "items/", "items-outline/", "pokemon-gen7x/"]' \
     && mv /tmp/cows/pokemon-gen8/* /tmp/cows && rmdir /tmp/cows/pokemon-gen8/ \
+    && cat /tmp/original/pokesprite/data/pokemon.json | jq -c .[] > /tmp/cows/pokemon.json \
     && rm -rf /tmp/original/pokesprite
 
 ADD . .

@@ -1,6 +1,6 @@
 DOCKER_OUTPUT_DIR ?= /tmp/cows
-DOCKER_REPO ?= "tmckcode"
-DOCKER_TAG ?= "latest"
+DOCKER_REPO ?= tmckcode
+DOCKER_TAG ?= latest
 
 DOCKER_IMAGE=$(DOCKER_REPO)/pokesay:$(DOCKER_TAG)
 
@@ -38,4 +38,11 @@ build/release: build/assets
 		  build/scripts/build.sh
 	tree $(PWD)/bin/
 
-.PHONY: all build/docker build/cows build/assets build/release
+test:
+	docker run \
+		-v $(PWD)/../:/usr/local/src \
+		--rm --name pokesay-test \
+			$(DOCKER_IMAGE) \
+			go test -v ./test/
+
+.PHONY: all build/docker build/cows build/assets build/release test
