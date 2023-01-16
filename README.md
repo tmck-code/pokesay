@@ -140,9 +140,12 @@ This will produce 4 executable bin files inside the `build/bin` directory, and a
 ## TODO
 
 - Short-term
+  - [ ] Import japanese names from data/pokemon.json
+- Longer-term
+
+- Completed
   - [x] Fix bad whitespace stripping when building assets
   - [x] List all names
-- Longer-term
   - [x] Make data structure to hold categories, names and pokemon
   - [x] Increase speed
   - [x] Improve categories to be more specific than shiny/regular
