@@ -27,8 +27,7 @@ RUN go run /usr/local/src/src/bin/convert/png_convert.go \
         -from /tmp/original/pokesprite/ \
         -to /tmp/cows/ \
         -padding 4 \
-        -skip '["resources/", "misc/", "icons/", "items/", "items-outline/", "pokemon-gen7x/"]' \
-    && mv /tmp/cows/pokemon-gen8/* /tmp/cows && rmdir /tmp/cows/pokemon-gen8/ \
+        -skip '["resources/", "misc/", "icons/", "items/", "items-outline/"]' \
     && cat /tmp/original/pokesprite/data/pokemon.json | jq -c .[] > /tmp/cows/pokemon.json \
     && rm -rf /tmp/original/pokesprite
 
