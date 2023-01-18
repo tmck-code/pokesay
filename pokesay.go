@@ -94,11 +94,14 @@ func runListNames() {
 	fmt.Printf("\n%d %s\n", len(names), "total names")
 }
 
-func GenerateName(metadata pokedex.PokemonMetadata, args Args) string {
+func GenerateNames(metadata pokedex.PokemonMetadata, args Args) []string {
 	if args.JapaneseName {
-		return fmt.Sprintf("%s / %s (%s)", metadata.Name, metadata.JapaneseName, metadata.JapanesePhonetic)
+		return []string{
+			metadata.Name,
+			fmt.Sprintf("%s (%s)", metadata.JapaneseName, metadata.JapanesePhonetic),
+		}
 	} else {
-		return metadata.Name
+		return []string{metadata.Name}
 	}
 }
 
@@ -112,7 +115,7 @@ func runPrintByName(args Args, categories pokedex.PokemonTrie) {
 	metadata := pokedex.ReadMetadataFromBytes(m)
 
 	pokesay.PrintSpeechBubble(bufio.NewScanner(os.Stdin), args.Width, args.NoTabSpaces, args.TabSpaces, args.NoWrap)
-	pokesay.PrintPokemon(match.Entry.Index, []string{GenerateName(metadata, args)}, match.Categories, GOBCowData)
+	pokesay.PrintPokemon(match.Entry.Index, GenerateNames(metadata, args), match.Categories, GOBCowData)
 }
 
 func runPrintByCategory(args Args, categories pokedex.PokemonTrie) {
@@ -128,7 +131,7 @@ func runPrintByCategory(args Args, categories pokedex.PokemonTrie) {
 	metadata := pokedex.ReadMetadataFromBytes(m)
 
 	pokesay.PrintSpeechBubble(bufio.NewScanner(os.Stdin), args.Width, args.NoTabSpaces, args.TabSpaces, args.NoWrap)
-	pokesay.PrintPokemon(choice.Index, []string{GenerateName(metadata, args)}, keys, GOBCowData)
+	pokesay.PrintPokemon(choice.Index, GenerateNames(metadata, args), keys, GOBCowData)
 }
 
 func runPrintRandom(args Args) {
@@ -139,7 +142,7 @@ func runPrintRandom(args Args) {
 	metadata := pokedex.ReadMetadataFromBytes(m)
 
 	pokesay.PrintSpeechBubble(bufio.NewScanner(os.Stdin), args.Width, args.NoTabSpaces, args.TabSpaces, args.NoWrap)
-	pokesay.PrintPokemon(choice, []string{GenerateName(metadata, args)}, strings.Split(metadata.Categories, "/"), GOBCowData)
+	pokesay.PrintPokemon(choice, GenerateNames(metadata, args), strings.Split(metadata.Categories, "/"), GOBCowData)
 }
 
 func main() {
