@@ -23,9 +23,9 @@ type Node struct {
 }
 
 type Trie struct {
-	Root *Node      `json:"root"`
-	Len  int        `json:"len"`
-	Keys [][]string `json:"keys"`
+	Root     *Node      `json:"root"`
+	Len      int        `json:"len"`
+	KeyPaths [][]string `json:"keys"`
 }
 
 func NewEntry(idx int, value string) *Entry {
@@ -43,9 +43,9 @@ func NewNode() *Node {
 
 func NewTrie() *Trie {
 	return &Trie{
-		Len:  0,
-		Root: NewNode(),
-		Keys: make([][]string, 0),
+		Len:      0,
+		Root:     NewNode(),
+		KeyPaths: make([][]string, 0),
 	}
 }
 
@@ -59,18 +59,6 @@ func NewTrieFromBytes(data []byte) Trie {
 	Check(err)
 
 	return *d
-}
-
-func Equal(a, b []string) bool {
-	if len(a) != len(b) {
-		return false
-	}
-	for i, v := range a {
-		if v != b[i] {
-			return false
-		}
-	}
-	return true
 }
 
 func (t *Trie) ToString(indentation ...int) string {
@@ -89,19 +77,19 @@ func (t Trie) WriteToFile(fpath string) {
 	WriteStructToFile(t, fpath)
 }
 
-func (t *Trie) Insert(keys []string, data *Entry) {
+func (t *Trie) Insert(keyPath []string, data *Entry) {
 	current := t.Root
 	found := false
-	for _, k := range t.Keys {
-		if Equal(k, keys) {
+	for _, k := range t.KeyPaths {
+		if KeyPathsEqual(k, keyPath) {
 			found = true
 			break
 		}
 	}
 	if !found {
-		t.Keys = append(t.Keys, keys)
+		t.KeyPaths = append(t.KeyPaths, keyPath)
 	}
-	for _, key := range keys {
+	for _, key := range keyPath {
 		if _, ok := current.Children[key]; ok {
 			current = current.Children[key]
 		} else {
@@ -112,6 +100,18 @@ func (t *Trie) Insert(keys []string, data *Entry) {
 	}
 	current.Data = append(current.Data, data)
 	t.Len += 1
+}
+
+func KeyPathsEqual(a, b []string) bool {
+	if len(a) != len(b) {
+		return false
+	}
+	for i, v := range a {
+		if v != b[i] {
+			return false
+		}
+	}
+	return true
 }
 
 type PokemonMatch struct {
@@ -135,7 +135,7 @@ func (current Node) Find(value string, keys []string) []*PokemonMatch {
 	matches := []*PokemonMatch{}
 
 	for _, entry := range current.Data {
-		for _, tk := range TokenizeValue(entry.Value) {
+		for _, tk := range tokenizeValue(entry.Value) {
 			if tk == value {
 				matches = append(matches, &PokemonMatch{Entry: entry, Keys: keys})
 			}
@@ -150,13 +150,13 @@ func (current Node) Find(value string, keys []string) []*PokemonMatch {
 	return matches
 }
 
-func TokenizeValue(value string) []string {
+func tokenizeValue(value string) []string {
 	return strings.Split(value, "-")
 }
 
 func (t Trie) FindKeyPaths(key string) ([][]string, error) {
 	matches := [][]string{}
-	for _, k := range t.Keys {
+	for _, k := range t.KeyPaths {
 		for _, el := range k {
 			if el == key {
 				matches = append(matches, k)
