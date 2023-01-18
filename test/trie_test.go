@@ -11,6 +11,7 @@ import (
 func TestNewPokemonEntry(test *testing.T) {
 	p := pokedex.NewPokemonEntry(1, "yo")
 	Assert(1, p.Index, p, test)
+	Assert("yo", p.Key, p, test)
 }
 
 func TestTrieToString(test *testing.T) {
@@ -24,7 +25,7 @@ func TestTrieToString(test *testing.T) {
 				"p":{"children":{
 					"g1":{"children":{
 						"r":{"children":{},
-							"data":[{"name":"pikachu","index":0},{"name":"bulbasaur","index":1}]
+							"data":[{"key":"pikachu","index":0},{"key":"bulbasaur","index":1}]
 						}
 					},"data":[]}
 				},"data":[]}
@@ -55,11 +56,11 @@ func TestTrieToStringIndented(test *testing.T) {
                 "children": {},
                 "data": [
                   {
-                    "name": "pikachu",
+                    "key": "pikachu",
                     "index": 0
                   },
                   {
-                    "name": "bulbasaur",
+                    "key": "bulbasaur",
                     "index": 1
                   }
                 ]
@@ -93,13 +94,13 @@ func TestTrieInsert(test *testing.T) {
 	t.Insert([]string{"p", "g1", "r"}, pokedex.NewPokemonEntry(1, "bulbasaur"))
 
 	Assert(
-		&pokedex.PokemonEntry{Name: "pikachu", Index: 0},
+		&pokedex.PokemonEntry{Key: "pikachu", Index: 0},
 		t.Root.Children["p"].Children["g1"].Children["r"].Data[0],
 		t,
 		test,
 	)
 	Assert(
-		&pokedex.PokemonEntry{Name: "bulbasaur", Index: 1},
+		&pokedex.PokemonEntry{Key: "bulbasaur", Index: 1},
 		t.Root.Children["p"].Children["g1"].Children["r"].Data[1],
 		t,
 		test,
@@ -114,11 +115,11 @@ func TestTrieFind(test *testing.T) {
 
 	expected := []pokedex.PokemonMatch{
 		{
-			Entry:      &pokedex.PokemonEntry{Index: 0, Name: "pikachu"},
+			Entry:      &pokedex.PokemonEntry{Index: 0, Key: "pikachu"},
 			Categories: []string{"p", "g1", "r"},
 		},
 		{
-			Entry:      &pokedex.PokemonEntry{Index: 2, Name: "pikachu-other"},
+			Entry:      &pokedex.PokemonEntry{Index: 2, Key: "pikachu-other"},
 			Categories: []string{"x", "g1", "l"},
 		},
 	}
@@ -129,7 +130,7 @@ func TestTrieFind(test *testing.T) {
 	for i := 0; i <= len(results)-1; i++ {
 		match := pokedex.PokemonMatch{}
 		for _, e := range expected {
-			if e.Entry.Name == results[i].Entry.Name {
+			if e.Entry.Key == results[i].Entry.Key {
 				match = e
 			}
 		}
@@ -148,7 +149,7 @@ func TestTrieGetCategory(test *testing.T) {
 
 	Assert(2, len(result), result, test)
 	Assert(
-		"[{Index: 0, Name: pikachu} {Index: 1, Name: bulbasaur}]",
+		"[{Index: 0, Key: pikachu} {Index: 1, Key: bulbasaur}]",
 		fmt.Sprintf("%s", result),
 		result, test,
 	)
