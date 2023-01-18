@@ -1,6 +1,7 @@
 package test
 
 import (
+	"encoding/json"
 	"fmt"
 	"testing"
 
@@ -84,6 +85,32 @@ func TestTrieToStringIndented(test *testing.T) {
   ]
 }`
 	result := t.ToString(2)
+
+	Assert(expected, string(result), string(result), test)
+}
+
+func TestTrieToString(test *testing.T) {
+	t := pokedex.NewTrie()
+	t.Insert([]string{"p", "g1", "r"}, pokedex.NewPokemonEntry(0, "pikachu"))
+	t.Insert([]string{"p", "g1", "r"}, pokedex.NewPokemonEntry(1, "bulbasaur"))
+
+	expected := FlattenJSON(`{
+		"root":{
+			"children":{
+				"p":{"children":{
+					"g1":{"children":{
+						"r":{"children":{},
+							"data":[{"name":"pikachu","index":0},{"name":"bulbasaur","index":1}]
+						}
+					},"data":[]}
+				},"data":[]}
+			},
+			"data":null
+		},
+		"len":2,
+		"keys":[["p","g1","r"]]
+	}`)
+	result, _ := json.Marshal(t)
 
 	Assert(expected, string(result), string(result), test)
 }
