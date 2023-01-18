@@ -56,11 +56,18 @@ func PrintSpeechBubble(scanner *bufio.Scanner, width int, noTabSpaces bool, tabS
 
 func PrintPokemon(index int, names []string, categoryKeys []string, GOBCowData embed.FS) {
 	d, _ := GOBCowData.ReadFile(pokedex.EntryFpath("build/assets/cows", index))
+	delimiter := "|"
+
+	namesFmt := make([]string, 0)
+	for _, name := range names {
+		namesFmt = append(namesFmt, textStyleBold.Sprint(name))
+	}
 
 	fmt.Printf(
-		"%s> %s | %s\n",
+		"%s> %s %s %s\n",
 		pokedex.Decompress(d),
-		textStyleBold.Sprint(strings.Join(names, " / ")),
+		strings.Join(namesFmt, fmt.Sprintf(" %s ", delimiter)),
+		delimiter,
 		textStyleItalic.Sprint(strings.Join(categoryKeys, "/")),
 	)
 }
