@@ -1,7 +1,6 @@
 package pokedex
 
 import (
-	"encoding/json"
 	"fmt"
 	"strings"
 )
@@ -56,15 +55,7 @@ func (t Trie) WriteToFile(fpath string) {
 }
 
 func (t *Trie) ToString(indentation ...int) string {
-	if len(indentation) == 1 {
-		json, err := json.MarshalIndent(t, "", strings.Repeat(" ", indentation[0]))
-		Check(err)
-		return string(json)
-	} else {
-		json, err := json.Marshal(t)
-		Check(err)
-		return string(json)
-	}
+	return StructToJSON(*t, indentation...)
 }
 
 func (t *Trie) Insert(keyPath []string, data *Entry) {
