@@ -17,14 +17,14 @@ func assert(expected interface{}, result interface{}, obj interface{}, test *tes
 }
 
 func TestNewPokemonEntry(test *testing.T) {
-	p := pokedex.NewPokemonEntry(1, "yo", "スイクン")
+	p := pokedex.NewPokemonEntry(1, "yo")
 	assert(1, p.Index, p, test)
 }
 
 func TestTrieInsert(test *testing.T) {
 	t := pokedex.NewTrie()
-	t.Insert([]string{"p", "g1", "r"}, pokedex.NewPokemonEntry(0, "pikachu", "ピカチュウ"))
-	t.Insert([]string{"p", "g1", "r"}, pokedex.NewPokemonEntry(1, "bulbasaur", "フシギダネ"))
+	t.Insert([]string{"p", "g1", "r"}, pokedex.NewPokemonEntry(0, "pikachu"))
+	t.Insert([]string{"p", "g1", "r"}, pokedex.NewPokemonEntry(1, "bulbasaur"))
 
 	result, err := t.GetCategory([]string{"p", "g1"})
 	pokesay.Check(err)
@@ -39,11 +39,11 @@ func TestTrieInsert(test *testing.T) {
 
 func TestCategoryPaths(test *testing.T) {
 	t := pokedex.NewTrie()
-	t.Insert([]string{"small", "g1", "r"}, pokedex.NewPokemonEntry(0, "pikachu", "ピカチュウ"))
-	t.Insert([]string{"small", "g1", "o"}, pokedex.NewPokemonEntry(1, "bulbasaur", "フシギダネ"))
-	t.Insert([]string{"medium", "g1", "o"}, pokedex.NewPokemonEntry(2, "bulbasaur", "フシギダネ"))
-	t.Insert([]string{"big", "g1", "o"}, pokedex.NewPokemonEntry(3, "bulbasaur", "フシギダネ"))
-	t.Insert([]string{"big", "g1"}, pokedex.NewPokemonEntry(4, "charmander", "ヒトカゲ"))
+	t.Insert([]string{"small", "g1", "r"}, pokedex.NewPokemonEntry(0, "pikachu"))
+	t.Insert([]string{"small", "g1", "o"}, pokedex.NewPokemonEntry(1, "bulbasaur"))
+	t.Insert([]string{"medium", "g1", "o"}, pokedex.NewPokemonEntry(2, "bulbasaur"))
+	t.Insert([]string{"big", "g1", "o"}, pokedex.NewPokemonEntry(3, "bulbasaur"))
+	t.Insert([]string{"big", "g1"}, pokedex.NewPokemonEntry(4, "charmander"))
 
 	expected := [][]string{
 		{"small", "g1", "r"},
@@ -67,9 +67,9 @@ func TestReadNames(test *testing.T) {
 	result := pokedex.ReadNames("./data/pokemon.json")
 
 	expected := map[string]pokedex.PokemonName{
-		"bulbasaur": {English: "Bulbasaur", Japanese: "フシギダネ", JapaneseRomaji: "fushigidane"},
-		"ivysaur":   {English: "Ivysaur", Japanese: "フシギソウ", JapaneseRomaji: "fushigisou"},
-		"venusaur":  {English: "Venusaur", Japanese: "フシギバナ", JapaneseRomaji: "fushigibana"},
+		"bulbasaur": {English: "Bulbasaur", Japanese: "フシギダネ", JapanesePhonetic: "fushigidane"},
+		"ivysaur":   {English: "Ivysaur", Japanese: "フシギソウ", JapanesePhonetic: "fushigisou"},
+		"venusaur":  {English: "Venusaur", Japanese: "フシギバナ", JapanesePhonetic: "fushigibana"},
 	}
 
 	assert(expected, result, result, test)
