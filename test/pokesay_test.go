@@ -16,5 +16,5 @@ func TestListCategories(test *testing.T) {
 	t.Insert([]string{"big", "g1"}, pokedex.NewPokemonEntry(4, "charmander"))
 
 	result := pokesay.ListCategories(*t)
-	assert([]string{"big", "g1", "medium", "o", "r", "small"}, result, result, test)
+	Assert([]string{"big", "g1", "medium", "o", "r", "small"}, result, result, test)
 }
