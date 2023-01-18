@@ -157,6 +157,8 @@ func TestTrieFindByKeyPath(test *testing.T) {
 }
 
 func TestFindKeyPaths(test *testing.T) {
+	defer os.Remove("test.txt")
+
 	t := pokedex.NewTrie()
 	t.Insert([]string{"small", "g1", "r"}, pokedex.NewEntry(0, "pikachu"))
 	t.Insert([]string{"small", "g1", "o"}, pokedex.NewEntry(1, "bulbasaur"))
@@ -183,6 +185,8 @@ func TestFindKeyPaths(test *testing.T) {
 }
 
 func TestWriteToFile(test *testing.T) {
+	defer os.Remove("test.txt")
+
 	t := pokedex.NewTrie()
 	t.Insert([]string{"p", "g1", "r"}, pokedex.NewEntry(0, "pikachu"))
 	t.Insert([]string{"p", "g1", "r"}, pokedex.NewEntry(1, "bulbasaur"))
