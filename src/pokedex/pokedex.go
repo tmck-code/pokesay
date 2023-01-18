@@ -26,13 +26,21 @@ func MetadataFpath(subdir string, idx int) string {
 	return path.Join(subdir, fmt.Sprintf("%d.metadata", idx))
 }
 
-func WriteStructToFile(i interface{}, fpath string) {
+func ReadStructFromBytes[T interface{}](data []byte) T {
+	var d T
+	err := gob.NewDecoder(bytes.NewBuffer(data)).Decode(&d)
+	Check(err)
+
+	return d
+}
+
+func WriteStructToFile[T interface{}](obj T, fpath string) {
 	ostream, err := os.Create(fpath)
 	Check(err)
 
 	writer := bufio.NewWriter(ostream)
-	enc := gob.NewEncoder(writer)
-	enc.Encode(i)
+	gob.NewEncoder(writer).Encode(obj)
+
 	writer.Flush()
 	ostream.Close()
 }
@@ -76,6 +84,12 @@ func Decompress(data []byte) []byte {
 	Check(err)
 
 	return resB.Bytes()
+}
+
+type Metadata struct {
+	Data     []byte
+	Index    int
+	Metadata PokemonMetadata
 }
 
 func CreateMetadata(rootDir string, fpaths []string, pokemonNames map[string]PokemonName, debug bool) []Metadata {

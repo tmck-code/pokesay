@@ -1,8 +1,6 @@
 package pokedex
 
 import (
-	"bytes"
-	"encoding/gob"
 	"encoding/json"
 	"fmt"
 	"strings"
@@ -50,15 +48,11 @@ func NewTrie() *Trie {
 }
 
 func NewTrieFromBytes(data []byte) Trie {
-	buf := bytes.NewBuffer(data)
-	dec := gob.NewDecoder(buf)
+	return ReadStructFromBytes[Trie](data)
+}
 
-	d := &Trie{}
-
-	err := dec.Decode(&d)
-	Check(err)
-
-	return *d
+func (t Trie) WriteToFile(fpath string) {
+	WriteStructToFile(t, fpath)
 }
 
 func (t *Trie) ToString(indentation ...int) string {
@@ -71,10 +65,6 @@ func (t *Trie) ToString(indentation ...int) string {
 		Check(err)
 		return string(json)
 	}
-}
-
-func (t Trie) WriteToFile(fpath string) {
-	WriteStructToFile(t, fpath)
 }
 
 func (t *Trie) Insert(keyPath []string, data *Entry) {
@@ -95,10 +85,13 @@ func (t *Trie) Insert(keyPath []string, data *Entry) {
 		} else {
 			current.Children[key] = NewNode()
 			current = current.Children[key]
-			current.Data = make([]*Entry, 0)
 		}
 	}
-	current.Data = append(current.Data, data)
+	if current.Data == nil {
+		current.Data = []*Entry{data}
+	} else {
+		current.Data = append(current.Data, data)
+	}
 	t.Len += 1
 }
 
