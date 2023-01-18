@@ -106,7 +106,7 @@ func GenerateNames(metadata pokedex.PokemonMetadata, args Args) []string {
 }
 
 func runPrintByName(args Args, categories pokedex.PokemonTrie) {
-	matches, err := categories.MatchNameToken(args.NameToken)
+	matches, err := categories.Find(args.NameToken)
 	pokesay.Check(err)
 	match := matches[pokesay.RandomInt(len(matches))]
 

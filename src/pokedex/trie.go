@@ -93,8 +93,8 @@ type PokemonMatch struct {
 	Categories []string
 }
 
-func (t PokemonTrie) MatchNameToken(s string) ([]*PokemonMatch, error) {
-	matches := t.Root.MatchNameToken(s, []string{})
+func (t PokemonTrie) Find(s string) ([]*PokemonMatch, error) {
+	matches := t.Root.Find(s, []string{})
 	if len(matches) > 0 {
 		return matches, nil
 	} else {
@@ -102,7 +102,7 @@ func (t PokemonTrie) MatchNameToken(s string) ([]*PokemonMatch, error) {
 	}
 }
 
-func (current Node) MatchNameToken(s string, keys []string) []*PokemonMatch {
+func (current Node) Find(s string, keys []string) []*PokemonMatch {
 	matches := []*PokemonMatch{}
 
 	for _, entry := range current.Data {
@@ -113,7 +113,7 @@ func (current Node) MatchNameToken(s string, keys []string) []*PokemonMatch {
 		}
 	}
 	for k, node := range current.Children {
-		more := node.MatchNameToken(s, append(keys, k))
+		more := node.Find(s, append(keys, k))
 		if len(more) > 0 {
 			matches = append(matches, more...)
 		}
