@@ -22,7 +22,7 @@ func TestCategoryPaths(test *testing.T) {
 		{"big", "g1", "o"},
 		{"big", "g1"},
 	}
-	assert(expected, t.Keys, t, test)
+	Assert(expected, t.Keys, t, test)
 
 	expected = [][]string{
 		{"big", "g1", "o"},
@@ -30,7 +30,7 @@ func TestCategoryPaths(test *testing.T) {
 	}
 	result, err := t.GetCategoryPaths("big")
 	pokesay.Check(err)
-	assert(expected, result, result, test)
+	Assert(expected, result, result, test)
 }
 
 func TestReadNames(test *testing.T) {
@@ -42,5 +42,5 @@ func TestReadNames(test *testing.T) {
 		"venusaur":  {English: "Venusaur", Japanese: "フシギバナ", JapanesePhonetic: "fushigibana"},
 	}
 
-	assert(expected, result, result, test)
+	Assert(expected, result, result, test)
 }
