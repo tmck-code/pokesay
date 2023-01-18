@@ -15,18 +15,6 @@ import (
 //	}
 //
 // Out of all these names, we want the name.jpn, name.jpn_ro, slug.eng,
-type DataEntryName struct {
-	Eng    string `json:"eng"`
-	Jpn    string `json:"jpn"`
-	Jpn_ro string `json:"jpn_ro"`
-}
-
-type DataEntrySlug struct {
-	Eng    string `json:"eng"`
-	Jpn    string `json:"jpn"`
-	Jpn_ro string `json:"jpn_ro"`
-}
-
 type DataEntry struct {
 	Name struct {
 		Eng    string `json:"eng"`
@@ -63,7 +51,6 @@ func ReadNames(fpath string) map[string]PokemonName {
 
 	entries := make(map[string]PokemonName)
 	scanner := bufio.NewScanner(istream)
-	// optionally, resize scanner's capacity for lines over 64K, see next example
 	for scanner.Scan() {
 		line := scanner.Bytes()
 		var entry DataEntry
