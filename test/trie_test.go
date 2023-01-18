@@ -1,7 +1,10 @@
 package test
 
 import (
+	"bytes"
+	"encoding/gob"
 	"fmt"
+	"os"
 	"sort"
 	"strings"
 	"testing"
@@ -29,10 +32,9 @@ func TestTrieToString(test *testing.T) {
 						"r":{"children":{},
 							"data":[{"value":"pikachu","index":0},{"value":"bulbasaur","index":1}]
 						}
-					},"data":[]}
-				},"data":[]}
-			},
-			"data":null
+					},"data":null}
+				},"data":null}
+			},"data":null
 		},
 		"len":2,
 		"keys":[["p","g1","r"]]
@@ -68,10 +70,10 @@ func TestTrieToStringIndented(test *testing.T) {
                 ]
               }
             },
-            "data": []
+            "data": null
           }
         },
-        "data": []
+        "data": null
       }
     },
     "data": null
@@ -178,4 +180,22 @@ func TestFindKeyPaths(test *testing.T) {
 	result, err := t.FindKeyPaths("big")
 	pokesay.Check(err)
 	Assert(expected, result, result, test)
+}
+
+func TestWriteToFile(test *testing.T) {
+	t := pokedex.NewTrie()
+	t.Insert([]string{"p", "g1", "r"}, pokedex.NewEntry(0, "pikachu"))
+	t.Insert([]string{"p", "g1", "r"}, pokedex.NewEntry(1, "bulbasaur"))
+
+	t.WriteToFile("test.txt")
+
+	data, err := os.ReadFile("test.txt")
+	pokesay.Check(err)
+
+	d := &pokedex.Trie{}
+
+	err = gob.NewDecoder(bytes.NewBuffer(data)).Decode(&d)
+	pokesay.Check(err)
+
+	Assert(t.ToString(), d.ToString(), d, test)
 }
