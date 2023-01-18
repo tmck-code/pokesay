@@ -153,3 +153,29 @@ func TestTrieFindByKeyPath(test *testing.T) {
 		result, test,
 	)
 }
+
+func TestFindKeyPaths(test *testing.T) {
+	t := pokedex.NewTrie()
+	t.Insert([]string{"small", "g1", "r"}, pokedex.NewEntry(0, "pikachu"))
+	t.Insert([]string{"small", "g1", "o"}, pokedex.NewEntry(1, "bulbasaur"))
+	t.Insert([]string{"medium", "g1", "o"}, pokedex.NewEntry(2, "bulbasaur"))
+	t.Insert([]string{"big", "g1", "o"}, pokedex.NewEntry(3, "bulbasaur"))
+	t.Insert([]string{"big", "g1"}, pokedex.NewEntry(4, "charmander"))
+
+	expected := [][]string{
+		{"small", "g1", "r"},
+		{"small", "g1", "o"},
+		{"medium", "g1", "o"},
+		{"big", "g1", "o"},
+		{"big", "g1"},
+	}
+	Assert(expected, t.Keys, t, test)
+
+	expected = [][]string{
+		{"big", "g1", "o"},
+		{"big", "g1"},
+	}
+	result, err := t.FindKeyPaths("big")
+	pokesay.Check(err)
+	Assert(expected, result, result, test)
+}
