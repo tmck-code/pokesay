@@ -105,6 +105,10 @@ type Metadata struct {
 	Metadata PokemonMetadata
 }
 
+func (m Metadata) WriteToFile(fpath string) {
+	WriteStructToFile(m, fpath)
+}
+
 func CreateMetadata(rootDir string, fpaths []string, pokemonNames map[string]PokemonName, debug bool) []Metadata {
 	metadata := []Metadata{}
 	for i, fpath := range fpaths {

@@ -1,5 +1,7 @@
 package pokedex
 
+import "embed"
+
 type PokemonMetadata struct {
 	Categories       string
 	Name             string
@@ -20,6 +22,8 @@ func NewMetadataFromBytes(data []byte) PokemonMetadata {
 	return ReadStructFromBytes[PokemonMetadata](data)
 }
 
-func (m Metadata) WriteToFile(fpath string) {
-	WriteStructToFile(m, fpath)
+func NewMetadataFromGOBData(data embed.FS, index int) PokemonMetadata {
+	m, err := data.ReadFile(MetadataFpath("build/assets/metadata", index))
+	Check(err)
+	return NewMetadataFromBytes(m)
 }
