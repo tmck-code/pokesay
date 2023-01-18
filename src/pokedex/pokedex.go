@@ -35,7 +35,7 @@ func ReadStructFromBytes[T any](data []byte) T {
 	return d
 }
 
-func WriteStructToFile[T any](obj T, fpath string) {
+func WriteStructToFile(obj interface{}, fpath string) {
 	ostream, err := os.Create(fpath)
 	Check(err)
 
@@ -46,7 +46,7 @@ func WriteStructToFile[T any](obj T, fpath string) {
 	ostream.Close()
 }
 
-func StructToJSON[T any](obj T, indentation ...int) string {
+func StructToJSON(obj interface{}, indentation ...int) string {
 	if len(indentation) == 1 {
 		json, err := json.MarshalIndent(obj, "", strings.Repeat(" ", indentation[0]))
 		Check(err)
