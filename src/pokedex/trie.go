@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"bytes"
 	"encoding/gob"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"os"
@@ -11,8 +12,8 @@ import (
 )
 
 type PokemonEntry struct {
-	Name  string
-	Index int
+	Name  string `json:"name"`
+	Index int    `json:"index"`
 }
 
 func (p PokemonEntry) String() string {
@@ -20,14 +21,14 @@ func (p PokemonEntry) String() string {
 }
 
 type Node struct {
-	Children map[string]*Node
-	Data     []*PokemonEntry
+	Children map[string]*Node `json:"children"`
+	Data     []*PokemonEntry  `json:"data"`
 }
 
 type PokemonTrie struct {
-	Root *Node
-	Len  int
-	Keys [][]string
+	Root *Node      `json:"root"`
+	Len  int        `json:"len"`
+	Keys [][]string `json:"keys"`
 }
 
 func NewPokemonEntry(idx int, name string) *PokemonEntry {
@@ -61,6 +62,18 @@ func Equal(a, b []string) bool {
 		}
 	}
 	return true
+}
+
+func (t *PokemonTrie) ToString(indentation ...int) string {
+	if len(indentation) == 1 {
+		json, err := json.MarshalIndent(t, "", strings.Repeat(" ", indentation[0]))
+		Check(err)
+		return string(json)
+	} else {
+		json, err := json.Marshal(t)
+		Check(err)
+		return string(json)
+	}
 }
 
 func (t *PokemonTrie) Insert(s []string, data *PokemonEntry) {
