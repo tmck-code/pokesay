@@ -140,7 +140,7 @@ This will produce 4 executable bin files inside the `build/bin` directory, and a
 ## TODO
 
 - Short-term
-  - [ ] Import japanese names from data/pokemon.json
+  - [x] Import japanese names from data/pokemon.json
 - Longer-term
 
 - Completed
