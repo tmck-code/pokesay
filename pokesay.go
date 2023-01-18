@@ -87,7 +87,7 @@ func runListNames() {
 		data := pokedex.MetadataFpath("build/assets/metadata", i)
 		m, err := GOBCowNames.ReadFile(data)
 		pokesay.Check(err)
-		metadata := pokedex.ReadMetadataFromBytes(m)
+		metadata := pokedex.NewMetadataFromBytes(m)
 		names[i] = metadata.Name
 	}
 	fmt.Println(strings.Join(names, " "))
@@ -112,14 +112,14 @@ func runPrintByName(args Args, categories pokedex.Trie) {
 
 	m, err := GOBCowNames.ReadFile(pokedex.MetadataFpath("build/assets/metadata", match.Entry.Index))
 	pokesay.Check(err)
-	metadata := pokedex.ReadMetadataFromBytes(m)
+	metadata := pokedex.NewMetadataFromBytes(m)
 
 	pokesay.PrintSpeechBubble(bufio.NewScanner(os.Stdin), args.Width, args.NoTabSpaces, args.TabSpaces, args.NoWrap)
-	pokesay.PrintPokemon(match.Entry.Index, GenerateNames(metadata, args), match.Categories, GOBCowData)
+	pokesay.PrintPokemon(match.Entry.Index, GenerateNames(metadata, args), match.Keys, GOBCowData)
 }
 
 func runPrintByCategory(args Args, categories pokedex.Trie) {
-	matches, err := categories.FindKeys(args.Category)
+	matches, err := categories.FindKeyPaths(args.Category)
 	pokesay.Check(err)
 	keys, category := pokesay.ChooseRandomCategory(matches, categories)
 	choice := category[pokesay.RandomInt(len(category))]
@@ -128,7 +128,7 @@ func runPrintByCategory(args Args, categories pokedex.Trie) {
 
 	m, err := GOBCowNames.ReadFile(pokedex.MetadataFpath("build/assets/metadata", choice.Index))
 	pokesay.Check(err)
-	metadata := pokedex.ReadMetadataFromBytes(m)
+	metadata := pokedex.NewMetadataFromBytes(m)
 
 	pokesay.PrintSpeechBubble(bufio.NewScanner(os.Stdin), args.Width, args.NoTabSpaces, args.TabSpaces, args.NoWrap)
 	pokesay.PrintPokemon(choice.Index, GenerateNames(metadata, args), keys, GOBCowData)
@@ -139,7 +139,7 @@ func runPrintRandom(args Args) {
 	choice := pokesay.RandomInt(total)
 	m, err := GOBCowNames.ReadFile(pokedex.MetadataFpath("build/assets/metadata", choice))
 	pokesay.Check(err)
-	metadata := pokedex.ReadMetadataFromBytes(m)
+	metadata := pokedex.NewMetadataFromBytes(m)
 
 	pokesay.PrintSpeechBubble(bufio.NewScanner(os.Stdin), args.Width, args.NoTabSpaces, args.TabSpaces, args.NoWrap)
 	pokesay.PrintPokemon(choice, GenerateNames(metadata, args), strings.Split(metadata.Categories, "/"), GOBCowData)

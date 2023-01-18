@@ -1,13 +1,10 @@
 package pokedex
 
 import (
-	"bufio"
 	"bytes"
 	"encoding/gob"
 	"encoding/json"
-	"errors"
 	"fmt"
-	"os"
 	"strings"
 )
 
@@ -64,17 +61,6 @@ func NewTrieFromBytes(data []byte) Trie {
 	return *d
 }
 
-func (t Trie) WriteToFile(fpath string) {
-	ostream, err := os.Create(fpath)
-	Check(err)
-
-	writer := bufio.NewWriter(ostream)
-	enc := gob.NewEncoder(writer)
-	enc.Encode(t)
-	writer.Flush()
-	ostream.Close()
-}
-
 func Equal(a, b []string) bool {
 	if len(a) != len(b) {
 		return false
@@ -97,6 +83,10 @@ func (t *Trie) ToString(indentation ...int) string {
 		Check(err)
 		return string(json)
 	}
+}
+
+func (t Trie) WriteToFile(fpath string) {
+	WriteStructToFile(t, fpath)
 }
 
 func (t *Trie) Insert(keys []string, data *Entry) {
@@ -129,27 +119,30 @@ type PokemonMatch struct {
 	Keys  []string
 }
 
-func (t Trie) Find(s string) ([]*PokemonMatch, error) {
-	matches := t.Root.Find(s, []string{})
+// Search every node in a trie for a given value.
+// Returns a slice of all nodes that have a matching value.
+// Returns an error if the value wasn't found
+func (t Trie) Find(value string) ([]*PokemonMatch, error) {
+	matches := t.Root.Find(value, []string{})
 	if len(matches) > 0 {
 		return matches, nil
 	} else {
-		return nil, errors.New(fmt.Sprintf("Could not find value: %s", s))
+		return nil, fmt.Errorf("value not found: %s", value)
 	}
 }
 
-func (current Node) Find(s string, keys []string) []*PokemonMatch {
+func (current Node) Find(value string, keys []string) []*PokemonMatch {
 	matches := []*PokemonMatch{}
 
 	for _, entry := range current.Data {
 		for _, tk := range TokenizeValue(entry.Value) {
-			if tk == s {
+			if tk == value {
 				matches = append(matches, &PokemonMatch{Entry: entry, Keys: keys})
 			}
 		}
 	}
 	for k, node := range current.Children {
-		more := node.Find(s, append(keys, k))
+		more := node.Find(value, append(keys, k))
 		if len(more) > 0 {
 			matches = append(matches, more...)
 		}
@@ -161,37 +154,37 @@ func TokenizeValue(value string) []string {
 	return strings.Split(value, "-")
 }
 
-func (t Trie) FindKeys(s string) ([][]string, error) {
+func (t Trie) FindKeyPaths(key string) ([][]string, error) {
 	matches := [][]string{}
 	for _, k := range t.Keys {
 		for _, el := range k {
-			if el == s {
+			if el == key {
 				matches = append(matches, k)
 			}
 		}
 	}
 	if len(matches) == 0 {
-		return nil, errors.New(fmt.Sprintf("Category not found: %s", s))
+		return nil, fmt.Errorf("key not found: %s", key)
 	}
 	return matches, nil
 }
 
 // given a
-func (t Trie) FindKeyEntries(s []string) ([]*Entry, error) {
+func (t Trie) FindByKeyPath(keyPath []string) ([]*Entry, error) {
 	current := t.Root
 	matches := make([]*Entry, 0)
-	for _, char := range s {
+	for _, char := range keyPath {
 		if _, ok := current.Children[char]; ok {
 			current = current.Children[char]
 			for _, p := range current.Children {
 				matches = append(matches, p.Data...)
 			}
 		} else {
-			return nil, errors.New(fmt.Sprintf("Could not find category: %s", s))
+			return nil, fmt.Errorf("key path not found: %s", keyPath)
 		}
 	}
 	if len(matches) == 0 {
-		return nil, errors.New(fmt.Sprintf("Could not find category: %s", s))
+		return nil, fmt.Errorf("key path not found: %s", keyPath)
 	}
 	return matches, nil
 }

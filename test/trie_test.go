@@ -138,12 +138,12 @@ func TestTrieFind(test *testing.T) {
 	}
 }
 
-func TestTrieFindKeyEntries(test *testing.T) {
+func TestTrieFindByKeyPath(test *testing.T) {
 	t := pokedex.NewTrie()
 	t.Insert([]string{"p", "g1", "r"}, pokedex.NewEntry(0, "pikachu"))
 	t.Insert([]string{"p", "g1", "r"}, pokedex.NewEntry(1, "bulbasaur"))
 
-	result, err := t.FindKeyEntries([]string{"p", "g1"})
+	result, err := t.FindByKeyPath([]string{"p", "g1"})
 	pokesay.Check(err)
 
 	Assert(2, len(result), result, test)
