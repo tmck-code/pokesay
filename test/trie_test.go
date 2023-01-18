@@ -169,7 +169,7 @@ func TestFindKeyPaths(test *testing.T) {
 		{"big", "g1", "o"},
 		{"big", "g1"},
 	}
-	Assert(expected, t.Keys, t, test)
+	Assert(expected, t.KeyPaths, t, test)
 
 	expected = [][]string{
 		{"big", "g1", "o"},
