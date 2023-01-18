@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"compress/gzip"
 	"encoding/gob"
+	"encoding/json"
 	"fmt"
 	"log"
 	"os"
@@ -43,6 +44,18 @@ func WriteStructToFile[T interface{}](obj T, fpath string) {
 
 	writer.Flush()
 	ostream.Close()
+}
+
+func StructToJSON[T interface{}](obj T, indentation ...int) string {
+	if len(indentation) == 1 {
+		json, err := json.MarshalIndent(obj, "", strings.Repeat(" ", indentation[0]))
+		Check(err)
+		return string(json)
+	} else {
+		json, err := json.Marshal(obj)
+		Check(err)
+		return string(json)
+	}
 }
 
 func WriteBytesToFile(data []byte, fpath string, compress bool) {
