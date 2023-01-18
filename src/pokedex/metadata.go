@@ -1,10 +1,8 @@
 package pokedex
 
 import (
-	"bufio"
 	"bytes"
 	"encoding/gob"
-	"os"
 )
 
 type Metadata struct {
@@ -20,7 +18,16 @@ type PokemonMetadata struct {
 	JapanesePhonetic string
 }
 
-func ReadMetadataFromBytes(data []byte) PokemonMetadata {
+func NewMetadata(categories string, name string, japaneseName string, japanesePhonetic string) *PokemonMetadata {
+	return &PokemonMetadata{
+		Categories:       categories,
+		Name:             name,
+		JapaneseName:     japaneseName,
+		JapanesePhonetic: japanesePhonetic,
+	}
+}
+
+func NewMetadataFromBytes(data []byte) PokemonMetadata {
 	buf := bytes.NewBuffer(data)
 	dec := gob.NewDecoder(buf)
 
@@ -32,16 +39,6 @@ func ReadMetadataFromBytes(data []byte) PokemonMetadata {
 	return *d
 }
 
-func WriteBytesToFile(data []byte, fpath string, compress bool) {
-	ostream, err := os.Create(fpath)
-	Check(err)
-
-	writer := bufio.NewWriter(ostream)
-	if compress {
-		writer.WriteString(string(Compress(data)))
-	} else {
-		writer.WriteString(string(data))
-	}
-	writer.Flush()
-	ostream.Close()
+func (m Metadata) WriteToFile(fpath string) {
+	WriteStructToFile(m, fpath)
 }

@@ -23,7 +23,7 @@ func RandomInt(n int) int {
 
 func ChooseRandomCategory(keys [][]string, categories pokedex.Trie) ([]string, []*pokedex.Entry) {
 	choice := keys[RandomInt(len(keys)-1)]
-	category, err := categories.FindKeyEntries(choice)
+	category, err := categories.FindByKeyPath(choice)
 	Check(err)
 	return choice, category
 }

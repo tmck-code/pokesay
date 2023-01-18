@@ -1,8 +1,10 @@
 package pokedex
 
 import (
+	"bufio"
 	"bytes"
 	"compress/gzip"
+	"encoding/gob"
 	"fmt"
 	"log"
 	"os"
@@ -22,6 +24,31 @@ func EntryFpath(subdir string, idx int) string {
 
 func MetadataFpath(subdir string, idx int) string {
 	return path.Join(subdir, fmt.Sprintf("%d.metadata", idx))
+}
+
+func WriteStructToFile(i interface{}, fpath string) {
+	ostream, err := os.Create(fpath)
+	Check(err)
+
+	writer := bufio.NewWriter(ostream)
+	enc := gob.NewEncoder(writer)
+	enc.Encode(i)
+	writer.Flush()
+	ostream.Close()
+}
+
+func WriteBytesToFile(data []byte, fpath string, compress bool) {
+	ostream, err := os.Create(fpath)
+	Check(err)
+
+	writer := bufio.NewWriter(ostream)
+	if compress {
+		writer.WriteString(string(Compress(data)))
+	} else {
+		writer.WriteString(string(data))
+	}
+	writer.Flush()
+	ostream.Close()
 }
 
 func Compress(data []byte) []byte {
@@ -60,7 +87,7 @@ func CreateMetadata(rootDir string, fpaths []string, pokemonNames map[string]Pok
 		cats := createCategories(strings.TrimPrefix(fpath, rootDir), data)
 		name := createName(fpath)
 
-		v, _ := pokemonNames[strings.Split(name, "-")[0]]
+		v := pokemonNames[strings.Split(name, "-")[0]]
 
 		fmt.Println("name:", name, "found:", v)
 
