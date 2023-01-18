@@ -163,18 +163,18 @@ func createName(fpath string) string {
 	return strings.Split(parts[len(parts)-1], ".")[0]
 }
 
-func SizeCategory(height int) string {
+func createCategories(fpath string, data []byte) []string {
+	parts := strings.Split(fpath, "/")
+	height := sizeCategory(len(strings.Split(string(data), "\n")))
+
+	return append([]string{height}, parts[0:len(parts)-1]...)
+}
+
+func sizeCategory(height int) string {
 	if height <= 13 {
 		return "small"
 	} else if height <= 19 {
 		return "medium"
 	}
 	return "big"
-}
-
-func createCategories(fpath string, data []byte) []string {
-	parts := strings.Split(fpath, "/")
-	height := SizeCategory(len(strings.Split(string(data), "\n")))
-
-	return append([]string{height}, parts[0:len(parts)-1]...)
 }
