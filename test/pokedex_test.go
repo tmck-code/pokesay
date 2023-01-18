@@ -28,7 +28,7 @@ func TestCategoryPaths(test *testing.T) {
 		{"big", "g1", "o"},
 		{"big", "g1"},
 	}
-	result, err := t.FindKeys("big")
+	result, err := t.FindKeyPaths("big")
 	pokesay.Check(err)
 	Assert(expected, result, result, test)
 }

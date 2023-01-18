@@ -28,8 +28,16 @@ type DataEntrySlug struct {
 }
 
 type DataEntry struct {
-	Name DataEntryName `json:"name"`
-	Slug DataEntrySlug `json:"slug"`
+	Name struct {
+		Eng    string `json:"eng"`
+		Jpn    string `json:"jpn"`
+		Jpn_ro string `json:"jpn_ro"`
+	} `json:"name"`
+	Slug struct {
+		Eng    string `json:"eng"`
+		Jpn    string `json:"jpn"`
+		Jpn_ro string `json:"jpn_ro"`
+	} `json:"slug"`
 }
 
 type PokemonName struct {
