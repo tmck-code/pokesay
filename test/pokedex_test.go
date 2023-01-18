@@ -9,11 +9,11 @@ import (
 
 func TestCategoryPaths(test *testing.T) {
 	t := pokedex.NewTrie()
-	t.Insert([]string{"small", "g1", "r"}, pokedex.NewPokemonEntry(0, "pikachu"))
-	t.Insert([]string{"small", "g1", "o"}, pokedex.NewPokemonEntry(1, "bulbasaur"))
-	t.Insert([]string{"medium", "g1", "o"}, pokedex.NewPokemonEntry(2, "bulbasaur"))
-	t.Insert([]string{"big", "g1", "o"}, pokedex.NewPokemonEntry(3, "bulbasaur"))
-	t.Insert([]string{"big", "g1"}, pokedex.NewPokemonEntry(4, "charmander"))
+	t.Insert([]string{"small", "g1", "r"}, pokedex.NewEntry(0, "pikachu"))
+	t.Insert([]string{"small", "g1", "o"}, pokedex.NewEntry(1, "bulbasaur"))
+	t.Insert([]string{"medium", "g1", "o"}, pokedex.NewEntry(2, "bulbasaur"))
+	t.Insert([]string{"big", "g1", "o"}, pokedex.NewEntry(3, "bulbasaur"))
+	t.Insert([]string{"big", "g1"}, pokedex.NewEntry(4, "charmander"))
 
 	expected := [][]string{
 		{"small", "g1", "r"},
@@ -28,7 +28,7 @@ func TestCategoryPaths(test *testing.T) {
 		{"big", "g1", "o"},
 		{"big", "g1"},
 	}
-	result, err := t.GetCategoryPaths("big")
+	result, err := t.FindKeys("big")
 	pokesay.Check(err)
 	Assert(expected, result, result, test)
 }

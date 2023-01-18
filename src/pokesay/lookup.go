@@ -21,14 +21,14 @@ func RandomInt(n int) int {
 	return rand.New(Rand).Intn(n)
 }
 
-func ChooseRandomCategory(keys [][]string, categories pokedex.PokemonTrie) ([]string, []*pokedex.PokemonEntry) {
+func ChooseRandomCategory(keys [][]string, categories pokedex.Trie) ([]string, []*pokedex.Entry) {
 	choice := keys[RandomInt(len(keys)-1)]
-	category, err := categories.GetCategory(choice)
+	category, err := categories.FindKeyEntries(choice)
 	Check(err)
 	return choice, category
 }
 
-func ListCategories(categories pokedex.PokemonTrie) []string {
+func ListCategories(categories pokedex.Trie) []string {
 	ukm := map[string]bool{}
 	for _, v := range categories.Keys {
 		for _, k := range v {
