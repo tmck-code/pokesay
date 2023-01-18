@@ -2,6 +2,7 @@ package test
 
 import (
 	"fmt"
+	"strings"
 	"testing"
 )
 
@@ -12,4 +13,11 @@ func Assert(expected interface{}, result interface{}, obj interface{}, test *tes
 	if fmt.Sprintf("%#v", expected) != fmt.Sprintf("%#v", result) {
 		test.Fatalf("\nexpected = %#v \nresult = %#v \nobj = %#v", expected, result, obj)
 	}
+}
+
+func FlattenJSON(json string) string {
+	json = strings.Replace(json, "\n", "", -1)
+	json = strings.Replace(json, "\t", "", -1)
+	json = strings.Replace(json, " ", "", -1)
+	return json
 }
