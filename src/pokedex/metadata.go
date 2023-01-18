@@ -1,16 +1,5 @@
 package pokedex
 
-import (
-	"bytes"
-	"encoding/gob"
-)
-
-type Metadata struct {
-	Data     []byte
-	Index    int
-	Metadata PokemonMetadata
-}
-
 type PokemonMetadata struct {
 	Categories       string
 	Name             string
@@ -28,15 +17,7 @@ func NewMetadata(categories string, name string, japaneseName string, japanesePh
 }
 
 func NewMetadataFromBytes(data []byte) PokemonMetadata {
-	buf := bytes.NewBuffer(data)
-	dec := gob.NewDecoder(buf)
-
-	d := &PokemonMetadata{}
-
-	err := dec.Decode(&d)
-	Check(err)
-
-	return *d
+	return ReadStructFromBytes[PokemonMetadata](data)
 }
 
 func (m Metadata) WriteToFile(fpath string) {
