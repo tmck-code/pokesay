@@ -12,12 +12,12 @@ import (
 )
 
 type PokemonEntry struct {
-	Name  string `json:"name"`
+	Key   string `json:"key"`
 	Index int    `json:"index"`
 }
 
 func (p PokemonEntry) String() string {
-	return fmt.Sprintf("{Index: %d, Name: %s}", p.Index, p.Name)
+	return fmt.Sprintf("{Index: %d, Key: %s}", p.Index, p.Key)
 }
 
 type Node struct {
@@ -31,10 +31,10 @@ type PokemonTrie struct {
 	Keys [][]string `json:"keys"`
 }
 
-func NewPokemonEntry(idx int, name string) *PokemonEntry {
+func NewPokemonEntry(idx int, key string) *PokemonEntry {
 	return &PokemonEntry{
 		Index: idx,
-		Name:  name,
+		Key:   key,
 	}
 }
 
@@ -111,7 +111,7 @@ func (t PokemonTrie) Find(s string) ([]*PokemonMatch, error) {
 	if len(matches) > 0 {
 		return matches, nil
 	} else {
-		return nil, errors.New(fmt.Sprintf("Could not find name: %s", s))
+		return nil, errors.New(fmt.Sprintf("Could not find key: %s", s))
 	}
 }
 
@@ -119,7 +119,7 @@ func (current Node) Find(s string, keys []string) []*PokemonMatch {
 	matches := []*PokemonMatch{}
 
 	for _, entry := range current.Data {
-		for _, tk := range TokenizeName(entry.Name) {
+		for _, tk := range TokenizeKey(entry.Key) {
 			if tk == s {
 				matches = append(matches, &PokemonMatch{Entry: entry, Categories: keys})
 			}
@@ -134,8 +134,8 @@ func (current Node) Find(s string, keys []string) []*PokemonMatch {
 	return matches
 }
 
-func TokenizeName(name string) []string {
-	return strings.Split(name, "-")
+func TokenizeKey(key string) []string {
+	return strings.Split(key, "-")
 }
 
 func (t PokemonTrie) GetCategoryPaths(s string) ([][]string, error) {
