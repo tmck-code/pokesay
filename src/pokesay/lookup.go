@@ -30,7 +30,7 @@ func ChooseRandomCategory(keys [][]string, categories pokedex.Trie) ([]string, [
 
 func ListCategories(categories pokedex.Trie) []string {
 	ukm := map[string]bool{}
-	for _, v := range categories.Keys {
+	for _, v := range categories.KeyPaths {
 		for _, k := range v {
 			ukm[k] = true
 		}
