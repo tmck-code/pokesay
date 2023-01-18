@@ -27,7 +27,7 @@ func MetadataFpath(subdir string, idx int) string {
 	return path.Join(subdir, fmt.Sprintf("%d.metadata", idx))
 }
 
-func ReadStructFromBytes[T interface{}](data []byte) T {
+func ReadStructFromBytes[T any](data []byte) T {
 	var d T
 	err := gob.NewDecoder(bytes.NewBuffer(data)).Decode(&d)
 	Check(err)
@@ -35,7 +35,7 @@ func ReadStructFromBytes[T interface{}](data []byte) T {
 	return d
 }
 
-func WriteStructToFile[T interface{}](obj T, fpath string) {
+func WriteStructToFile[T any](obj T, fpath string) {
 	ostream, err := os.Create(fpath)
 	Check(err)
 
@@ -46,7 +46,7 @@ func WriteStructToFile[T interface{}](obj T, fpath string) {
 	ostream.Close()
 }
 
-func StructToJSON[T interface{}](obj T, indentation ...int) string {
+func StructToJSON[T any](obj T, indentation ...int) string {
 	if len(indentation) == 1 {
 		json, err := json.MarshalIndent(obj, "", strings.Repeat(" ", indentation[0]))
 		Check(err)
