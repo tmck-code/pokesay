@@ -11,30 +11,30 @@ import (
 	"strings"
 )
 
-type PokemonEntry struct {
-	Key   string `json:"key"`
+type Entry struct {
+	Value string `json:"value"`
 	Index int    `json:"index"`
 }
 
-func (p PokemonEntry) String() string {
-	return fmt.Sprintf("{Index: %d, Key: %s}", p.Index, p.Key)
+func (p Entry) String() string {
+	return fmt.Sprintf("{Index: %d, Value: %s}", p.Index, p.Value)
 }
 
 type Node struct {
 	Children map[string]*Node `json:"children"`
-	Data     []*PokemonEntry  `json:"data"`
+	Data     []*Entry         `json:"data"`
 }
 
-type PokemonTrie struct {
+type Trie struct {
 	Root *Node      `json:"root"`
 	Len  int        `json:"len"`
 	Keys [][]string `json:"keys"`
 }
 
-func NewPokemonEntry(idx int, key string) *PokemonEntry {
-	return &PokemonEntry{
+func NewEntry(idx int, value string) *Entry {
+	return &Entry{
 		Index: idx,
-		Key:   key,
+		Value: value,
 	}
 }
 
@@ -44,12 +44,35 @@ func NewNode() *Node {
 	}
 }
 
-func NewTrie() *PokemonTrie {
-	return &PokemonTrie{
+func NewTrie() *Trie {
+	return &Trie{
 		Len:  0,
 		Root: NewNode(),
 		Keys: make([][]string, 0),
 	}
+}
+
+func NewTrieFromBytes(data []byte) Trie {
+	buf := bytes.NewBuffer(data)
+	dec := gob.NewDecoder(buf)
+
+	d := &Trie{}
+
+	err := dec.Decode(&d)
+	Check(err)
+
+	return *d
+}
+
+func (t Trie) WriteToFile(fpath string) {
+	ostream, err := os.Create(fpath)
+	Check(err)
+
+	writer := bufio.NewWriter(ostream)
+	enc := gob.NewEncoder(writer)
+	enc.Encode(t)
+	writer.Flush()
+	ostream.Close()
 }
 
 func Equal(a, b []string) bool {
@@ -64,7 +87,7 @@ func Equal(a, b []string) bool {
 	return true
 }
 
-func (t *PokemonTrie) ToString(indentation ...int) string {
+func (t *Trie) ToString(indentation ...int) string {
 	if len(indentation) == 1 {
 		json, err := json.MarshalIndent(t, "", strings.Repeat(" ", indentation[0]))
 		Check(err)
@@ -76,25 +99,25 @@ func (t *PokemonTrie) ToString(indentation ...int) string {
 	}
 }
 
-func (t *PokemonTrie) Insert(s []string, data *PokemonEntry) {
+func (t *Trie) Insert(keys []string, data *Entry) {
 	current := t.Root
 	found := false
 	for _, k := range t.Keys {
-		if Equal(k, s) {
+		if Equal(k, keys) {
 			found = true
 			break
 		}
 	}
 	if !found {
-		t.Keys = append(t.Keys, s)
+		t.Keys = append(t.Keys, keys)
 	}
-	for _, char := range s {
-		if _, ok := current.Children[char]; ok {
-			current = current.Children[char]
+	for _, key := range keys {
+		if _, ok := current.Children[key]; ok {
+			current = current.Children[key]
 		} else {
-			current.Children[char] = NewNode()
-			current = current.Children[char]
-			current.Data = make([]*PokemonEntry, 0)
+			current.Children[key] = NewNode()
+			current = current.Children[key]
+			current.Data = make([]*Entry, 0)
 		}
 	}
 	current.Data = append(current.Data, data)
@@ -102,16 +125,16 @@ func (t *PokemonTrie) Insert(s []string, data *PokemonEntry) {
 }
 
 type PokemonMatch struct {
-	Entry      *PokemonEntry
-	Categories []string
+	Entry *Entry
+	Keys  []string
 }
 
-func (t PokemonTrie) Find(s string) ([]*PokemonMatch, error) {
+func (t Trie) Find(s string) ([]*PokemonMatch, error) {
 	matches := t.Root.Find(s, []string{})
 	if len(matches) > 0 {
 		return matches, nil
 	} else {
-		return nil, errors.New(fmt.Sprintf("Could not find key: %s", s))
+		return nil, errors.New(fmt.Sprintf("Could not find value: %s", s))
 	}
 }
 
@@ -119,9 +142,9 @@ func (current Node) Find(s string, keys []string) []*PokemonMatch {
 	matches := []*PokemonMatch{}
 
 	for _, entry := range current.Data {
-		for _, tk := range TokenizeKey(entry.Key) {
+		for _, tk := range TokenizeValue(entry.Value) {
 			if tk == s {
-				matches = append(matches, &PokemonMatch{Entry: entry, Categories: keys})
+				matches = append(matches, &PokemonMatch{Entry: entry, Keys: keys})
 			}
 		}
 	}
@@ -134,11 +157,11 @@ func (current Node) Find(s string, keys []string) []*PokemonMatch {
 	return matches
 }
 
-func TokenizeKey(key string) []string {
-	return strings.Split(key, "-")
+func TokenizeValue(value string) []string {
+	return strings.Split(value, "-")
 }
 
-func (t PokemonTrie) GetCategoryPaths(s string) ([][]string, error) {
+func (t Trie) FindKeys(s string) ([][]string, error) {
 	matches := [][]string{}
 	for _, k := range t.Keys {
 		for _, el := range k {
@@ -153,9 +176,10 @@ func (t PokemonTrie) GetCategoryPaths(s string) ([][]string, error) {
 	return matches, nil
 }
 
-func (t PokemonTrie) GetCategory(s []string) ([]*PokemonEntry, error) {
+// given a
+func (t Trie) FindKeyEntries(s []string) ([]*Entry, error) {
 	current := t.Root
-	matches := make([]*PokemonEntry, 0)
+	matches := make([]*Entry, 0)
 	for _, char := range s {
 		if _, ok := current.Children[char]; ok {
 			current = current.Children[char]
@@ -170,27 +194,4 @@ func (t PokemonTrie) GetCategory(s []string) ([]*PokemonEntry, error) {
 		return nil, errors.New(fmt.Sprintf("Could not find category: %s", s))
 	}
 	return matches, nil
-}
-
-func WriteStructToFile(data interface{}, fpath string) {
-	ostream, err := os.Create(fpath)
-	Check(err)
-
-	writer := bufio.NewWriter(ostream)
-	enc := gob.NewEncoder(writer)
-	enc.Encode(data)
-	writer.Flush()
-	ostream.Close()
-}
-
-func ReadTrieFromBytes(data []byte) PokemonTrie {
-	buf := bytes.NewBuffer(data)
-	dec := gob.NewDecoder(buf)
-
-	d := &PokemonTrie{}
-
-	err := dec.Decode(&d)
-	Check(err)
-
-	return *d
 }

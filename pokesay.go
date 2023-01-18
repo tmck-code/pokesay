@@ -74,7 +74,7 @@ func parseFlags() Args {
 	return args
 }
 
-func runListCategories(categories pokedex.PokemonTrie) {
+func runListCategories(categories pokedex.Trie) {
 	keys := pokesay.ListCategories(categories)
 	fmt.Printf("%s\n%d %s\n", strings.Join(keys, " "), len(keys), "total categories")
 }
@@ -105,7 +105,7 @@ func GenerateNames(metadata pokedex.PokemonMetadata, args Args) []string {
 	}
 }
 
-func runPrintByName(args Args, categories pokedex.PokemonTrie) {
+func runPrintByName(args Args, categories pokedex.Trie) {
 	matches, err := categories.Find(args.NameToken)
 	pokesay.Check(err)
 	match := matches[pokesay.RandomInt(len(matches))]
@@ -118,8 +118,8 @@ func runPrintByName(args Args, categories pokedex.PokemonTrie) {
 	pokesay.PrintPokemon(match.Entry.Index, GenerateNames(metadata, args), match.Categories, GOBCowData)
 }
 
-func runPrintByCategory(args Args, categories pokedex.PokemonTrie) {
-	matches, err := categories.GetCategoryPaths(args.Category)
+func runPrintByCategory(args Args, categories pokedex.Trie) {
+	matches, err := categories.FindKeys(args.Category)
 	pokesay.Check(err)
 	keys, category := pokesay.ChooseRandomCategory(matches, categories)
 	choice := category[pokesay.RandomInt(len(category))]
@@ -149,13 +149,13 @@ func main() {
 	args := parseFlags()
 
 	if args.ListCategories {
-		runListCategories(pokedex.ReadTrieFromBytes(GOBCategory))
+		runListCategories(pokedex.NewTrieFromBytes(GOBCategory))
 	} else if args.ListNames {
 		runListNames()
 	} else if args.NameToken != "" {
-		runPrintByName(args, pokedex.ReadTrieFromBytes(GOBCategory))
+		runPrintByName(args, pokedex.NewTrieFromBytes(GOBCategory))
 	} else if args.Category != "" {
-		runPrintByCategory(args, pokedex.ReadTrieFromBytes(GOBCategory))
+		runPrintByCategory(args, pokedex.NewTrieFromBytes(GOBCategory))
 	} else {
 		runPrintRandom(args)
 	}
