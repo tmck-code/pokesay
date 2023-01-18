@@ -7,6 +7,7 @@ import (
 	"os"
 	"path"
 	"strconv"
+	"strings"
 
 	"github.com/tmck-code/pokesay/src/bin"
 	"github.com/tmck-code/pokesay/src/pokedex"
@@ -16,6 +17,11 @@ func check(e error) {
 	if e != nil {
 		log.Fatal(e)
 	}
+}
+
+// Strips the leading "./" from a path e.g. "./cows/ -> cows/"
+func normaliseRelativeDir(dirPath string) string {
+	return strings.TrimPrefix(dirPath, "./")
 }
 
 type PokedexArgs struct {
@@ -43,12 +49,12 @@ func parseArgs() PokedexArgs {
 	flag.Parse()
 
 	args := PokedexArgs{
-		FromDir:           pokedex.NormaliseRelativeDir(*fromDir),
+		FromDir:           normaliseRelativeDir(*fromDir),
 		FromMetadataFname: *fromMetadataFname,
-		ToDir:             pokedex.NormaliseRelativeDir(*toDir),
+		ToDir:             normaliseRelativeDir(*toDir),
 		ToCategoryFname:   *toCategoryFname,
-		ToDataSubDir:      pokedex.NormaliseRelativeDir(*toDataSubDir),
-		ToMetadataSubDir:  pokedex.NormaliseRelativeDir(*toMetadataSubDir),
+		ToDataSubDir:      normaliseRelativeDir(*toDataSubDir),
+		ToMetadataSubDir:  normaliseRelativeDir(*toMetadataSubDir),
 		ToTotalFname:      *toTotalFname,
 		Debug:             *debug,
 	}
@@ -61,10 +67,13 @@ func parseArgs() PokedexArgs {
 // This function reads in the files given by the PokedexArgs, and generates the data that pokesay will use when running
 // - The "category" struct
 //   - contains category information, and the index of the corresponding metadata file
+//
 // - The "metadata" files
 //   - named like 1.metadata, contains pokemon info like name, categories, japanese name
+//
 // - The "data" files
 //   - contain the pokemon as gzipped text
+//
 // - The "total" file
 //   - contains the total number of pokemon files, used for random selection
 func main() {

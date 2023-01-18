@@ -1,8 +1,13 @@
 package pokedex
 
 import (
+	"bufio"
+	"bytes"
+	"encoding/gob"
 	"errors"
 	"fmt"
+	"os"
+	"strings"
 )
 
 type PokemonEntry struct {
@@ -83,6 +88,11 @@ func (t *PokemonTrie) Insert(s []string, data *PokemonEntry) {
 	t.Len += 1
 }
 
+type PokemonMatch struct {
+	Entry      *PokemonEntry
+	Categories []string
+}
+
 func (t PokemonTrie) MatchNameToken(s string) ([]*PokemonMatch, error) {
 	matches := t.Root.MatchNameToken(s, []string{})
 	if len(matches) > 0 {
@@ -109,6 +119,10 @@ func (current Node) MatchNameToken(s string, keys []string) []*PokemonMatch {
 		}
 	}
 	return matches
+}
+
+func TokenizeName(name string) []string {
+	return strings.Split(name, "-")
 }
 
 func (t PokemonTrie) GetCategoryPaths(s string) ([][]string, error) {
@@ -143,4 +157,27 @@ func (t PokemonTrie) GetCategory(s []string) ([]*PokemonEntry, error) {
 		return nil, errors.New(fmt.Sprintf("Could not find category: %s", s))
 	}
 	return matches, nil
+}
+
+func WriteStructToFile(data interface{}, fpath string) {
+	ostream, err := os.Create(fpath)
+	Check(err)
+
+	writer := bufio.NewWriter(ostream)
+	enc := gob.NewEncoder(writer)
+	enc.Encode(data)
+	writer.Flush()
+	ostream.Close()
+}
+
+func ReadTrieFromBytes(data []byte) PokemonTrie {
+	buf := bytes.NewBuffer(data)
+	dec := gob.NewDecoder(buf)
+
+	d := &PokemonTrie{}
+
+	err := dec.Decode(&d)
+	Check(err)
+
+	return *d
 }
