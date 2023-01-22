@@ -48,6 +48,7 @@ func TestTrieToStringIndented(test *testing.T) {
 	t := pokedex.NewTrie()
 	t.Insert([]string{"p", "g1", "r"}, pokedex.NewEntry(0, "pikachu"))
 	t.Insert([]string{"p", "g1", "r"}, pokedex.NewEntry(1, "bulbasaur"))
+	t.Insert([]string{"p", "g2", "r"}, pokedex.NewEntry(2, "bulbasaur"))
 
 	expected := `{
   "root": {
@@ -71,6 +72,20 @@ func TestTrieToStringIndented(test *testing.T) {
               }
             },
             "data": null
+          },
+          "g2": {
+            "children": {
+              "r": {
+                "children": {},
+                "data": [
+                  {
+                    "value": "bulbasaur",
+                    "index": 2
+                  }
+                ]
+              }
+            },
+            "data": null
           }
         },
         "data": null
@@ -78,11 +93,16 @@ func TestTrieToStringIndented(test *testing.T) {
     },
     "data": null
   },
-  "len": 2,
+  "len": 3,
   "keys": [
     [
       "p",
       "g1",
+      "r"
+    ],
+    [
+      "p",
+      "g2",
       "r"
     ]
   ]
@@ -182,6 +202,25 @@ func TestFindKeyPaths(test *testing.T) {
 	result, err := t.FindKeyPaths("big")
 	pokesay.Check(err)
 	Assert(expected, result, result, test)
+}
+
+func TestFindByKeyPath(test *testing.T) {
+	t := pokedex.NewTrie()
+
+	t.Insert([]string{"small", "g1", "r"}, pokedex.NewEntry(0, "pikachu"))
+	t.Insert([]string{"small", "g1", "o"}, pokedex.NewEntry(1, "bulbasaur"))
+	t.Insert([]string{"medium", "g1", "o"}, pokedex.NewEntry(2, "bulbasaur"))
+	t.Insert([]string{"big", "g1", "o"}, pokedex.NewEntry(3, "bulbasaur"))
+	t.Insert([]string{"big", "g1"}, pokedex.NewEntry(4, "charmander"))
+
+	result, err := t.FindByKeyPath([]string{"small", "g1"})
+	pokesay.Check(err)
+
+	expected := []*pokedex.Entry{{Index: 0, Value: "pikachu"}, {Index: 1, Value: "bulbasaur"}}
+
+	for i := range result {
+		Assert(expected[i], result[i], result[i], test)
+	}
 }
 
 func TestWriteToFile(test *testing.T) {
