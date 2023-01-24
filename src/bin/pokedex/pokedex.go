@@ -6,7 +6,6 @@ import (
 	"log"
 	"os"
 	"path"
-	"strconv"
 	"strings"
 
 	"github.com/tmck-code/pokesay/src/bin"
@@ -101,12 +100,6 @@ func main() {
 	pokemonNames := pokedex.ReadNames(args.FromMetadataFname)
 	fmt.Println("- Read", len(pokemonNames), "pokemon names from", args.FromMetadataFname)
 
-	// categories is a Trie struct that will be written to a file using encoding/gob
-	// metadata is a list of pokemon data and an index to use when writing them to a file
-	// - this index matches a corresponding one in the categories struct
-	// - these files are embedded into the build binary using go:embed and then loaded at runtime
-	// categories, metadata := pokedex.CreateMetadata(args.FromDir, cowfileFpaths, pokemonNames, args.Debug)
-
 	// 1. Create the category struct using the cowfile paths, pokemon names and indexes\
 	fmt.Println("- Writing categories to file")
 	pokedex.WriteStructToFile(
@@ -125,7 +118,7 @@ func main() {
 		pbar.Add(1)
 	}
 	fmt.Println("- Writing total metadata to file")
-	pokedex.WriteBytesToFile([]byte(strconv.Itoa(len(metadata))), totalFpath, false)
+	pokedex.WriteIntToFile(len(metadata), totalFpath)
 
 	fmt.Println("✓ Complete! Indexed", len(cowfileFpaths), "total cowfiles")
 	fmt.Println("✓ Wrote gzipped metadata to", metadataDirPath)

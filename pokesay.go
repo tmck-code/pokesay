@@ -6,7 +6,6 @@ import (
 	"flag"
 	"fmt"
 	"os"
-	"strconv"
 	"strings"
 
 	"github.com/tmck-code/pokesay/src/pokedex"
@@ -91,14 +90,11 @@ func runListCategories(categories pokedex.Trie) {
 }
 
 func runListNames() {
-	total, _ := strconv.Atoi(string(GOBTotal))
+	total := pokedex.ReadIntFromBytes(GOBTotal)
 	names := make([]string, total)
 
 	for i := 0; i < total; i++ {
-		data := MetadataFpath(i)
-		m, err := GOBCowNames.ReadFile(data)
-		pokesay.Check(err)
-		metadata := pokedex.ReadMetadataFromBytes(m)
+		metadata := pokedex.ReadMetadataFromEmbedded(GOBCowNames, MetadataFpath(i))
 		names[i] = metadata.Name
 	}
 	fmt.Println(strings.Join(names, " "))
@@ -140,8 +136,7 @@ func runPrintByCategory(args Args, categories pokedex.Trie) {
 }
 
 func runPrintRandom(args Args) {
-	total, _ := strconv.Atoi(string(GOBTotal))
-	choice := pokesay.RandomInt(total)
+	choice := pokesay.RandomInt(pokedex.ReadIntFromBytes(GOBTotal))
 
 	metadata := pokedex.ReadMetadataFromEmbedded(GOBCowNames, MetadataFpath(choice))
 
