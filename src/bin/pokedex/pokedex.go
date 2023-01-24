@@ -64,6 +64,13 @@ func parseArgs() PokedexArgs {
 	return args
 }
 
+func mkDirs(dirPaths []string) {
+	for _, dirPath := range dirPaths {
+		err := os.MkdirAll(dirPath, 0755)
+		check(err)
+	}
+}
+
 // This function reads in the files given by the PokedexArgs, and generates the data that pokesay will use when running
 // - The "category" struct
 //   - contains category information, and the index of the corresponding metadata file
@@ -84,21 +91,15 @@ func main() {
 	entryDirPath := path.Join(args.ToDir, args.ToDataSubDir)
 	metadataDirPath := path.Join(args.ToDir, args.ToMetadataSubDir)
 
+	// ensure that the destination directories exist
+	mkDirs([]string{entryDirPath, metadataDirPath})
+
+	// Find all the cowfiles
 	cowfileFpaths := pokedex.FindFiles(args.FromDir, ".cow", make([]string, 0))
-
-	err := os.MkdirAll(entryDirPath, 0755)
-	check(err)
-	err = os.MkdirAll(metadataDirPath, 0755)
-	check(err)
-
+	fmt.Println("- Found", len(cowfileFpaths), "cowfiles")
+	// Read pokemon names
 	pokemonNames := pokedex.ReadNames(args.FromMetadataFname)
-	fmt.Printf("%+v\n", pokemonNames)
-
-	// 1. Create the category struct using the cowfile paths, pokemon names and indexes
-	categories := pokedex.CreateCategoryStruct(args.FromDir, cowfileFpaths, args.Debug)
-
-	// 2. Create the metadata files, containing name/category/japanese name info for each pokemon
-	metadata := pokedex.CreateMetadata(args.FromDir, cowfileFpaths, pokemonNames, args.Debug)
+	fmt.Println("- Read", len(pokemonNames), "pokemon names from", args.FromMetadataFname)
 
 	// categories is a Trie struct that will be written to a file using encoding/gob
 	// metadata is a list of pokemon data and an index to use when writing them to a file
@@ -106,17 +107,29 @@ func main() {
 	// - these files are embedded into the build binary using go:embed and then loaded at runtime
 	// categories, metadata := pokedex.CreateMetadata(args.FromDir, cowfileFpaths, pokemonNames, args.Debug)
 
-	pokedex.WriteStructToFile(categories, categoryFpath)
+	// 1. Create the category struct using the cowfile paths, pokemon names and indexes\
+	fmt.Println("- Writing categories to file")
+	pokedex.WriteStructToFile(
+		pokedex.CreateCategoryStruct(args.FromDir, cowfileFpaths, args.Debug),
+		categoryFpath,
+	)
 
-	fmt.Println("\nConverting cowfiles -> category & metadata GOB")
-	pbar := bin.NewProgressBar(len(cowfileFpaths))
+	// 2. Create the metadata files, containing name/category/japanese name info for each pokemon
+	metadata := pokedex.CreateMetadata(args.FromDir, cowfileFpaths, pokemonNames, args.Debug)
+
+	fmt.Println("- Writing metadata and entries to file")
+	pbar := bin.NewProgressBar(len(metadata))
 	for _, m := range metadata {
 		pokedex.WriteBytesToFile(m.Data, pokedex.EntryFpath(entryDirPath, m.Index), true)
 		pokedex.WriteStructToFile(m.Metadata, pokedex.MetadataFpath(metadataDirPath, m.Index))
 		pbar.Add(1)
 	}
+	fmt.Println("- Writing total metadata to file")
 	pokedex.WriteBytesToFile([]byte(strconv.Itoa(len(metadata))), totalFpath, false)
 
-	fmt.Println("Finished converting", len(cowfileFpaths), "pokesprite -> cowfiles")
-	fmt.Println("Wrote categories to", path.Join(args.ToDir, args.ToCategoryFname))
+	fmt.Println("✓ Complete! Indexed", len(cowfileFpaths), "total cowfiles")
+	fmt.Println("✓ Wrote gzipped metadata to", metadataDirPath)
+	fmt.Println("✓ Wrote gzipped cowfiles to", entryDirPath)
+	fmt.Println("✓ Wrote 'total' metadata to", totalFpath)
+	fmt.Println("✓ Wrote gzipped category trie to", categoryFpath)
 }

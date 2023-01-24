@@ -121,8 +121,6 @@ func CreateMetadata(rootDir string, fpaths []string, pokemonNames map[string]Pok
 
 		v := pokemonNames[strings.Split(name, "-")[0]]
 
-		fmt.Println("name:", name, "found:", v)
-
 		metadata = append(
 			metadata,
 			Metadata{
@@ -148,8 +146,6 @@ func CreateCategoryStruct(rootDir string, fpaths []string, debug bool) Trie {
 
 		cats := createCategories(strings.TrimPrefix(fpath, rootDir), data)
 		name := createName(fpath)
-
-		fmt.Println("name:", name)
 
 		categories.Insert(
 			cats,
