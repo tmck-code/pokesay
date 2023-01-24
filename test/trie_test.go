@@ -19,6 +19,116 @@ func TestNewEntry(test *testing.T) {
 	Assert("yo", p.Value, p, test)
 }
 
+func TestTrieInsert(test *testing.T) {
+	t := pokedex.NewTrie()
+	t.Insert([]string{"p", "g1", "r"}, pokedex.NewEntry(0, "pikachu"))
+	t.Insert([]string{"p", "g1", "r"}, pokedex.NewEntry(1, "bulbasaur"))
+
+	Assert(
+		&pokedex.Entry{Value: "pikachu", Index: 0},
+		t.Root.Children["p"].Children["g1"].Children["r"].Data[0],
+		t,
+		test,
+	)
+	Assert(
+		&pokedex.Entry{Value: "bulbasaur", Index: 1},
+		t.Root.Children["p"].Children["g1"].Children["r"].Data[1],
+		t,
+		test,
+	)
+}
+
+func TestTrieFind(test *testing.T) {
+	t := pokedex.NewTrie()
+	t.Insert([]string{"p", "g1", "r"}, pokedex.NewEntry(0, "pikachu"))
+	t.Insert([]string{"p", "g1", "r"}, pokedex.NewEntry(1, "bulbasaur"))
+	t.Insert([]string{"x", "g1", "l"}, pokedex.NewEntry(2, "pikachu-other"))
+
+	expected := []pokedex.PokemonMatch{
+		{
+			Entry: &pokedex.Entry{Index: 0, Value: "pikachu"},
+			Keys:  []string{"p", "g1", "r"},
+		},
+		{
+			Entry: &pokedex.Entry{Index: 2, Value: "pikachu-other"},
+			Keys:  []string{"x", "g1", "l"},
+		},
+	}
+
+	results, err := t.Find("pikachu")
+	pokesay.Check(err)
+
+	sort.Slice(results, func(i, j int) bool {
+		return strings.Compare(results[i].Entry.Value, results[j].Entry.Value) == -1
+	})
+
+	for i := range results {
+		Assert(expected[i].Entry, results[i].Entry, results[i], test)
+	}
+}
+func TestFindKeyPaths(test *testing.T) {
+	defer os.Remove("test.txt")
+
+	t := pokedex.NewTrie()
+	t.Insert([]string{"small", "g1", "r"}, pokedex.NewEntry(0, "pikachu"))
+	t.Insert([]string{"small", "g1", "o"}, pokedex.NewEntry(1, "bulbasaur"))
+	t.Insert([]string{"medium", "g1", "o"}, pokedex.NewEntry(2, "bulbasaur"))
+	t.Insert([]string{"big", "g1", "o"}, pokedex.NewEntry(3, "bulbasaur"))
+	t.Insert([]string{"big", "g1"}, pokedex.NewEntry(4, "charmander"))
+
+	expected := [][]string{
+		{"small", "g1", "r"},
+		{"small", "g1", "o"},
+		{"medium", "g1", "o"},
+		{"big", "g1", "o"},
+		{"big", "g1"},
+	}
+	Assert(expected, t.KeyPaths, t, test)
+
+	expected = [][]string{
+		{"big", "g1", "o"},
+		{"big", "g1"},
+	}
+	result, err := t.FindKeyPaths("big")
+	pokesay.Check(err)
+	Assert(expected, result, result, test)
+}
+
+func TestFindByKeyPath(test *testing.T) {
+	t := pokedex.NewTrie()
+
+	t.Insert([]string{"small", "g1", "r"}, pokedex.NewEntry(0, "pikachu"))
+	t.Insert([]string{"small", "g1", "o"}, pokedex.NewEntry(1, "bulbasaur"))
+	t.Insert([]string{"medium", "g1", "o"}, pokedex.NewEntry(2, "bulbasaur"))
+	t.Insert([]string{"big", "g1", "o"}, pokedex.NewEntry(3, "bulbasaur"))
+	t.Insert([]string{"big", "g1"}, pokedex.NewEntry(4, "charmander"))
+
+	result, err := t.FindByKeyPath([]string{"small", "g1"})
+	pokesay.Check(err)
+
+	expected := []*pokedex.Entry{{Index: 0, Value: "pikachu"}, {Index: 1, Value: "bulbasaur"}}
+
+	for i := range result {
+		Assert(expected[i], result[i], result[i], test)
+	}
+}
+
+func TestTrieFindByKeyPath(test *testing.T) {
+	t := pokedex.NewTrie()
+	t.Insert([]string{"p", "g1", "r"}, pokedex.NewEntry(0, "pikachu"))
+	t.Insert([]string{"p", "g1", "r"}, pokedex.NewEntry(1, "bulbasaur"))
+
+	result, err := t.FindByKeyPath([]string{"p", "g1"})
+	pokesay.Check(err)
+
+	Assert(2, len(result), result, test)
+	Assert(
+		"[{Index: 0, Value: pikachu} {Index: 1, Value: bulbasaur}]",
+		fmt.Sprintf("%s", result),
+		result, test,
+	)
+}
+
 func TestTrieToString(test *testing.T) {
 	t := pokedex.NewTrie()
 	t.Insert([]string{"p", "g1", "r"}, pokedex.NewEntry(0, "pikachu"))
@@ -112,117 +222,6 @@ func TestTrieToStringIndented(test *testing.T) {
 	Assert(expected, string(result), string(result), test)
 }
 
-func TestTrieInsert(test *testing.T) {
-	t := pokedex.NewTrie()
-	t.Insert([]string{"p", "g1", "r"}, pokedex.NewEntry(0, "pikachu"))
-	t.Insert([]string{"p", "g1", "r"}, pokedex.NewEntry(1, "bulbasaur"))
-
-	Assert(
-		&pokedex.Entry{Value: "pikachu", Index: 0},
-		t.Root.Children["p"].Children["g1"].Children["r"].Data[0],
-		t,
-		test,
-	)
-	Assert(
-		&pokedex.Entry{Value: "bulbasaur", Index: 1},
-		t.Root.Children["p"].Children["g1"].Children["r"].Data[1],
-		t,
-		test,
-	)
-}
-
-func TestTrieFind(test *testing.T) {
-	t := pokedex.NewTrie()
-	t.Insert([]string{"p", "g1", "r"}, pokedex.NewEntry(0, "pikachu"))
-	t.Insert([]string{"p", "g1", "r"}, pokedex.NewEntry(1, "bulbasaur"))
-	t.Insert([]string{"x", "g1", "l"}, pokedex.NewEntry(2, "pikachu-other"))
-
-	expected := []pokedex.PokemonMatch{
-		{
-			Entry: &pokedex.Entry{Index: 0, Value: "pikachu"},
-			Keys:  []string{"p", "g1", "r"},
-		},
-		{
-			Entry: &pokedex.Entry{Index: 2, Value: "pikachu-other"},
-			Keys:  []string{"x", "g1", "l"},
-		},
-	}
-
-	results, err := t.Find("pikachu")
-	pokesay.Check(err)
-
-	sort.Slice(results, func(i, j int) bool {
-		return strings.Compare(results[i].Entry.Value, results[j].Entry.Value) == -1
-	})
-
-	for i := range results {
-		Assert(expected[i].Entry, results[i].Entry, results[i], test)
-	}
-}
-
-func TestTrieFindByKeyPath(test *testing.T) {
-	t := pokedex.NewTrie()
-	t.Insert([]string{"p", "g1", "r"}, pokedex.NewEntry(0, "pikachu"))
-	t.Insert([]string{"p", "g1", "r"}, pokedex.NewEntry(1, "bulbasaur"))
-
-	result, err := t.FindByKeyPath([]string{"p", "g1"})
-	pokesay.Check(err)
-
-	Assert(2, len(result), result, test)
-	Assert(
-		"[{Index: 0, Value: pikachu} {Index: 1, Value: bulbasaur}]",
-		fmt.Sprintf("%s", result),
-		result, test,
-	)
-}
-
-func TestFindKeyPaths(test *testing.T) {
-	defer os.Remove("test.txt")
-
-	t := pokedex.NewTrie()
-	t.Insert([]string{"small", "g1", "r"}, pokedex.NewEntry(0, "pikachu"))
-	t.Insert([]string{"small", "g1", "o"}, pokedex.NewEntry(1, "bulbasaur"))
-	t.Insert([]string{"medium", "g1", "o"}, pokedex.NewEntry(2, "bulbasaur"))
-	t.Insert([]string{"big", "g1", "o"}, pokedex.NewEntry(3, "bulbasaur"))
-	t.Insert([]string{"big", "g1"}, pokedex.NewEntry(4, "charmander"))
-
-	expected := [][]string{
-		{"small", "g1", "r"},
-		{"small", "g1", "o"},
-		{"medium", "g1", "o"},
-		{"big", "g1", "o"},
-		{"big", "g1"},
-	}
-	Assert(expected, t.KeyPaths, t, test)
-
-	expected = [][]string{
-		{"big", "g1", "o"},
-		{"big", "g1"},
-	}
-	result, err := t.FindKeyPaths("big")
-	pokesay.Check(err)
-	Assert(expected, result, result, test)
-}
-
-func TestFindByKeyPath(test *testing.T) {
-	t := pokedex.NewTrie()
-
-	t.Insert([]string{"small", "g1", "r"}, pokedex.NewEntry(0, "pikachu"))
-	t.Insert([]string{"small", "g1", "o"}, pokedex.NewEntry(1, "bulbasaur"))
-	t.Insert([]string{"medium", "g1", "o"}, pokedex.NewEntry(2, "bulbasaur"))
-	t.Insert([]string{"big", "g1", "o"}, pokedex.NewEntry(3, "bulbasaur"))
-	t.Insert([]string{"big", "g1"}, pokedex.NewEntry(4, "charmander"))
-
-	result, err := t.FindByKeyPath([]string{"small", "g1"})
-	pokesay.Check(err)
-
-	expected := []*pokedex.Entry{{Index: 0, Value: "pikachu"}, {Index: 1, Value: "bulbasaur"}}
-
-	for i := range result {
-		Assert(expected[i], result[i], result[i], test)
-	}
-}
-
 func TestWriteToFile(test *testing.T) {
 	defer os.Remove("test.txt")
 
@@ -241,4 +240,17 @@ func TestWriteToFile(test *testing.T) {
 	pokesay.Check(err)
 
 	Assert(t.ToString(), d.ToString(), d, test)
+}
+
+func TestReadFromBytes(test *testing.T) {
+	t := pokedex.NewTrie()
+	t.Insert([]string{"p", "g1", "r"}, pokedex.NewEntry(0, "pikachu"))
+	t.Insert([]string{"p", "g1", "r"}, pokedex.NewEntry(1, "bulbasaur"))
+
+	t.WriteToFile("test.txt")
+
+	data, err := os.ReadFile("test.txt")
+	pokesay.Check(err)
+	result := pokedex.NewTrieFromBytes(data)
+	Assert(t.ToString(), result.ToString(), result.ToString(), test)
 }
