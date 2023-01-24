@@ -81,15 +81,18 @@ func main() {
 
 	totalFpath := path.Join(args.ToDir, args.ToTotalFname)
 	categoryFpath := path.Join(args.ToDir, args.ToCategoryFname)
+	entryDirPath := path.Join(args.ToDir, args.ToDataSubDir)
+	metadataDirPath := path.Join(args.ToDir, args.ToMetadataSubDir)
+
+	cowfileFpaths := pokedex.FindFiles(args.FromDir, ".cow", make([]string, 0))
+
+	err := os.MkdirAll(entryDirPath, 0755)
+	check(err)
+	err = os.MkdirAll(metadataDirPath, 0755)
+	check(err)
 
 	pokemonNames := pokedex.ReadNames(args.FromMetadataFname)
 	fmt.Printf("%+v\n", pokemonNames)
-	cowfileFpaths := pokedex.FindFiles(args.FromDir, ".cow", make([]string, 0))
-
-	err := os.MkdirAll(path.Join(args.ToDir, args.ToDataSubDir), 0755)
-	check(err)
-	err = os.MkdirAll(path.Join(args.ToDir, args.ToMetadataSubDir), 0755)
-	check(err)
 
 	// 1. Create the category struct using the cowfile paths, pokemon names and indexes
 	categories := pokedex.CreateCategoryStruct(args.FromDir, cowfileFpaths, args.Debug)
@@ -108,8 +111,8 @@ func main() {
 	fmt.Println("\nConverting cowfiles -> category & metadata GOB")
 	pbar := bin.NewProgressBar(len(cowfileFpaths))
 	for _, m := range metadata {
-		pokedex.WriteBytesToFile(m.Data, pokedex.EntryFpath(path.Join(args.ToDir, args.ToDataSubDir), m.Index), true)
-		pokedex.WriteStructToFile(m.Metadata, pokedex.MetadataFpath(path.Join(args.ToDir, args.ToMetadataSubDir), m.Index))
+		pokedex.WriteBytesToFile(m.Data, pokedex.EntryFpath(entryDirPath, m.Index), true)
+		pokedex.WriteStructToFile(m.Metadata, pokedex.MetadataFpath(metadataDirPath, m.Index))
 		pbar.Add(1)
 	}
 	pokedex.WriteBytesToFile([]byte(strconv.Itoa(len(metadata))), totalFpath, false)
