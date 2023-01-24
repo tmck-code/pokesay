@@ -12,6 +12,7 @@ import (
 	"os"
 	"path"
 	"strings"
+	"strconv"
 )
 
 func Check(e error) {
@@ -71,6 +72,17 @@ func WriteBytesToFile(data []byte, fpath string, compress bool) {
 	}
 	writer.Flush()
 	ostream.Close()
+}
+
+func WriteIntToFile(n int, fpath string) {
+	WriteBytesToFile([]byte(strconv.Itoa(n)), fpath, false)
+}
+
+func ReadIntFromBytes(bs []byte) int {
+	total, err := strconv.Atoi(string(bs))
+	Check(err)
+
+	return total
 }
 
 func Compress(data []byte) []byte {
