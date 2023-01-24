@@ -1,6 +1,7 @@
 package pokesay
 
 import (
+	"embed"
 	"errors"
 	"log"
 	"math/rand"
@@ -43,4 +44,11 @@ func ListCategories(categories pokedex.Trie) []string {
 	}
 	sort.Strings(keys)
 	return keys
+}
+
+func ReadPokemonCow(GOBCowData embed.FS, fpath string) []byte {
+	d, err := GOBCowData.ReadFile(fpath)
+	Check(err)
+
+	return pokedex.Decompress(d)
 }

@@ -1,10 +1,17 @@
 package test
 
 import (
+	"embed"
+	"os"
 	"testing"
 
 	"github.com/tmck-code/pokesay/src/pokedex"
 	"github.com/tmck-code/pokesay/src/pokesay"
+)
+
+var (
+	//go:embed data/cows/*cow
+	GOBCowData embed.FS
 )
 
 func TestListCategories(test *testing.T) {
@@ -16,5 +23,16 @@ func TestListCategories(test *testing.T) {
 	t.Insert([]string{"big", "g1"}, pokedex.NewEntry(4, "charmander"))
 
 	result := pokesay.ListCategories(*t)
-	Assert([]string{"big", "g1", "medium", "o", "r", "small"}, result, result, test)
+	expected := []string{"big", "g1", "medium", "o", "r", "small"}
+
+	Assert(expected, result, result, test)
+}
+
+func TestReadEntry(test *testing.T) {
+	result := pokesay.ReadPokemonCow(GOBCowData, "data/cows/1.cow")
+
+	expected, err := os.ReadFile("data/cows/egg.cow")
+	pokesay.Check(err)
+
+	Assert(string(expected), string(result), string(result), test)
 }
