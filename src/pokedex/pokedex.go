@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"bytes"
 	"compress/gzip"
+	"embed"
 	"encoding/gob"
 	"encoding/json"
 	"fmt"
@@ -177,4 +178,11 @@ func sizeCategory(height int) string {
 		return "medium"
 	}
 	return "big"
+}
+
+func ReadPokemonCow(embeddedData embed.FS, fpath string) []byte {
+	d, err := embeddedData.ReadFile(fpath)
+	Check(err)
+
+	return Decompress(d)
 }
