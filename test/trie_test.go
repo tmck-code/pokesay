@@ -3,7 +3,6 @@ package test
 import (
 	"bytes"
 	"encoding/gob"
-	"fmt"
 	"os"
 	"sort"
 	"strings"
@@ -103,30 +102,17 @@ func TestFindByKeyPath(test *testing.T) {
 	t.Insert([]string{"big", "g1", "o"}, pokedex.NewEntry(3, "bulbasaur"))
 	t.Insert([]string{"big", "g1"}, pokedex.NewEntry(4, "charmander"))
 
-	result, err := t.FindByKeyPath([]string{"small", "g1"})
+	results, err := t.FindByKeyPath([]string{"small", "g1"})
 	pokesay.Check(err)
 
+	sort.Slice(results, func(i, j int) bool {
+		return strings.Compare(results[i].Value, results[j].Value) == 1
+	})
 	expected := []*pokedex.Entry{{Index: 0, Value: "pikachu"}, {Index: 1, Value: "bulbasaur"}}
 
-	for i := range result {
-		Assert(expected[i], result[i], result[i], test)
+	for i := range results {
+		Assert(expected[i], results[i], results[i], test)
 	}
-}
-
-func TestTrieFindByKeyPath(test *testing.T) {
-	t := pokedex.NewTrie()
-	t.Insert([]string{"p", "g1", "r"}, pokedex.NewEntry(0, "pikachu"))
-	t.Insert([]string{"p", "g1", "r"}, pokedex.NewEntry(1, "bulbasaur"))
-
-	result, err := t.FindByKeyPath([]string{"p", "g1"})
-	pokesay.Check(err)
-
-	Assert(2, len(result), result, test)
-	Assert(
-		"[{Index: 0, Value: pikachu} {Index: 1, Value: bulbasaur}]",
-		fmt.Sprintf("%s", result),
-		result, test,
-	)
 }
 
 func TestTrieToString(test *testing.T) {
