@@ -18,12 +18,12 @@ func NewMetadata(categories string, name string, japaneseName string, japanesePh
 	}
 }
 
-func NewMetadataFromBytes(data []byte) PokemonMetadata {
+func ReadMetadataFromBytes(data []byte) PokemonMetadata {
 	return ReadStructFromBytes[PokemonMetadata](data)
 }
 
-func NewMetadataFromGOBData(data embed.FS, index int) PokemonMetadata {
-	m, err := data.ReadFile(MetadataFpath("build/assets/metadata", index))
+func ReadMetadataFromEmbedded(embeddedData embed.FS, fpath string) PokemonMetadata {
+	metadata, err := embeddedData.ReadFile(fpath)
 	Check(err)
-	return NewMetadataFromBytes(m)
+	return ReadMetadataFromBytes(metadata)
 }
