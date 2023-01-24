@@ -22,6 +22,9 @@ var (
 	GOBCowData embed.FS
 	//go:embed build/assets/metadata/*metadata
 	GOBCowNames embed.FS
+
+	MetadataRoot string = "build/assets/metadata"
+	CowDataRoot  string = "build/assets/cows"
 )
 
 type Args struct {
@@ -74,6 +77,14 @@ func parseFlags() Args {
 	return args
 }
 
+func EntryFpath(idx int) string {
+	return pokedex.EntryFpath(MetadataRoot, idx)
+}
+
+func MetadataFpath(idx int) string {
+	return pokedex.MetadataFpath(MetadataRoot, idx)
+}
+
 func runListCategories(categories pokedex.Trie) {
 	keys := pokesay.ListCategories(categories)
 	fmt.Printf("%s\n%d %s\n", strings.Join(keys, " "), len(keys), "total categories")
@@ -84,10 +95,10 @@ func runListNames() {
 	names := make([]string, total)
 
 	for i := 0; i < total; i++ {
-		data := pokedex.MetadataFpath("build/assets/metadata", i)
+		data := MetadataFpath(i)
 		m, err := GOBCowNames.ReadFile(data)
 		pokesay.Check(err)
-		metadata := pokedex.NewMetadataFromBytes(m)
+		metadata := pokedex.ReadMetadataFromBytes(m)
 		names[i] = metadata.Name
 	}
 	fmt.Println(strings.Join(names, " "))
@@ -110,7 +121,7 @@ func runPrintByName(args Args, categories pokedex.Trie) {
 	pokesay.Check(err)
 	match := matches[pokesay.RandomInt(len(matches))]
 
-	metadata := pokedex.NewMetadataFromGOBData(GOBCowNames, match.Entry.Index)
+	metadata := pokedex.ReadMetadataFromEmbedded(GOBCowNames, MetadataFpath(match.Entry.Index))
 
 	pokesay.PrintSpeechBubble(bufio.NewScanner(os.Stdin), args.Width, args.NoTabSpaces, args.TabSpaces, args.NoWrap)
 	pokesay.PrintPokemon(match.Entry.Index, GenerateNames(metadata, args), match.Keys, GOBCowData)
@@ -122,7 +133,7 @@ func runPrintByCategory(args Args, categories pokedex.Trie) {
 	keys, category := pokesay.ChooseRandomCategory(matches, categories)
 	choice := category[pokesay.RandomInt(len(category))]
 
-	metadata := pokedex.NewMetadataFromGOBData(GOBCowNames, choice.Index)
+	metadata := pokedex.ReadMetadataFromEmbedded(GOBCowNames, MetadataFpath(choice.Index))
 
 	pokesay.PrintSpeechBubble(bufio.NewScanner(os.Stdin), args.Width, args.NoTabSpaces, args.TabSpaces, args.NoWrap)
 	pokesay.PrintPokemon(choice.Index, GenerateNames(metadata, args), keys, GOBCowData)
@@ -132,7 +143,7 @@ func runPrintRandom(args Args) {
 	total, _ := strconv.Atoi(string(GOBTotal))
 	choice := pokesay.RandomInt(total)
 
-	metadata := pokedex.NewMetadataFromGOBData(GOBCowNames, choice)
+	metadata := pokedex.ReadMetadataFromEmbedded(GOBCowNames, MetadataFpath(choice))
 
 	pokesay.PrintSpeechBubble(bufio.NewScanner(os.Stdin), args.Width, args.NoTabSpaces, args.TabSpaces, args.NoWrap)
 	pokesay.PrintPokemon(choice, GenerateNames(metadata, args), strings.Split(metadata.Categories, "/"), GOBCowData)
