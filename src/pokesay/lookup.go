@@ -1,7 +1,6 @@
 package pokesay
 
 import (
-	"embed"
 	"errors"
 	"log"
 	"math/rand"
@@ -44,11 +43,4 @@ func ListCategories(categories pokedex.Trie) []string {
 	}
 	sort.Strings(keys)
 	return keys
-}
-
-func ReadMetadata(embeddedData embed.FS, index int) pokedex.PokemonMetadata {
-	return pokedex.ReadMetadataFromEmbedded(
-		embeddedData,
-		pokedex.MetadataFpath("build/assets/metadata", index),
-	)
 }

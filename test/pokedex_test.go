@@ -37,7 +37,7 @@ func TestReadEntry(test *testing.T) {
 	Assert(expected, result, result, test)
 }
 
-func TestReadMetadata(test *testing.T) {
+func TestReadMetadataFromEmbedded(test *testing.T) {
 	result := pokedex.ReadMetadataFromEmbedded(GOBMetadata, "data/cows/4.metadata")
 
 	expected := pokedex.PokemonMetadata{
