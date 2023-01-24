@@ -85,10 +85,11 @@ func TestFindKeyPaths(test *testing.T) {
 	Assert(expected, t.KeyPaths, t, test)
 
 	expected = [][]string{
+		{"small", "g1", "o"},
+		{"medium", "g1", "o"},
 		{"big", "g1", "o"},
-		{"big", "g1"},
 	}
-	result, err := t.FindKeyPaths("big")
+	result, err := t.FindKeyPaths("o")
 	pokesay.Check(err)
 	Assert(expected, result, result, test)
 }

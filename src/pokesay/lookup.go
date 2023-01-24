@@ -46,9 +46,9 @@ func ListCategories(categories pokedex.Trie) []string {
 	return keys
 }
 
-func ReadPokemonCow(GOBCowData embed.FS, fpath string) []byte {
-	d, err := GOBCowData.ReadFile(fpath)
-	Check(err)
-
-	return pokedex.Decompress(d)
+func ReadMetadata(embeddedData embed.FS, index int) pokedex.PokemonMetadata {
+	return pokedex.ReadMetadataFromEmbedded(
+		embeddedData,
+		pokedex.MetadataFpath("build/assets/metadata", index),
+	)
 }
