@@ -230,6 +230,8 @@ func TestWriteToFile(test *testing.T) {
 }
 
 func TestReadFromBytes(test *testing.T) {
+	defer os.Remove("test.txt")
+
 	t := pokedex.NewTrie()
 	t.Insert([]string{"p", "g1", "r"}, pokedex.NewEntry(0, "pikachu"))
 	t.Insert([]string{"p", "g1", "r"}, pokedex.NewEntry(1, "bulbasaur"))
