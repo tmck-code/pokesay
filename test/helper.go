@@ -2,6 +2,7 @@ package test
 
 import (
 	"fmt"
+	"reflect"
 	"strings"
 	"testing"
 )
@@ -16,6 +17,20 @@ func Assert(expected interface{}, result interface{}, test *testing.T) {
 	// fmt.Printf("%#v %#v\n", expected, result)
 	if fmt.Sprintf("%#v", expected) != fmt.Sprintf("%#v", result) {
 		Fail(expected, result, test)
+	}
+}
+
+func AssertContains[T any](collection []T, item T, test *testing.T) {
+	found := false
+	for _, el := range collection {
+		if reflect.DeepEqual(el, item) {
+			found = true
+			break
+		}
+	}
+
+	if !found {
+		Fail(collection, item, test)
 	}
 }
 
