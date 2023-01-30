@@ -157,10 +157,10 @@ DEBUG=test go test -v ./test/
 ## TODO
 
 - Short-term
-  - [x] Import japanese names from data/pokemon.json
+  - [ ] Store metadata and names in a more storage-efficient manner
 - Longer-term
-
 - Completed
+  - [x] Import japanese names from data/pokemon.json
   - [x] Fix bad whitespace stripping when building assets
   - [x] List all names
   - [x] Make data structure to hold categories, names and pokemon
