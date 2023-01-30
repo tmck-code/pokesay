@@ -44,7 +44,7 @@ func parseArgs() CowBuildArgs {
 	json.Unmarshal([]byte(*skipDirs), &args.SkipDirs)
 
 	if DEBUG {
-		fmt.Println("%+v", args)
+		fmt.Printf("%+v\n", args)
 	}
 	return args
 }
@@ -60,7 +60,10 @@ func main() {
 	fmt.Println("Converting PNGs -> cowfiles")
 	pbar := bin.NewProgressBar(len(fpaths))
 	for _, f := range fpaths {
-		pokedex.ConvertPngToCow(args.FromDir, f, args.ToDir, args.Padding)
+		destFpath := pokedex.CreateDestination(args.FromDir, f, args.ToDir)
+		data := pokedex.ConvertPngToCow(destFpath, f, args.Padding)
+		pokedex.WriteCowfile(data, destFpath)
+
 		pbar.Add(1)
 	}
 	fmt.Println("Finished converting", len(fpaths), "pokesprite PNGs", "-> cowfiles")

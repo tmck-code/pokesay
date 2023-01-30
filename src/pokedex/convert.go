@@ -10,7 +10,6 @@ import (
 )
 
 var (
-	failures     []string
 	COLOUR_RESET string = fmt.Sprintf("%s[%dm\n", "\x1b", 39)
 )
 
@@ -85,7 +84,7 @@ func stripPadding(cowfile []byte, n int) []string {
 	return converted
 }
 
-func ConvertPngToCow(sourceDirpath string, sourceFpath string, destDirpath string, extraPadding int) {
+func CreateDestination(sourceDirpath string, sourceFpath string, destDirpath string) string {
 	destDir := filepath.Join(
 		destDirpath,
 		// strip the root "source dirpath" from the source path
@@ -95,25 +94,31 @@ func ConvertPngToCow(sourceDirpath string, sourceFpath string, destDirpath strin
 	// Ensure that the destination dir exists
 	os.MkdirAll(destDir, 0755)
 
+	destFpath := filepath.Join(destDir, strings.ReplaceAll(filepath.Base(sourceFpath), ".png", ".cow"))
+
+	return destFpath
+}
+
+func ConvertPngToCow(destFpath string, sourceFpath string, extraPadding int) string {
 	// Some conversions are failing with something about colour channels
 	// Can't be bothered resolving atm, so just skip past any failed conversions
 	converted, _ := img2xterm(sourceFpath)
 
 	if len(converted) == 0 {
-		failures = append(failures, sourceFpath)
-		return
+		return ""
 	}
-
-	destFpath := filepath.Join(destDir, strings.ReplaceAll(filepath.Base(sourceFpath), ".png", ".cow"))
-	ostream, err := os.Create(destFpath)
-	Check(err)
-	defer ostream.Close()
-	writer := bufio.NewWriter(ostream)
-
 	final := stripPadding(converted, countCowfileLeftPadding(converted)-extraPadding)
 
-	// Join all of the lines back together, add colour reset sequence at the end
-	_, err = writer.WriteString(strings.Join(final, "\n") + COLOUR_RESET)
+	return strings.Join(final, "\n") + COLOUR_RESET
+}
+
+func WriteCowfile(data string, fpath string) {
+	ostream, err := os.Create(fpath)
+	defer ostream.Close()
+	Check(err)
+
+	writer := bufio.NewWriter(ostream)
+	_, err = writer.WriteString(data)
 	Check(err)
 
 	writer.Flush()
