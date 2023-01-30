@@ -129,8 +129,7 @@ func runPrintByCategory(args Args, categories pokedex.Trie) {
 }
 
 func runPrintRandom(args Args) {
-	choice := pokesay.RandomInt(pokedex.ReadIntFromBytes(GOBTotal))
-
+	_, choice := pokesay.ChooseByRandomIndex(GOBTotal)
 	metadata := pokedex.ReadMetadataFromEmbedded(GOBCowNames, MetadataFpath(choice))
 
 	pokesay.PrintSpeechBubble(bufio.NewScanner(os.Stdin), args.Width, args.NoTabSpaces, args.TabSpaces, args.NoWrap)

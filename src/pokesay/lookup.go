@@ -56,3 +56,8 @@ func ChooseByName(name string, categories pokedex.Trie) *pokedex.PokemonMatch {
 	Check(err)
 	return matches[RandomInt(len(matches))]
 }
+
+func ChooseByRandomIndex(totalInBytes []byte) (int, int) {
+	total := pokedex.ReadIntFromBytes(totalInBytes)
+	return total, RandomInt(total)
+}
