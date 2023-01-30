@@ -7,19 +7,25 @@ import (
 	"testing"
 )
 
+// Fails a test with a formatted message showing the expected vs. result.
+// (These are both printed in %#v form)
 func Fail(expected interface{}, result interface{}, test *testing.T) {
 	test.Fatalf("\nexpected = %#v \nresult = %#v \n", expected, result)
 }
 
-// Made my own basic test assertion helper. Takes in an expected & result object of any type,
-// and Asserts that their Go syntax representations (%#v) are the same
+// Takes in an expected & result object, of any type.
+// Asserts that their Go syntax representations (%#v) are the same.
+// Fails the test if this is not true.
 func Assert(expected interface{}, result interface{}, test *testing.T) {
-	// fmt.Printf("%#v %#v\n", expected, result)
-	if fmt.Sprintf("%#v", expected) != fmt.Sprintf("%#v", result) {
-		Fail(expected, result, test)
+	expectedString, resultString := fmt.Sprintf("%#v", expected), fmt.Sprintf("%#v", result)
+	if expectedString != resultString {
+		Fail(expectedString, resultString, test)
 	}
 }
 
+// Takes in an expected collection of objects and an 'item' object, of any type
+// Asserts that the 'item' is contained within the collection.
+// Fails the test if this is not true.
 func AssertContains[T any](collection []T, item T, test *testing.T) {
 	for _, el := range collection {
 		if reflect.DeepEqual(el, item) {
