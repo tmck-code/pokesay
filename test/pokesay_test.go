@@ -44,3 +44,20 @@ func TestChooseRandomCategory(test *testing.T) {
 	}
 	AssertContains(expectedResult, *result[0], test)
 }
+
+func TestChooseByName(test *testing.T) {
+	t := pokedex.NewTrie()
+	t.Insert([]string{"small", "g1", "r"}, pokedex.NewEntry(0, "pikachu"))
+	t.Insert([]string{"small", "g1", "o"}, pokedex.NewEntry(1, "bulbasaur"))
+	t.Insert([]string{"medium", "g1", "o"}, pokedex.NewEntry(2, "charmander"))
+	t.Insert([]string{"big", "g1", "o"}, pokedex.NewEntry(3, "bulbasaur"))
+	t.Insert([]string{"big", "g1"}, pokedex.NewEntry(4, "charmander"))
+
+	result := pokesay.ChooseByName("charmander", *t)
+	expected := []pokedex.PokemonMatch{
+		{Entry: &pokedex.Entry{Index: 2, Value: "charmander"}, Keys: []string{"medium", "g1", "o"}},
+		{Entry: &pokedex.Entry{Index: 4, Value: "charmander"}, Keys: []string{"big", "g1"}},
+	}
+
+	AssertContains(expected, *result, test)
+}
