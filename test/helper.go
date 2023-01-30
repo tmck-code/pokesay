@@ -21,17 +21,12 @@ func Assert(expected interface{}, result interface{}, test *testing.T) {
 }
 
 func AssertContains[T any](collection []T, item T, test *testing.T) {
-	found := false
 	for _, el := range collection {
 		if reflect.DeepEqual(el, item) {
-			found = true
-			break
+			return
 		}
 	}
-
-	if !found {
-		Fail(collection, item, test)
-	}
+	Fail(collection, item, test)
 }
 
 // Flattens a given json string, removing all tabs, spaces and newlines
