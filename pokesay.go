@@ -26,10 +26,10 @@ var (
 
 func parseFlags() pokesay.Args {
 	width := flag.Int("width", 80, "the max speech bubble width")
-	noWrap := flag.Bool("nowrap", false, "disable text wrapping (fastest)")
-	tabWidth := flag.Int("tabwidth", 4, "replace any tab characters with N spaces")
-	noTabSpaces := flag.Bool("notabspaces", false, "do not replace tab characters (fastest)")
-	noCategoryInfo := flag.Bool("nocategoryinfo", false, "do not print pokemon categories")
+	noWrap := flag.Bool("no-wrap", false, "disable text wrapping (fastest)")
+	tabWidth := flag.Int("tab-width", 4, "replace any tab characters with N spaces")
+	noTabSpaces := flag.Bool("no-tab-spaces", false, "do not replace tab characters (fastest)")
+	noCategoryInfo := flag.Bool("no-category-info", false, "do not print pokemon categories")
 	fastest := flag.Bool("fastest", false, "run with the fastest possible configuration (-nowrap -notabspaces)")
 	category := flag.String("category", "", "choose a pokemon from a specific category")
 	name := flag.String("name", "", "choose a pokemon from a specific name")
