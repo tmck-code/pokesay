@@ -27,7 +27,7 @@ func FindFiles(dirpath string, ext string, skip []string) []string {
 		}
 		return err
 	})
-	check(err)
+	Check(err)
 	return fpaths
 }
 
@@ -106,7 +106,7 @@ func ConvertPngToCow(sourceDirpath string, sourceFpath string, destDirpath strin
 
 	destFpath := filepath.Join(destDir, strings.ReplaceAll(filepath.Base(sourceFpath), ".png", ".cow"))
 	ostream, err := os.Create(destFpath)
-	check(err)
+	Check(err)
 	defer ostream.Close()
 	writer := bufio.NewWriter(ostream)
 
@@ -114,88 +114,7 @@ func ConvertPngToCow(sourceDirpath string, sourceFpath string, destDirpath strin
 
 	// Join all of the lines back together, add colour reset sequence at the end
 	_, err = writer.WriteString(strings.Join(final, "\n") + COLOUR_RESET)
-	check(err)
+	Check(err)
 
 	writer.Flush()
-}
-
-type Metadata struct {
-	Data     []byte
-	Index    int
-	Metadata PokemonMetadata
-}
-
-func CreateMetadata(rootDir string, fpaths []string, pokemonNames map[string]PokemonName, debug bool) []Metadata {
-	metadata := []Metadata{}
-	for i, fpath := range fpaths {
-		data, err := os.ReadFile(fpath)
-		check(err)
-
-		cats := createCategories(strings.TrimPrefix(fpath, rootDir), data)
-		name := createName(fpath)
-
-		v, _ := pokemonNames[strings.Split(name, "-")[0]]
-
-		fmt.Println("name:", name, "found:", v)
-
-		metadata = append(
-			metadata,
-			Metadata{
-				data,
-				i,
-				PokemonMetadata{
-					Name:           name,
-					JapaneseName:   v.Japanese,
-					JapanesePhonetic: v.JapanesePhonetic,
-					Categories:     strings.Join(cats, "/"),
-				},
-			},
-		)
-	}
-	return metadata
-}
-
-func CreateCategoryStruct(rootDir string, fpaths []string, debug bool) PokemonTrie {
-	categories := NewTrie()
-	for i, fpath := range fpaths {
-		data, err := os.ReadFile(fpath)
-		check(err)
-
-		cats := createCategories(strings.TrimPrefix(fpath, rootDir), data)
-		name := createName(fpath)
-
-		fmt.Println("name:", name)
-
-		categories.Insert(
-			cats,
-			NewPokemonEntry(i, name),
-		)
-	}
-	return *categories
-}
-
-func createName(fpath string) string {
-	parts := strings.Split(fpath, "/")
-	return strings.Split(parts[len(parts)-1], ".")[0]
-}
-
-func SizeCategory(height int) string {
-	if height <= 13 {
-		return "small"
-	} else if height <= 19 {
-		return "medium"
-	}
-	return "big"
-}
-
-func createCategories(fpath string, data []byte) []string {
-	parts := strings.Split(fpath, "/")
-	height := SizeCategory(len(strings.Split(string(data), "\n")))
-
-	return append([]string{height}, parts[0:len(parts)-1]...)
-}
-
-// Strips the leading "./" from a path e.g. "./cows/ -> cows/"
-func NormaliseRelativeDir(dirPath string) string {
-	return strings.TrimPrefix(dirPath, "./")
 }

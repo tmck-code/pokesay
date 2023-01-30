@@ -9,6 +9,8 @@ Print pokemon in the CLI! An adaptation of the classic "cowsay"
   - [Building binaries](#building-binaries)
     - [On your host OS](#on-your-host-os)
     - [In docker](#in-docker)
+  - [Developing](#developing)
+    - [Testing](#testing)
   - [TODO](#todo)
 
 ---
@@ -134,6 +136,21 @@ make -C build build/docker build/assets build/release
 ```
 
 This will produce 4 executable bin files inside the `build/bin` directory, and a heap of binary asset files in `build/assets`.
+
+---
+
+## Developing
+
+### Testing
+
+Run tests with
+
+```shell
+go test -v ./test/
+
+# or, with debug information printed
+DEBUG=test go test -v ./test/
+```
 
 ---
 
