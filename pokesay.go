@@ -124,8 +124,6 @@ func runPrintByCategory(args Args, categories pokedex.PokemonTrie) {
 	keys, category := pokesay.ChooseRandomCategory(matches, categories)
 	choice := category[pokesay.RandomInt(len(category))]
 
-	fmt.Printf("+%v\n", choice)
-
 	m, err := GOBCowNames.ReadFile(pokedex.MetadataFpath("build/assets/metadata", choice.Index))
 	pokesay.Check(err)
 	metadata := pokedex.ReadMetadataFromBytes(m)
