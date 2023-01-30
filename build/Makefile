@@ -5,7 +5,7 @@ DOCKER_TAG ?= latest
 DOCKER_IMAGE=$(DOCKER_REPO)/pokesay:$(DOCKER_TAG)
 
 
-all: build/docker build/cows build/assets build/release
+all: build/docker build/cows build/assets test build/release
 
 build/docker:
 	echo "Building $(DOCKER_IMAGE)"
