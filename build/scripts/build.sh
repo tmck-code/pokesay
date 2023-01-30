@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -euxo pipefail
+set -euo pipefail
 
 OUTPUT_DIR="build/bin"
 mkdir -p "$OUTPUT_DIR"
