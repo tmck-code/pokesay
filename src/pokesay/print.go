@@ -22,6 +22,7 @@ type Args struct {
 	NoWrap         bool
 	TabSpaces      string
 	NoTabSpaces    bool
+	NoCategoryInfo bool
 	ListCategories bool
 	ListNames      bool
 	Category       string
@@ -36,7 +37,7 @@ type Args struct {
 // 3. The pokemon is printed along with the name & category information
 func Print(args Args, choice int, names []string, categories []string, cows embed.FS) {
 	printSpeechBubble(bufio.NewScanner(os.Stdin), args.Width, args.NoTabSpaces, args.TabSpaces, args.NoWrap)
-	printPokemon(choice, names, categories, cows)
+	printPokemon(args, choice, names, categories, cows)
 }
 
 // Prints text from STDIN, surrounded by a speech bubble.
@@ -81,7 +82,7 @@ func printWrappedText(line string, width int, tabSpaces string) {
 }
 
 // Prints a pokemon with its name & category information.
-func printPokemon(index int, names []string, categoryKeys []string, GOBCowData embed.FS) {
+func printPokemon(args Args, index int, names []string, categoryKeys []string, GOBCowData embed.FS) {
 	d, _ := GOBCowData.ReadFile(pokedex.EntryFpath("build/assets/cows", index))
 	delimiter := "|"
 
@@ -90,11 +91,19 @@ func printPokemon(index int, names []string, categoryKeys []string, GOBCowData e
 		namesFmt = append(namesFmt, textStyleBold.Sprint(name))
 	}
 
-	fmt.Printf(
-		"%s> %s %s %s\n",
-		pokedex.Decompress(d),
-		strings.Join(namesFmt, fmt.Sprintf(" %s ", delimiter)),
-		delimiter,
-		textStyleItalic.Sprint(strings.Join(categoryKeys, "/")),
-	)
+	if args.NoCategoryInfo {
+		fmt.Printf(
+			"%s> %s\n",
+			pokedex.Decompress(d),
+			strings.Join(namesFmt, fmt.Sprintf(" %s ", delimiter)),
+		)
+	} else {
+		fmt.Printf(
+			"%s> %s %s %s\n",
+			pokedex.Decompress(d),
+			strings.Join(namesFmt, fmt.Sprintf(" %s ", delimiter)),
+			delimiter,
+			textStyleItalic.Sprint(strings.Join(categoryKeys, "/")),
+		)
+	}
 }
