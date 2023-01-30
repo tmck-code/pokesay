@@ -121,11 +121,7 @@ func runPrintByName(args Args, categories pokedex.Trie) {
 }
 
 func runPrintByCategory(args Args, categories pokedex.Trie) {
-	matches, err := categories.FindKeyPaths(args.Category)
-	pokesay.Check(err)
-	keys, category := pokesay.ChooseRandomCategory(matches, categories)
-	choice := category[pokesay.RandomInt(len(category))]
-
+	choice, keys := pokesay.ChooseByCategory(args.Category, categories)
 	metadata := pokedex.ReadMetadataFromEmbedded(GOBCowNames, MetadataFpath(choice.Index))
 
 	pokesay.PrintSpeechBubble(bufio.NewScanner(os.Stdin), args.Width, args.NoTabSpaces, args.TabSpaces, args.NoWrap)

@@ -21,11 +21,17 @@ func RandomInt(n int) int {
 	return rand.New(Rand).Intn(n)
 }
 
-func ChooseRandomCategory(keys [][]string, categories pokedex.Trie) ([]string, []*pokedex.Entry) {
-	choice := keys[RandomInt(len(keys)-1)]
-	category, err := categories.FindByKeyPath(choice)
+func ChooseByCategory(categoryKey string, categories pokedex.Trie) (*pokedex.Entry, []string) {
+	matches, err := categories.FindKeyPaths(categoryKey)
 	Check(err)
-	return choice, category
+
+	keyPath := matches[RandomInt(len(matches)-1)]
+	category, err := categories.FindByKeyPath(keyPath)
+	Check(err)
+
+	choice := category[RandomInt(len(category))]
+
+	return choice, keyPath
 }
 
 func ListCategories(categories pokedex.Trie) []string {
