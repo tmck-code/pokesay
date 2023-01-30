@@ -113,10 +113,7 @@ func GenerateNames(metadata pokedex.PokemonMetadata, args Args) []string {
 }
 
 func runPrintByName(args Args, categories pokedex.Trie) {
-	matches, err := categories.Find(args.NameToken)
-	pokesay.Check(err)
-	match := matches[pokesay.RandomInt(len(matches))]
-
+	match := pokesay.ChooseByName(args.NameToken, categories)
 	metadata := pokedex.ReadMetadataFromEmbedded(GOBCowNames, MetadataFpath(match.Entry.Index))
 
 	pokesay.PrintSpeechBubble(bufio.NewScanner(os.Stdin), args.Width, args.NoTabSpaces, args.TabSpaces, args.NoWrap)

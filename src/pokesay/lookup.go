@@ -44,3 +44,9 @@ func ListCategories(categories pokedex.Trie) []string {
 	sort.Strings(keys)
 	return keys
 }
+
+func ChooseByName(name string, categories pokedex.Trie) *pokedex.PokemonMatch {
+	matches, err := categories.Find(name)
+	Check(err)
+	return matches[RandomInt(len(matches))]
+}
