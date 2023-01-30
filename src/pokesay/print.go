@@ -29,20 +29,13 @@ type Args struct {
 	JapaneseName   bool
 }
 
-func printSpeechBubbleLine(line string, width int) {
-	if len(line) > width {
-		fmt.Printf("| %s\n", line)
-	} else if len(line) == width {
-		fmt.Printf("| %s |\n", line)
-	} else {
-		fmt.Printf("| %s%s |\n", line, strings.Repeat(" ", width-len(line)))
-	}
-}
-
-func printWrappedText(line string, width int, tabSpaces string) {
-	for _, wline := range strings.Split(wordwrap.WrapString(strings.Replace(line, "\t", tabSpaces, -1), uint(width)), "\n") {
-		printSpeechBubbleLine(wline, width)
-	}
+// The main print function! This uses a chosen pokemon's index, names and categories, and an
+// embedded filesystem of cowfile data
+// The cowfile data is retrieved using the matching index, decompressed (un-gzipped),
+// then the pokemon is printed along with the name & category information
+func Print(args Args, choice int, names []string, categories []string, cows embed.FS) {
+	PrintSpeechBubble(bufio.NewScanner(os.Stdin), args.Width, args.NoTabSpaces, args.TabSpaces, args.NoWrap)
+	PrintPokemon(choice, names, categories, cows)
 }
 
 func PrintSpeechBubble(scanner *bufio.Scanner, width int, noTabSpaces bool, tabSpaces string, noWrap bool) {
@@ -67,6 +60,22 @@ func PrintSpeechBubble(scanner *bufio.Scanner, width int, noTabSpaces bool, tabS
 	}
 }
 
+func printSpeechBubbleLine(line string, width int) {
+	if len(line) > width {
+		fmt.Printf("| %s\n", line)
+	} else if len(line) == width {
+		fmt.Printf("| %s |\n", line)
+	} else {
+		fmt.Printf("| %s%s |\n", line, strings.Repeat(" ", width-len(line)))
+	}
+}
+
+func printWrappedText(line string, width int, tabSpaces string) {
+	for _, wline := range strings.Split(wordwrap.WrapString(strings.Replace(line, "\t", tabSpaces, -1), uint(width)), "\n") {
+		printSpeechBubbleLine(wline, width)
+	}
+}
+
 func PrintPokemon(index int, names []string, categoryKeys []string, GOBCowData embed.FS) {
 	d, _ := GOBCowData.ReadFile(pokedex.EntryFpath("build/assets/cows", index))
 	delimiter := "|"
@@ -83,9 +92,4 @@ func PrintPokemon(index int, names []string, categoryKeys []string, GOBCowData e
 		delimiter,
 		textStyleItalic.Sprint(strings.Join(categoryKeys, "/")),
 	)
-}
-
-func Print(args Args, choice int, names []string, categories []string, cows embed.FS) {
-	PrintSpeechBubble(bufio.NewScanner(os.Stdin), args.Width, args.NoTabSpaces, args.TabSpaces, args.NoWrap)
-	PrintPokemon(choice, names, categories, cows)
 }
