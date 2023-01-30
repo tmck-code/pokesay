@@ -25,7 +25,7 @@ func TestReadNames(test *testing.T) {
 		"venusaur":  {English: "Venusaur", Japanese: "フシギバナ", JapanesePhonetic: "fushigibana"},
 	}
 
-	Assert(expected, result, result, test)
+	Assert(expected, result, test)
 }
 
 func TestReadEntry(test *testing.T) {
@@ -34,7 +34,7 @@ func TestReadEntry(test *testing.T) {
 	expected, err := os.ReadFile("data/cows/egg.cow")
 	pokesay.Check(err)
 
-	Assert(expected, result, result, test)
+	Assert(expected, result, test)
 }
 
 func TestReadMetadataFromEmbedded(test *testing.T) {
@@ -47,5 +47,5 @@ func TestReadMetadataFromEmbedded(test *testing.T) {
 		JapanesePhonetic: "yukinoo-",
 	}
 
-	Assert(expected, result, result, test)
+	Assert(expected, result, test)
 }
