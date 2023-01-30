@@ -14,8 +14,8 @@ import (
 
 func TestNewEntry(test *testing.T) {
 	p := pokedex.NewEntry(1, "yo")
-	Assert(1, p.Index, p, test)
-	Assert("yo", p.Value, p, test)
+	Assert(1, p.Index, test)
+	Assert("yo", p.Value, test)
 }
 
 func TestTrieInsert(test *testing.T) {
@@ -26,13 +26,11 @@ func TestTrieInsert(test *testing.T) {
 	Assert(
 		&pokedex.Entry{Value: "pikachu", Index: 0},
 		t.Root.Children["p"].Children["g1"].Children["r"].Data[0],
-		t,
 		test,
 	)
 	Assert(
 		&pokedex.Entry{Value: "bulbasaur", Index: 1},
 		t.Root.Children["p"].Children["g1"].Children["r"].Data[1],
-		t,
 		test,
 	)
 }
@@ -62,7 +60,7 @@ func TestTrieFind(test *testing.T) {
 	})
 
 	for i := range results {
-		Assert(expected[i].Entry, results[i].Entry, results[i], test)
+		Assert(expected[i].Entry, results[i].Entry, test)
 	}
 }
 func TestFindKeyPaths(test *testing.T) {
@@ -82,7 +80,7 @@ func TestFindKeyPaths(test *testing.T) {
 		{"big", "g1", "o"},
 		{"big", "g1"},
 	}
-	Assert(expected, t.KeyPaths, t, test)
+	Assert(expected, t.KeyPaths, test)
 
 	expected = [][]string{
 		{"small", "g1", "o"},
@@ -91,7 +89,7 @@ func TestFindKeyPaths(test *testing.T) {
 	}
 	result, err := t.FindKeyPaths("o")
 	pokesay.Check(err)
-	Assert(expected, result, result, test)
+	Assert(expected, result, test)
 }
 
 func TestFindByKeyPath(test *testing.T) {
@@ -112,7 +110,7 @@ func TestFindByKeyPath(test *testing.T) {
 	expected := []*pokedex.Entry{{Index: 0, Value: "pikachu"}, {Index: 1, Value: "bulbasaur"}}
 
 	for i := range results {
-		Assert(expected[i], results[i], results[i], test)
+		Assert(expected[i], results[i], test)
 	}
 }
 
@@ -138,7 +136,7 @@ func TestTrieToString(test *testing.T) {
 	}`)
 	result := t.ToString()
 
-	Assert(expected, string(result), string(result), test)
+	Assert(expected, string(result), test)
 }
 
 func TestTrieToStringIndented(test *testing.T) {
@@ -206,7 +204,7 @@ func TestTrieToStringIndented(test *testing.T) {
 }`
 	result := t.ToString(2)
 
-	Assert(expected, string(result), string(result), test)
+	Assert(expected, string(result), test)
 }
 
 func TestWriteToFile(test *testing.T) {
@@ -226,7 +224,7 @@ func TestWriteToFile(test *testing.T) {
 	err = gob.NewDecoder(bytes.NewBuffer(data)).Decode(&d)
 	pokesay.Check(err)
 
-	Assert(t.ToString(), d.ToString(), d, test)
+	Assert(t.ToString(), d.ToString(), test)
 }
 
 func TestReadFromBytes(test *testing.T) {
@@ -241,5 +239,5 @@ func TestReadFromBytes(test *testing.T) {
 	data, err := os.ReadFile("test.txt")
 	pokesay.Check(err)
 	result := pokedex.NewTrieFromBytes(data)
-	Assert(t.ToString(), result.ToString(), result.ToString(), test)
+	Assert(t.ToString(), result.ToString(), test)
 }
