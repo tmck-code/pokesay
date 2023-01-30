@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"embed"
 	"fmt"
+	"os"
 	"strings"
 
 	"github.com/fatih/color"
@@ -15,6 +16,18 @@ var (
 	textStyleItalic *color.Color = color.New(color.Italic)
 	textStyleBold   *color.Color = color.New(color.Bold)
 )
+
+type Args struct {
+	Width          int
+	NoWrap         bool
+	TabSpaces      string
+	NoTabSpaces    bool
+	ListCategories bool
+	ListNames      bool
+	Category       string
+	NameToken      string
+	JapaneseName   bool
+}
 
 func printSpeechBubbleLine(line string, width int) {
 	if len(line) > width {
@@ -70,4 +83,9 @@ func PrintPokemon(index int, names []string, categoryKeys []string, GOBCowData e
 		delimiter,
 		textStyleItalic.Sprint(strings.Join(categoryKeys, "/")),
 	)
+}
+
+func Print(args Args, choice int, names []string, categories []string, cows embed.FS) {
+	PrintSpeechBubble(bufio.NewScanner(os.Stdin), args.Width, args.NoTabSpaces, args.TabSpaces, args.NoWrap)
+	PrintPokemon(choice, names, categories, cows)
 }
