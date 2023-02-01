@@ -107,7 +107,14 @@ func main() {
 	i := 0
 	for key, name := range pokemonNames {
 		metadata := pokedex.CreateNameMetadata(i, key, name, args.FromDir, cowfileFpaths)
-		fmt.Printf("%+v\n", metadata)
+		fmt.Printf("-- %+v\n", metadata)
+		for _, entry := range metadata.Entries {
+			fpath := pokedex.EntryFpath(entryDirPath, entry.EntryIndex)
+			data, err := os.ReadFile(fpath)
+			pokedex.Check(err)
+
+			fmt.Printf("%s\n", pokedex.Decompress(data))
+		}
 		pokedex.WriteStructToFile(metadata, pokedex.MetadataFpath(metadataDirPath, i))
 		pokemonMetadata = append(pokemonMetadata, *metadata)
 		i++
