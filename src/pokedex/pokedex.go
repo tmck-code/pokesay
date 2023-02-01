@@ -11,8 +11,8 @@ import (
 	"log"
 	"os"
 	"path"
-	"strings"
 	"strconv"
+	"strings"
 )
 
 func Check(e error) {
@@ -122,32 +122,24 @@ func (m Metadata) WriteToFile(fpath string) {
 	WriteStructToFile(m, fpath)
 }
 
-func CreateMetadata(rootDir string, fpaths []string, pokemonNames map[string]PokemonName, debug bool) []Metadata {
-	metadata := []Metadata{}
-	for i, fpath := range fpaths {
-		data, err := os.ReadFile(fpath)
-		Check(err)
+func CreateNameMetadata(idx int, key string, name PokemonName, rootDir string, fpaths []string) *PokemonMetadata {
+	entryCategories := make(map[int][][]string, 0)
 
-		cats := createCategories(strings.TrimPrefix(fpath, rootDir), data)
-		name := createName(fpath)
-
-		v := pokemonNames[strings.Split(name, "-")[0]]
-
-		metadata = append(
-			metadata,
-			Metadata{
-				data,
-				i,
-				PokemonMetadata{
-					Name:             name,
-					JapaneseName:     v.Japanese,
-					JapanesePhonetic: v.JapanesePhonetic,
-					Categories:       strings.Join(cats, "/"),
-				},
-			},
-		)
+	for _, fpath := range fpaths {
+		basename := strings.TrimPrefix(fpath, rootDir)
+		if strings.Contains(basename, strings.ToLower(name.English)) {
+			data, err := os.ReadFile(fpath)
+			Check(err)
+			cats := createCategories(strings.TrimPrefix(fpath, rootDir), data)
+			entryCategories[idx] = append(entryCategories[idx], cats)
+		}
 	}
-	return metadata
+	return NewMetadata(
+		name.English,
+		name.Japanese,
+		name.JapanesePhonetic,
+		entryCategories,
+	)
 }
 
 func CreateCategoryStruct(rootDir string, fpaths []string, debug bool) Trie {
