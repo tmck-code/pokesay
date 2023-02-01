@@ -118,7 +118,9 @@ func runPrintRandom(args pokesay.Args) {
 	_, choice := pokesay.ChooseByRandomIndex(GOBTotal)
 	metadata := pokedex.ReadMetadataFromEmbedded(GOBCowNames, MetadataFpath(choice))
 
-	pokesay.Print(args, choice, GenerateNames(metadata, args), strings.Split(metadata.Categories, "/"), GOBCowData)
+	final := metadata.Entries[pokesay.RandomInt(len(metadata.Entries))]
+
+	pokesay.Print(args, choice, GenerateNames(metadata, args), final.Categories, GOBCowData)
 }
 
 func main() {
