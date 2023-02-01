@@ -101,11 +101,14 @@ func main() {
 
 	// 1. For each pokemon name, write a metadata file, containing the name information, and
 	// links to all of the matching cowfile indexes
+
+	pokemonMetadata := make([]pokedex.PokemonMetadata, 0)
 	i := 0
 	for key, name := range pokemonNames {
 		metadata := pokedex.CreateNameMetadata(i, key, name, args.FromDir, cowfileFpaths)
 		fmt.Printf("%+v\n", metadata)
 		pokedex.WriteStructToFile(metadata, pokedex.MetadataFpath(metadataDirPath, i))
+		pokemonMetadata = append(pokemonMetadata, *metadata)
 		i++
 	}
 	fmt.Println("wrote", i, "name metadata files to", metadataDirPath)
@@ -114,11 +117,11 @@ func main() {
 	// metadata := pokedex.CreateMetadata(args.FromDir, cowfileFpaths, pokemonNames, args.Debug)
 
 	// 2. Create the category struct using the cowfile paths, pokemon names and indexes\
-	// fmt.Println("- Writing categories to file")
-	// pokedex.WriteStructToFile(
-	// 	pokedex.CreateCategoryStruct(args.FromDir, cowfileFpaths, args.Debug),
-	// 	categoryFpath,
-	// )
+	fmt.Println("- Writing categories to file")
+	pokedex.WriteStructToFile(
+		pokedex.CreateCategoryStruct(args.FromDir, pokemonMetadata, args.Debug),
+		categoryFpath,
+	)
 
 	// fmt.Println("- Writing metadata and entries to file")
 	// pbar := bin.NewProgressBar(len(metadata))
