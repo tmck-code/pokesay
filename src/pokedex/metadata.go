@@ -2,19 +2,33 @@ package pokedex
 
 import "embed"
 
+type PokemonEntryMapping struct {
+	EntryIndex int
+	Categories []string
+}
+
 type PokemonMetadata struct {
-	Categories       string
 	Name             string
 	JapaneseName     string
 	JapanesePhonetic string
+	Entries          []PokemonEntryMapping
 }
 
-func NewMetadata(categories string, name string, japaneseName string, japanesePhonetic string) *PokemonMetadata {
+func NewMetadata(name string, japaneseName string, japanesePhonetic string, entryMap map[int][][]string) *PokemonMetadata {
+
+	entries := make([]PokemonEntryMapping, 0)
+
+	for idx, categories := range entryMap {
+		for _, category := range categories {
+			entries = append(entries, PokemonEntryMapping{idx, category})
+		}
+	}
+
 	return &PokemonMetadata{
-		Categories:       categories,
 		Name:             name,
 		JapaneseName:     japaneseName,
 		JapanesePhonetic: japanesePhonetic,
+		Entries:          entries,
 	}
 }
 
