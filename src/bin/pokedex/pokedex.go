@@ -100,9 +100,18 @@ func main() {
 	pokemonNames := pokedex.ReadNames(args.FromMetadataFname)
 	fmt.Println("- Read", len(pokemonNames), "pokemon names from", args.FromMetadataFname)
 
+	fmt.Println("- Writing entries to file")
+	pbar := bin.NewProgressBar(len(cowfileFpaths))
+	for i, fpath := range cowfileFpaths {
+		data, err := os.ReadFile(fpath)
+		pokedex.Check(err)
+
+		pokedex.WriteBytesToFile(data, pokedex.EntryFpath(entryDirPath, i), true)
+		pbar.Add(1)
+	}
+
 	// 1. For each pokemon name, write a metadata file, containing the name information, and
 	// links to all of the matching cowfile indexes
-
 	pokemonMetadata := make([]pokedex.PokemonMetadata, 0)
 	i := 0
 	for key, name := range pokemonNames {
@@ -131,15 +140,6 @@ func main() {
 		categoryFpath,
 	)
 
-	fmt.Println("- Writing metadata and entries to file")
-	pbar := bin.NewProgressBar(len(cowfileFpaths))
-	for i, fpath := range cowfileFpaths {
-		data, err := os.ReadFile(fpath)
-		pokedex.Check(err)
-
-		pokedex.WriteBytesToFile(data, pokedex.EntryFpath(entryDirPath, i), true)
-		pbar.Add(1)
-	}
 	fmt.Println("- Writing total metadata to file")
 	pokedex.WriteIntToFile(len(pokemonMetadata), totalFpath)
 
