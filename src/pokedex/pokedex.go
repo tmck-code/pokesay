@@ -125,16 +125,17 @@ func (m Metadata) WriteToFile(fpath string) {
 func CreateNameMetadata(idx int, key string, name PokemonName, rootDir string, fpaths []string) *PokemonMetadata {
 	entryCategories := make(map[int][][]string, 0)
 
-	for _, fpath := range fpaths {
+	for i, fpath := range fpaths {
 		basename := strings.TrimPrefix(fpath, rootDir)
 		if strings.Contains(basename, strings.ToLower(name.English)) {
 			data, err := os.ReadFile(fpath)
 			Check(err)
 			cats := createCategories(strings.TrimPrefix(fpath, rootDir), data)
-			entryCategories[idx] = append(entryCategories[idx], cats)
+			entryCategories[i] = append(entryCategories[i], cats)
 		}
 	}
 	return NewMetadata(
+
 		name.English,
 		name.Japanese,
 		name.JapanesePhonetic,
