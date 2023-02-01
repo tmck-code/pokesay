@@ -1,8 +1,6 @@
 package pokesay
 
 import (
-	"errors"
-	"log"
 	"math/rand"
 	"sort"
 	"time"
@@ -16,7 +14,7 @@ var (
 
 func RandomInt(n int) int {
 	if n <= 0 {
-		log.Fatal(errors.New("RandomInt arg must be >0"))
+		return 0
 	}
 	return rand.New(Rand).Intn(n)
 }
