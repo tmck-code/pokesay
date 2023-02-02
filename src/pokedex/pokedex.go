@@ -112,16 +112,6 @@ func Decompress(data []byte) []byte {
 	return resB.Bytes()
 }
 
-type Metadata struct {
-	Data     []byte
-	Index    int
-	Metadata PokemonMetadata
-}
-
-func (m Metadata) WriteToFile(fpath string) {
-	WriteStructToFile(m, fpath)
-}
-
 func CreateNameMetadata(idx int, key string, name PokemonName, rootDir string, fpaths []string) *PokemonMetadata {
 	entryCategories := make(map[int][][]string, 0)
 
@@ -135,7 +125,6 @@ func CreateNameMetadata(idx int, key string, name PokemonName, rootDir string, f
 		}
 	}
 	return NewMetadata(
-
 		name.English,
 		name.Japanese,
 		name.JapanesePhonetic,
@@ -145,14 +134,15 @@ func CreateNameMetadata(idx int, key string, name PokemonName, rootDir string, f
 
 func CreateCategoryStruct(rootDir string, metadata []PokemonMetadata, debug bool) Trie {
 	categories := NewTrie()
-	for _, m := range metadata {
-		for i, category := range m.Entries {
+	for i, m := range metadata {
+		for _, entry := range m.Entries {
 			categories.Insert(
-				category.Categories,
-				NewEntry(i, m.Name),
+				entry.Categories,
+				NewEntry(i, strings.ToLower(m.Name)),
 			)
 		}
 	}
+	// fmt.Println(categories.ToString(2))
 	return *categories
 }
 
