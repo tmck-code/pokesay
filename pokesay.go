@@ -103,8 +103,9 @@ func GenerateNames(metadata pokedex.PokemonMetadata, args pokesay.Args) []string
 func runPrintByName(args pokesay.Args, categories pokedex.Trie) {
 	match := pokesay.ChooseByName(args.NameToken, categories)
 	metadata := pokedex.ReadMetadataFromEmbedded(GOBCowNames, MetadataFpath(match.Entry.Index))
+	final := metadata.Entries[pokesay.RandomInt(len(metadata.Entries))]
 
-	pokesay.Print(args, match.Entry.Index, GenerateNames(metadata, args), match.Keys, GOBCowData)
+	pokesay.Print(args, final.EntryIndex, GenerateNames(metadata, args), final.Categories, GOBCowData)
 }
 
 func runPrintByCategory(args pokesay.Args, categories pokedex.Trie) {

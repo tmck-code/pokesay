@@ -52,7 +52,11 @@ func ListCategories(categories pokedex.Trie) []string {
 func ChooseByName(name string, categories pokedex.Trie) *pokedex.PokemonMatch {
 	matches, err := categories.Find(name)
 	Check(err)
-	return matches[RandomInt(len(matches))]
+	// fmt.Printf("name matches for %s: %v\n", name, matches)
+	choice := matches[RandomInt(len(matches))]
+
+	// fmt.Printf("name choice for %s\n", choice)
+	return choice
 }
 
 func ChooseByRandomIndex(totalInBytes []byte) (int, int) {

@@ -59,6 +59,7 @@ func (t *Trie) ToString(indentation ...int) string {
 }
 
 func (t *Trie) Insert(keyPath []string, data *Entry) {
+	// fmt.Println("adding", keyPath, data)
 	current := t.Root
 	found := false
 	for _, k := range t.KeyPaths {
@@ -119,10 +120,9 @@ func (current Node) Find(value string, keys []string) []*PokemonMatch {
 	matches := []*PokemonMatch{}
 
 	for _, entry := range current.Data {
-		for _, tk := range tokenizeValue(entry.Value) {
-			if tk == value {
-				matches = append(matches, &PokemonMatch{Entry: entry, Keys: keys})
-			}
+		if strings.ToLower(entry.Value) == strings.ToLower(value) {
+			// fmt.Printf("%s matches %s: %v - %d\n", value, entry.Value, keys, len(current.Data))
+			matches = append(matches, &PokemonMatch{Entry: entry, Keys: keys})
 		}
 	}
 	for k, node := range current.Children {
@@ -132,10 +132,6 @@ func (current Node) Find(value string, keys []string) []*PokemonMatch {
 		}
 	}
 	return matches
-}
-
-func tokenizeValue(value string) []string {
-	return strings.Split(value, "-")
 }
 
 func (t Trie) FindKeyPaths(key string) ([][]string, error) {
