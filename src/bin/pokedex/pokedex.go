@@ -123,9 +123,6 @@ func main() {
 	}
 	fmt.Println("wrote", i, "name metadata files to", metadataDirPath)
 
-	// 1. Create the metadata files, containing name/category/japanese name info for each pokemon
-	// metadata := pokedex.CreateMetadata(args.FromDir, cowfileFpaths, pokemonNames, args.Debug)
-
 	// 2. Create the category struct using the cowfile paths, pokemon names and indexes\
 	fmt.Println("- Writing categories to file")
 	pokedex.WriteStructToFile(
