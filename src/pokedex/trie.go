@@ -107,8 +107,8 @@ type PokemonMatch struct {
 // Search every node in a trie for a given value.
 // Returns a slice of all nodes that have a matching value.
 // Returns an error if the value wasn't found
-func (t Trie) Find(value string) ([]*PokemonMatch, error) {
-	matches := t.Root.Find(value, []string{})
+func (t Trie) Find(value string, findFirst bool) ([]*PokemonMatch, error) {
+	matches := t.Root.Find(value, []string{}, findFirst)
 	if len(matches) > 0 {
 		return matches, nil
 	} else {
@@ -116,18 +116,24 @@ func (t Trie) Find(value string) ([]*PokemonMatch, error) {
 	}
 }
 
-func (current Node) Find(value string, keys []string) []*PokemonMatch {
+func (current Node) Find(value string, keys []string, findFirst bool) []*PokemonMatch {
 	matches := []*PokemonMatch{}
 
 	for _, entry := range current.Data {
 		if strings.ToLower(entry.Value) == strings.ToLower(value) {
+			if findFirst {
+				return []*PokemonMatch{{Entry: entry, Keys: keys}}
+			}
 			// fmt.Printf("%s matches %s: %v - %d\n", value, entry.Value, keys, len(current.Data))
 			matches = append(matches, &PokemonMatch{Entry: entry, Keys: keys})
 		}
 	}
 	for k, node := range current.Children {
-		more := node.Find(value, append(keys, k))
+		more := node.Find(value, append(keys, k), findFirst)
 		if len(more) > 0 {
+			if findFirst {
+				return more
+			}
 			matches = append(matches, more...)
 		}
 	}

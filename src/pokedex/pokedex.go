@@ -134,11 +134,11 @@ func CreateNameMetadata(idx int, key string, name PokemonName, rootDir string, f
 
 func CreateCategoryStruct(rootDir string, metadata []PokemonMetadata, debug bool) Trie {
 	categories := NewTrie()
-	for i, m := range metadata {
+	for _, m := range metadata {
 		for _, entry := range m.Entries {
 			categories.Insert(
 				entry.Categories,
-				NewEntry(i, strings.ToLower(m.Name)),
+				NewEntry(entry.EntryIndex, strings.ToLower(m.Name)),
 			)
 		}
 	}
