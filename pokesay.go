@@ -118,10 +118,11 @@ func runPrintByCategory(args pokesay.Args, categories pokedex.Trie) {
 func runPrintRandom(args pokesay.Args) {
 	_, choice := pokesay.ChooseByRandomIndex(GOBTotal)
 	metadata := pokedex.ReadMetadataFromEmbedded(GOBCowNames, MetadataFpath(choice))
+	fmt.Println(choice, metadata)
 
 	final := metadata.Entries[pokesay.RandomInt(len(metadata.Entries))]
 
-	pokesay.Print(args, choice, GenerateNames(metadata, args), final.Categories, GOBCowData)
+	pokesay.Print(args, final.EntryIndex, GenerateNames(metadata, args), final.Categories, GOBCowData)
 }
 
 func main() {
