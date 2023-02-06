@@ -65,7 +65,7 @@ func parseFlags() pokesay.Args {
 }
 
 func EntryFpath(idx int) string {
-	return pokedex.EntryFpath(MetadataRoot, idx)
+	return pokedex.EntryFpath(CowDataRoot, idx)
 }
 
 func MetadataFpath(idx int) string {
