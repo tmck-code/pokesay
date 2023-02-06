@@ -8,6 +8,7 @@ import (
 
 	"github.com/tmck-code/pokesay/src/pokedex"
 	"github.com/tmck-code/pokesay/src/pokesay"
+	"github.com/tmck-code/pokesay/src/timer"
 )
 
 var (
@@ -101,11 +102,20 @@ func GenerateNames(metadata pokedex.PokemonMetadata, args pokesay.Args) []string
 }
 
 func runPrintByName(args pokesay.Args, categories pokedex.Trie) {
+	t := timer.NewTimer()
 	match := pokesay.ChooseByName(args.NameToken, categories)
+	t.Mark("match")
 	metadata := pokedex.ReadMetadataFromEmbedded(GOBCowNames, MetadataFpath(match.Entry.Index))
-	final := metadata.Entries[pokesay.RandomInt(len(metadata.Entries))]
+	t.Mark("read metadata")
+	choice := pokesay.RandomInt(len(metadata.Entries))
+	t.Mark("choice")
+	final := metadata.Entries[choice]
+	// fmt.Println(pokedex.StructToJSON(metadata), "\n", choice, "\n", final)
 
 	pokesay.Print(args, final.EntryIndex, GenerateNames(metadata, args), final.Categories, GOBCowData)
+	t.Mark("print")
+	t.Stop()
+	t.PrintJson()
 }
 
 func runPrintByCategory(args pokesay.Args, categories pokedex.Trie) {

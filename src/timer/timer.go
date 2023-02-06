@@ -1,9 +1,9 @@
 package timer
 
 import (
-	"fmt"
 	"encoding/json"
-	"os"
+	"fmt"
+	"strings"
 	"time"
 )
 
@@ -46,5 +46,6 @@ func (t *Timer) Stop() {
 }
 
 func (t *Timer) PrintJson() {
-	json.NewEncoder(os.Stderr).Encode(t)
+	json, _ := json.MarshalIndent(t, "", strings.Repeat(" ", 2))
+	fmt.Println(string(json))
 }
