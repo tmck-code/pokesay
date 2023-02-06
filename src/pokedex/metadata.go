@@ -1,6 +1,10 @@
 package pokedex
 
-import "embed"
+import (
+	"embed"
+
+	"github.com/tmck-code/pokesay/src/timer"
+)
 
 type PokemonEntryMapping struct {
 	EntryIndex int
@@ -37,7 +41,13 @@ func ReadMetadataFromBytes(data []byte) PokemonMetadata {
 }
 
 func ReadMetadataFromEmbedded(embeddedData embed.FS, fpath string) PokemonMetadata {
+	t := timer.NewTimer()
 	metadata, err := embeddedData.ReadFile(fpath)
+	t.Mark("read file")
 	Check(err)
-	return ReadMetadataFromBytes(metadata)
+	data := ReadMetadataFromBytes(metadata)
+	t.Mark("read metadata")
+	t.Stop()
+	t.PrintJson()
+	return data
 }

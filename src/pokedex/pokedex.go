@@ -31,8 +31,8 @@ func MetadataFpath(subdir string, idx int) string {
 
 func ReadStructFromBytes[T any](data []byte) T {
 	var d T
-	err := gob.NewDecoder(bytes.NewBuffer(data)).Decode(&d)
-	Check(err)
+	gob.NewDecoder(bytes.NewBuffer(data)).Decode(&d)
+	// Check(err)
 
 	return d
 }

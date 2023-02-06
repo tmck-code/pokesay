@@ -1,7 +1,6 @@
 package pokesay
 
 import (
-	"fmt"
 	"math/rand"
 	"sort"
 	"time"
@@ -53,12 +52,12 @@ func ListCategories(categories pokedex.Trie) []string {
 func ChooseByName(name string, categories pokedex.Trie) *pokedex.PokemonMatch {
 	matches, err := categories.Find(name, true)
 	Check(err)
-	for i, m := range matches {
-		fmt.Printf("name matches for %s: %v (%d)\n", name, m, i)
-	}
+	// for i, m := range matches {
+	// 	fmt.Printf("name matches for %s: %v (%d)\n", name, m, i)
+	// }
 	choice := matches[RandomInt(len(matches))]
 
-	fmt.Printf("name choice for %s\n", choice)
+	// fmt.Printf("name choice for %s\n", choice)
 	return choice
 }
 
