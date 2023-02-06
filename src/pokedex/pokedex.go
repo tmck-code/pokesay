@@ -117,7 +117,7 @@ func CreateNameMetadata(idx int, key string, name PokemonName, rootDir string, f
 
 	for i, fpath := range fpaths {
 		basename := strings.TrimPrefix(fpath, rootDir)
-		if strings.Contains(basename, strings.ToLower(name.English)) {
+		if strings.Contains(basename, strings.ToLower(name.Slug)) {
 			data, err := os.ReadFile(fpath)
 			Check(err)
 			cats := createCategories(strings.TrimPrefix(fpath, rootDir), data)
@@ -137,7 +137,7 @@ func CreateCategoryStruct(rootDir string, metadata []PokemonMetadata, debug bool
 	for i, m := range metadata {
 		for _, entry := range m.Entries {
 			trieEntry := NewEntry(i, strings.ToLower(m.Name))
-			// fmt.Printf("inserting %s, %+v\n", entry.Categories, trieEntry)
+			fmt.Printf("inserting %s, %+v\n", entry.Categories, trieEntry)
 			categories.Insert(entry.Categories, trieEntry)
 		}
 	}
