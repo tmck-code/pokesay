@@ -52,7 +52,7 @@ func TestTrieFind(test *testing.T) {
 		},
 	}
 
-	results, err := t.Find("pikachu")
+	results, err := t.Find("pikachu", false)
 	pokesay.Check(err)
 
 	sort.Slice(results, func(i, j int) bool {
