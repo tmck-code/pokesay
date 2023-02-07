@@ -137,16 +137,30 @@ func runPrintRandom(args pokesay.Args) {
 
 func main() {
 	args := parseFlags()
+	t := timer.NewTimer()
 
 	if args.ListCategories {
-		runListCategories(pokedex.NewTrieFromBytes(GOBCategory))
+		c := pokedex.NewTrieFromBytes(GOBCategory)
+		t.Mark("trie")
+		runListCategories(c)
+		t.Mark("op")
 	} else if args.ListNames {
 		runListNames()
 	} else if args.NameToken != "" {
-		runPrintByName(args, pokedex.NewTrieFromBytes(GOBCategory))
+		c := pokedex.NewTrieFromBytes(GOBCategory)
+		t.Mark("trie")
+		runPrintByName(args, c)
+		t.Mark("op")
 	} else if args.Category != "" {
-		runPrintByCategory(args, pokedex.NewTrieFromBytes(GOBCategory))
+		c := pokedex.NewTrieFromBytes(GOBCategory)
+		t.Mark("trie")
+		runPrintByCategory(args, c)
+		t.Mark("op")
 	} else {
 		runPrintRandom(args)
+		t.Mark("op")
 	}
+
+	t.Stop()
+	t.PrintJson()
 }
