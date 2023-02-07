@@ -8,6 +8,7 @@ import (
 )
 
 type Timer struct {
+	Name             string
 	stageNames       []string
 	StageTimes       map[string]time.Time
 	StageDurations   map[string]time.Duration
@@ -16,12 +17,13 @@ type Timer struct {
 	AlignKeys        bool
 }
 
-func NewTimer(alignKeys ...bool) *Timer {
+func NewTimer(name string, alignKeys ...bool) *Timer {
 	align := false
 	if len(alignKeys) == 1 {
 		align = alignKeys[0]
 	}
 	t := &Timer{
+		Name:             name,
 		stageNames:       make([]string, 0),
 		StageTimes:       make(map[string]time.Time),
 		StageDurations:   make(map[string]time.Duration),
