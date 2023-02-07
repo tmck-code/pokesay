@@ -153,7 +153,7 @@ func runPrintRandom(args pokesay.Args) {
 
 func main() {
 	args := parseFlags()
-	t := timer.NewTimer()
+	t := timer.NewTimer("main", true)
 
 	if args.ListCategories {
 		c := pokedex.NewTrieFromBytes(GOBCategory)
