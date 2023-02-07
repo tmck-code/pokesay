@@ -8,18 +8,20 @@ import (
 )
 
 type Timer struct {
-	stageNames     []string
-	StageTimes     map[string]time.Time
-	StageDurations map[string]time.Duration
-	Total          int64
+	stageNames       []string
+	StageTimes       map[string]time.Time
+	StageDurations   map[string]time.Duration
+	StagePercentages map[string]string
+	Total            int64
 }
 
 func NewTimer() *Timer {
 	t := &Timer{
-		stageNames:     make([]string, 0),
-		StageTimes:     make(map[string]time.Time),
-		StageDurations: make(map[string]time.Duration),
-		Total:          0,
+		stageNames:       make([]string, 0),
+		StageTimes:       make(map[string]time.Time),
+		StageDurations:   make(map[string]time.Duration),
+		StagePercentages: make(map[string]string),
+		Total:            0,
 	}
 	t.Mark("Start")
 	return t
@@ -27,7 +29,7 @@ func NewTimer() *Timer {
 
 func (t *Timer) Mark(stage string) {
 	now := time.Now()
-	stage = fmt.Sprintf("%d.%s", len(t.stageNames), stage)
+	stage = fmt.Sprintf("%02d.%s", len(t.stageNames), stage)
 
 	t.StageTimes[stage] = now
 	t.stageNames = append(t.stageNames, stage)
@@ -43,6 +45,17 @@ func (t *Timer) Stop() {
 	}
 	// From the last stage, subtract the first stage, to get total duration
 	t.Total = t.StageTimes[t.stageNames[len(t.stageNames)-1]].Sub(t.StageTimes[t.stageNames[0]]).Nanoseconds()
+
+	for i, stage := range t.stageNames {
+		if i == 0 {
+			t.StagePercentages[stage] = "0.0%"
+		} else {
+			t.StagePercentages[stage] = fmt.Sprintf(
+				"%.2f%%",
+				float64(t.StageDurations[stage].Nanoseconds())*100.0/float64(t.Total),
+			)
+		}
+	}
 }
 
 func (t *Timer) PrintJson() {
