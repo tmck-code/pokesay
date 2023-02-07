@@ -43,7 +43,7 @@ func EntryFpath(idx int) string {
 
 func main() {
 	args := parseFlags()
-	t := timer.NewTimer("main", true)
+	t := timer.NewTimer("read_assets", true)
 	pokedex.NewTrieFromBytes(GOBCategory)
 	t.Mark("trie")
 
