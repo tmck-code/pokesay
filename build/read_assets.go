@@ -6,6 +6,7 @@ import (
 	"fmt"
 
 	"github.com/tmck-code/pokesay/src/pokedex"
+	"github.com/tmck-code/pokesay/src/timer"
 )
 
 var (
@@ -39,14 +40,24 @@ func EntryFpath(idx int) string {
 
 func main() {
 	args := parseFlags()
+	t := timer.NewTimer()
 	metadata := pokedex.ReadMetadataFromEmbedded(GOBCowNames, MetadataFpath(args.Index))
+	t.Mark("metadata")
 	fmt.Println(pokedex.StructToJSON(metadata, 2))
 
-	for _, entry := range metadata.Entries {
+	t.Mark("toJSON")
+
+	for i, entry := range metadata.Entries {
+		data := string(pokedex.ReadPokemonCow(GOBCowFiles, EntryFpath(entry.EntryIndex)))
+		t.Mark(fmt.Sprintf("read-cow-%d", i))
 		fmt.Println(
 			entry.Categories,
 			"\n",
-			string(pokedex.ReadPokemonCow(GOBCowFiles, EntryFpath(entry.EntryIndex))),
+			data,
 		)
+
+		t.Mark(fmt.Sprintf("print-cow-%d", i))
 	}
+	t.Stop()
+	t.PrintJson()
 }
