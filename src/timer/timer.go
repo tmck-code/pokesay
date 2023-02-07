@@ -13,15 +13,21 @@ type Timer struct {
 	StageDurations   map[string]time.Duration
 	StagePercentages map[string]string
 	Total            int64
+	AlignKeys        bool
 }
 
-func NewTimer() *Timer {
+func NewTimer(alignKeys ...bool) *Timer {
+	align := false
+	if len(alignKeys) == 1 {
+		align = alignKeys[0]
+	}
 	t := &Timer{
 		stageNames:       make([]string, 0),
 		StageTimes:       make(map[string]time.Time),
 		StageDurations:   make(map[string]time.Duration),
 		StagePercentages: make(map[string]string),
 		Total:            0,
+		AlignKeys:        align,
 	}
 	t.Mark("Start")
 	return t
@@ -29,7 +35,11 @@ func NewTimer() *Timer {
 
 func (t *Timer) Mark(stage string) {
 	now := time.Now()
-	stage = fmt.Sprintf("%02d.%s", len(t.stageNames), stage)
+	if t.AlignKeys {
+		stage = fmt.Sprintf("%02d.%-15s", len(t.stageNames), stage)
+	} else {
+		stage = fmt.Sprintf("%02d.%s", len(t.stageNames), stage)
+	}
 
 	t.StageTimes[stage] = now
 	t.stageNames = append(t.stageNames, stage)
