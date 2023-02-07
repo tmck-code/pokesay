@@ -43,25 +43,21 @@ func EntryFpath(idx int) string {
 
 func main() {
 	args := parseFlags()
-	t := timer.NewTimer()
+	t := timer.NewTimer("main", true)
 	pokedex.NewTrieFromBytes(GOBCategory)
 	t.Mark("trie")
 
 	metadata := pokedex.ReadMetadataFromEmbedded(GOBCowNames, MetadataFpath(args.Index))
 	t.Mark("metadata")
-	fmt.Println(pokedex.StructToJSON(metadata, 2))
 
+	fmt.Println(pokedex.StructToJSON(metadata, 2))
 	t.Mark("toJSON")
 
 	for i, entry := range metadata.Entries {
 		data := string(pokedex.ReadPokemonCow(GOBCowFiles, EntryFpath(entry.EntryIndex)))
 		t.Mark(fmt.Sprintf("read-cow-%d", i))
-		fmt.Println(
-			entry.Categories,
-			"\n",
-			data,
-		)
 
+		fmt.Printf("%s\n%s\n", entry.Categories, data)
 		t.Mark(fmt.Sprintf("print-cow-%d", i))
 	}
 	t.Stop()
