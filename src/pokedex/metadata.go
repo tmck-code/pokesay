@@ -41,12 +41,14 @@ func ReadMetadataFromBytes(data []byte) PokemonMetadata {
 }
 
 func ReadMetadataFromEmbedded(embeddedData embed.FS, fpath string) PokemonMetadata {
-	t := timer.NewTimer()
+	t := timer.NewTimer("ReadMetadataFromEmbedded")
 	metadata, err := embeddedData.ReadFile(fpath)
-	t.Mark("read file")
 	Check(err)
+	t.Mark("read file")
+
 	data := ReadMetadataFromBytes(metadata)
 	t.Mark("read metadata")
+
 	t.Stop()
 	t.PrintJson()
 	return data
