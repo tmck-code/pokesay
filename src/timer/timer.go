@@ -3,8 +3,13 @@ package timer
 import (
 	"encoding/json"
 	"fmt"
+	"os"
 	"strings"
 	"time"
+)
+
+var (
+	DEBUG bool = os.Getenv("DEBUG") != ""
 )
 
 type Timer struct {
@@ -15,6 +20,7 @@ type Timer struct {
 	StagePercentages map[string]string
 	Total            int64
 	AlignKeys        bool
+	Enabled          bool
 }
 
 func NewTimer(name string, alignKeys ...bool) *Timer {
@@ -30,12 +36,16 @@ func NewTimer(name string, alignKeys ...bool) *Timer {
 		StagePercentages: make(map[string]string),
 		Total:            0,
 		AlignKeys:        align,
+		Enabled:          DEBUG,
 	}
 	t.Mark("Start")
 	return t
 }
 
 func (t *Timer) Mark(stage string) {
+	if !t.Enabled {
+		return
+	}
 	now := time.Now()
 	if t.AlignKeys {
 		stage = fmt.Sprintf("%02d.%-15s", len(t.stageNames), stage)
@@ -48,6 +58,9 @@ func (t *Timer) Mark(stage string) {
 }
 
 func (t *Timer) Stop() {
+	if !t.Enabled {
+		return
+	}
 	for i, stage := range t.stageNames {
 		if i == 0 {
 			t.StageDurations[stage] = 0
@@ -71,6 +84,9 @@ func (t *Timer) Stop() {
 }
 
 func (t *Timer) PrintJson() {
+	if !t.Enabled {
+		return
+	}
 	json, _ := json.MarshalIndent(t, "", strings.Repeat(" ", 2))
 	fmt.Println(string(json))
 }
