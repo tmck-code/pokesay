@@ -32,6 +32,7 @@ type PokemonName struct {
 	English          string
 	Japanese         string
 	JapanesePhonetic string
+	Slug             string
 }
 
 func NewPokemonName(entry DataEntry) *PokemonName {
@@ -39,6 +40,7 @@ func NewPokemonName(entry DataEntry) *PokemonName {
 		English:          entry.Name.Eng,
 		Japanese:         entry.Name.Jpn,
 		JapanesePhonetic: entry.Slug.Jpn,
+		Slug:             entry.Slug.Eng,
 	}
 }
 

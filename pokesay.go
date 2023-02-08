@@ -8,6 +8,7 @@ import (
 
 	"github.com/tmck-code/pokesay/src/pokedex"
 	"github.com/tmck-code/pokesay/src/pokesay"
+	"github.com/tmck-code/pokesay/src/timer"
 )
 
 var (
@@ -65,7 +66,7 @@ func parseFlags() pokesay.Args {
 }
 
 func EntryFpath(idx int) string {
-	return pokedex.EntryFpath(MetadataRoot, idx)
+	return pokedex.EntryFpath(CowDataRoot, idx)
 }
 
 func MetadataFpath(idx int) string {
@@ -101,38 +102,81 @@ func GenerateNames(metadata pokedex.PokemonMetadata, args pokesay.Args) []string
 }
 
 func runPrintByName(args pokesay.Args, categories pokedex.Trie) {
+	t := timer.NewTimer("runPrintByName", true)
 	match := pokesay.ChooseByName(args.NameToken, categories)
+	t.Mark("match")
 	metadata := pokedex.ReadMetadataFromEmbedded(GOBCowNames, MetadataFpath(match.Entry.Index))
+	t.Mark("read metadata")
+	choice := pokesay.RandomInt(len(metadata.Entries))
+	t.Mark("choice")
+	final := metadata.Entries[choice]
+	// fmt.Println(pokedex.StructToJSON(metadata), "\n", choice, "\n", final)
 
-	pokesay.Print(args, match.Entry.Index, GenerateNames(metadata, args), match.Keys, GOBCowData)
+	pokesay.Print(args, final.EntryIndex, GenerateNames(metadata, args), final.Categories, GOBCowData)
+	t.Mark("print")
+
+	t.Stop()
+	t.PrintJson()
 }
 
 func runPrintByCategory(args pokesay.Args, categories pokedex.Trie) {
+	t := timer.NewTimer("runPrintByCategory", true)
 	choice, keys := pokesay.ChooseByCategory(args.Category, categories)
+	t.Mark("choose by category")
+
 	metadata := pokedex.ReadMetadataFromEmbedded(GOBCowNames, MetadataFpath(choice.Index))
+	t.Mark("read metadata")
 
 	pokesay.Print(args, choice.Index, GenerateNames(metadata, args), keys, GOBCowData)
+	t.Mark("print")
+
+	t.Stop()
+	t.PrintJson()
 }
 
 func runPrintRandom(args pokesay.Args) {
+	t := timer.NewTimer("runPrintRandom", true)
 	_, choice := pokesay.ChooseByRandomIndex(GOBTotal)
+	t.Mark("choose index")
 	metadata := pokedex.ReadMetadataFromEmbedded(GOBCowNames, MetadataFpath(choice))
+	t.Mark("read metadata")
 
-	pokesay.Print(args, choice, GenerateNames(metadata, args), strings.Split(metadata.Categories, "/"), GOBCowData)
+	final := metadata.Entries[pokesay.RandomInt(len(metadata.Entries))]
+	t.Mark("choose entry")
+
+	pokesay.Print(args, final.EntryIndex, GenerateNames(metadata, args), final.Categories, GOBCowData)
+	t.Mark("print")
+
+	t.Stop()
+	t.PrintJson()
 }
 
 func main() {
 	args := parseFlags()
+	t := timer.NewTimer("main", true)
 
 	if args.ListCategories {
-		runListCategories(pokedex.NewTrieFromBytes(GOBCategory))
+		c := pokedex.NewTrieFromBytes(GOBCategory)
+		t.Mark("trie")
+		runListCategories(c)
+		t.Mark("op")
 	} else if args.ListNames {
 		runListNames()
 	} else if args.NameToken != "" {
-		runPrintByName(args, pokedex.NewTrieFromBytes(GOBCategory))
+		c := pokedex.NewTrieFromBytes(GOBCategory)
+		t.Mark("trie")
+		runPrintByName(args, c)
+		t.Mark("op")
 	} else if args.Category != "" {
-		runPrintByCategory(args, pokedex.NewTrieFromBytes(GOBCategory))
+		c := pokedex.NewTrieFromBytes(GOBCategory)
+		t.Mark("trie")
+		runPrintByCategory(args, c)
+		t.Mark("op")
 	} else {
 		runPrintRandom(args)
+		t.Mark("op")
 	}
+
+	t.Stop()
+	t.PrintJson()
 }
