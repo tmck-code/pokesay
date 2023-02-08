@@ -1,8 +1,6 @@
 package pokesay
 
 import (
-	"errors"
-	"log"
 	"math/rand"
 	"sort"
 	"time"
@@ -16,7 +14,7 @@ var (
 
 func RandomInt(n int) int {
 	if n <= 0 {
-		log.Fatal(errors.New("RandomInt arg must be >0"))
+		return 0
 	}
 	return rand.New(Rand).Intn(n)
 }
@@ -52,9 +50,15 @@ func ListCategories(categories pokedex.Trie) []string {
 }
 
 func ChooseByName(name string, categories pokedex.Trie) *pokedex.PokemonMatch {
-	matches, err := categories.Find(name)
+	matches, err := categories.Find(name, true)
 	Check(err)
-	return matches[RandomInt(len(matches))]
+	// for i, m := range matches {
+	// 	fmt.Printf("name matches for %s: %v (%d)\n", name, m, i)
+	// }
+	choice := matches[RandomInt(len(matches))]
+
+	// fmt.Printf("name choice for %s\n", choice)
+	return choice
 }
 
 func ChooseByRandomIndex(totalInBytes []byte) (int, int) {
