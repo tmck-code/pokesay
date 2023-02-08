@@ -11,8 +11,8 @@ import (
 	"log"
 	"os"
 	"path"
-	"strings"
 	"strconv"
+	"strings"
 )
 
 func Check(e error) {
@@ -31,8 +31,8 @@ func MetadataFpath(subdir string, idx int) string {
 
 func ReadStructFromBytes[T any](data []byte) T {
 	var d T
-	err := gob.NewDecoder(bytes.NewBuffer(data)).Decode(&d)
-	Check(err)
+	gob.NewDecoder(bytes.NewBuffer(data)).Decode(&d)
+	// Check(err)
 
 	return d
 }
@@ -112,58 +112,36 @@ func Decompress(data []byte) []byte {
 	return resB.Bytes()
 }
 
-type Metadata struct {
-	Data     []byte
-	Index    int
-	Metadata PokemonMetadata
-}
+func CreateNameMetadata(idx int, key string, name PokemonName, rootDir string, fpaths []string) *PokemonMetadata {
+	entryCategories := make(map[int][][]string, 0)
 
-func (m Metadata) WriteToFile(fpath string) {
-	WriteStructToFile(m, fpath)
-}
-
-func CreateMetadata(rootDir string, fpaths []string, pokemonNames map[string]PokemonName, debug bool) []Metadata {
-	metadata := []Metadata{}
 	for i, fpath := range fpaths {
-		data, err := os.ReadFile(fpath)
-		Check(err)
-
-		cats := createCategories(strings.TrimPrefix(fpath, rootDir), data)
-		name := createName(fpath)
-
-		v := pokemonNames[strings.Split(name, "-")[0]]
-
-		metadata = append(
-			metadata,
-			Metadata{
-				data,
-				i,
-				PokemonMetadata{
-					Name:             name,
-					JapaneseName:     v.Japanese,
-					JapanesePhonetic: v.JapanesePhonetic,
-					Categories:       strings.Join(cats, "/"),
-				},
-			},
-		)
+		basename := strings.TrimPrefix(fpath, rootDir)
+		if strings.Contains(basename, strings.ToLower(name.Slug)) {
+			data, err := os.ReadFile(fpath)
+			Check(err)
+			cats := createCategories(strings.TrimPrefix(fpath, rootDir), data)
+			entryCategories[i] = append(entryCategories[i], cats)
+		}
 	}
-	return metadata
+	return NewMetadata(
+		name.English,
+		name.Japanese,
+		name.JapanesePhonetic,
+		entryCategories,
+	)
 }
 
-func CreateCategoryStruct(rootDir string, fpaths []string, debug bool) Trie {
+func CreateCategoryStruct(rootDir string, metadata []PokemonMetadata, debug bool) Trie {
 	categories := NewTrie()
-	for i, fpath := range fpaths {
-		data, err := os.ReadFile(fpath)
-		Check(err)
-
-		cats := createCategories(strings.TrimPrefix(fpath, rootDir), data)
-		name := createName(fpath)
-
-		categories.Insert(
-			cats,
-			NewEntry(i, name),
-		)
+	for i, m := range metadata {
+		for _, entry := range m.Entries {
+			trieEntry := NewEntry(i, strings.ToLower(m.Name))
+			fmt.Printf("inserting %s, %+v\n", entry.Categories, trieEntry)
+			categories.Insert(entry.Categories, trieEntry)
+		}
 	}
+	// fmt.Println(categories.ToString(2))
 	return *categories
 }
 

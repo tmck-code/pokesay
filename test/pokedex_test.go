@@ -41,10 +41,15 @@ func TestReadMetadataFromEmbedded(test *testing.T) {
 	result := pokedex.ReadMetadataFromEmbedded(GOBMetadata, "data/cows/4.metadata")
 
 	expected := pokedex.PokemonMetadata{
-		Categories:       "small/gen7x/regular",
-		Name:             "abomasnow",
-		JapaneseName:     "ユキノオー",
-		JapanesePhonetic: "yukinoo-",
+		Name:             "Hoothoot",
+		JapaneseName:     "ホーホー",
+		JapanesePhonetic: "ho-ho-",
+		Entries: []pokedex.PokemonEntryMapping{
+			{EntryIndex: 1586, Categories: []string{"small", "gen7x", "shiny"}},
+			{EntryIndex: 2960, Categories: []string{"small", "gen8", "regular"}},
+			{EntryIndex: 4285, Categories: []string{"small", "gen8", "shiny"}},
+			{EntryIndex: 428, Categories: []string{"small", "gen7x", "regular"}},
+		},
 	}
 
 	Assert(expected, result, test)
