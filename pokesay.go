@@ -4,6 +4,7 @@ import (
 	"embed"
 	"flag"
 	"fmt"
+	"strconv"
 	"strings"
 
 	"github.com/tmck-code/pokesay/src/pokedex"
@@ -121,31 +122,38 @@ func runPrintByName(args pokesay.Args, categories pokedex.Trie) {
 	t.PrintJson()
 }
 
-func runPrintByCategory(args pokesay.Args, categories pokedex.Trie) {
+func runPrintByCategory(args pokesay.Args) {
 	t := timer.NewTimer("runPrintByCategory", true)
 
 	dirPath := fmt.Sprintf("build/assets/categories/%s", args.Category)
 	dir, _ := GOBCategories.ReadDir(dirPath)
-	fmt.Printf("----- %d %#v\n", len(dir), dir)
+	// fmt.Printf("----- %d %#v\n", len(dir), dir)
 
 	choice := dir[pokesay.RandomInt(len(dir))]
-	fmt.Printf("random category choice %#v\n", choice)
+	// fmt.Printf("random category choice %#v\n", choice)
 
-	fmt.Println("category data", choice)
+	// fmt.Println("category data", choice)
 
 	categoryMetadata, err := GOBCategories.ReadFile(fmt.Sprintf("build/assets/categories/%s/%s", args.Category, choice.Name()))
-	metadataIndex := pokedex.ReadIntFromBytes(categoryMetadata)
 	pokesay.Check(err)
 
-	fmt.Printf("category metadata: %#v\n", categoryMetadata)
+	parts := strings.Split(string(categoryMetadata), "/")
+	// fmt.Println("parts:", parts)
+	metadataIndex, err := strconv.Atoi(string(parts[0]))
+	pokesay.Check(err)
+
+	entryIndex, err := strconv.Atoi(string(parts[1]))
+	pokesay.Check(err)
+
+	// fmt.Printf("category metadata: %#v\n", categoryMetadata)
 
 	metadata := pokedex.ReadMetadataFromEmbedded(GOBCowNames, MetadataFpath(metadataIndex))
-	fmt.Printf("name metadata: %#v\n", metadata)
+	// fmt.Printf("name metadata: %#v\n", metadata)
 
 	t.Mark("read file")
 	t.Mark("read metadata")
-
-	final := metadata.Entries[pokesay.RandomInt(len(metadata.Entries))]
+	// fmt.Println(entryIndex, metadata.Entries)
+	final := metadata.Entries[entryIndex]
 	t.Mark("choose entry")
 
 	pokesay.Print(args, final.EntryIndex, GenerateNames(metadata, args), final.Categories, GOBCowData)
@@ -189,9 +197,9 @@ func main() {
 		runPrintByName(args, c)
 		t.Mark("op")
 	} else if args.Category != "" {
-		c := pokedex.NewTrieFromBytes(GOBCategory)
-		t.Mark("trie")
-		runPrintByCategory(args, c)
+		// c := pokedex.NewTrieFromBytes(GOBCategory)
+		// t.Mark("trie")
+		runPrintByCategory(args)
 		t.Mark("op")
 	} else {
 		runPrintRandom(args)
