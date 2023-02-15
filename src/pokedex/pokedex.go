@@ -138,6 +138,14 @@ func CreateCategoryStruct(rootDir string, metadata []PokemonMetadata, debug bool
 		for _, entry := range m.Entries {
 			trieEntry := NewEntry(i, strings.ToLower(m.Name))
 			fmt.Printf("inserting %s, %+v\n", entry.Categories, trieEntry)
+			for _, cat := range entry.Categories {
+				destDir := fmt.Sprintf(
+					"build/assets/categories/%s",
+					cat,
+				)
+				os.MkdirAll(destDir, 0755)
+				WriteIntToFile(i, fmt.Sprintf("%s/%02d%s", destDir, i, ".cat"))
+			}
 			categories.Insert(entry.Categories, trieEntry)
 		}
 	}
