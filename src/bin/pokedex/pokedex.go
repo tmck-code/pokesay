@@ -125,10 +125,10 @@ func main() {
 
 	// 2. Create the category struct using the cowfile paths, pokemon names and indexes\
 	fmt.Println("- Writing categories to file")
-	pokedex.WriteStructToFile(
-		pokedex.CreateCategoryStruct(args.FromDir, pokemonMetadata, args.Debug),
-		categoryFpath,
-	)
+	trie, categories := pokedex.CreateCategoryStruct(args.FromDir, pokemonMetadata, args.Debug)
+	pokedex.WriteStructToFile(trie, categoryFpath)
+
+	pokedex.WriteStructToFile(categories, "build/assets/categories.txt")
 
 	fmt.Println("- Writing total metadata to file")
 	pokedex.WriteIntToFile(len(pokemonMetadata), totalFpath)
