@@ -11,7 +11,6 @@ import (
 	"log"
 	"os"
 	"path"
-	"sort"
 	"strconv"
 	"strings"
 )
@@ -139,7 +138,7 @@ func CreateCategoryStruct(rootDir string, metadata []PokemonMetadata, debug bool
 	for i, m := range metadata {
 		for j, entry := range m.Entries {
 			trieEntry := NewEntry(i, strings.ToLower(m.Name))
-			fmt.Printf("inserting %s, %+v\n", entry.Categories, trieEntry)
+			// fmt.Printf("inserting %s, %+v\n", entry.Categories, trieEntry)
 			for _, cat := range entry.Categories {
 				allCategories[cat] = append(allCategories[cat], i)
 				destDir := fmt.Sprintf(
@@ -152,11 +151,6 @@ func CreateCategoryStruct(rootDir string, metadata []PokemonMetadata, debug bool
 			categories.Insert(entry.Categories, trieEntry)
 		}
 	}
-	var allCategoryKeys []string
-	for k, _ := range allCategories {
-		allCategoryKeys = append(allCategoryKeys, k)
-	}
-	sort.Strings(allCategoryKeys)
 	// fmt.Println(categories.ToString(2))
 	return *categories, allCategories
 }
