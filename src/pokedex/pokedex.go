@@ -132,13 +132,10 @@ func CreateNameMetadata(idx int, key string, name PokemonName, rootDir string, f
 	)
 }
 
-func CreateCategoryStruct(rootDir string, metadata []PokemonMetadata, debug bool) (Trie, map[string][]int) {
-	categories := NewTrie()
+func CreateCategoryStruct(rootDir string, metadata []PokemonMetadata, debug bool) map[string][]int {
 	allCategories := make(map[string][]int)
 	for i, m := range metadata {
 		for j, entry := range m.Entries {
-			trieEntry := NewEntry(i, strings.ToLower(m.Name))
-			// fmt.Printf("inserting %s, %+v\n", entry.Categories, trieEntry)
 			for _, cat := range entry.Categories {
 				allCategories[cat] = append(allCategories[cat], i)
 				destDir := fmt.Sprintf(
@@ -148,16 +145,10 @@ func CreateCategoryStruct(rootDir string, metadata []PokemonMetadata, debug bool
 				os.MkdirAll(destDir, 0755)
 				WriteBytesToFile([]byte(fmt.Sprintf("%d/%d", i, j)), fmt.Sprintf("%s/%02d%s", destDir, i, ".cat"), false)
 			}
-			categories.Insert(entry.Categories, trieEntry)
 		}
 	}
 	// fmt.Println(categories.ToString(2))
-	return *categories, allCategories
-}
-
-func createName(fpath string) string {
-	parts := strings.Split(fpath, "/")
-	return strings.Split(parts[len(parts)-1], ".")[0]
+	return allCategories
 }
 
 func createCategories(fpath string, data []byte) []string {
