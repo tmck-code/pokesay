@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 	"path"
+	"sort"
 	"strings"
 
 	"github.com/tmck-code/pokesay/src/bin"
@@ -113,14 +114,24 @@ func main() {
 	// 1. For each pokemon name, write a metadata file, containing the name information, and
 	// links to all of the matching cowfile indexes
 	pokemonMetadata := make([]pokedex.PokemonMetadata, 0)
+	uniqueNames := make(map[string]bool)
 	i := 0
 	for key, name := range pokemonNames {
 		metadata := pokedex.CreateNameMetadata(i, key, name, args.FromDir, cowfileFpaths)
 		fmt.Printf("-- %d %+v\n", i, metadata)
 		pokedex.WriteStructToFile(metadata, pokedex.MetadataFpath(metadataDirPath, i))
 		pokemonMetadata = append(pokemonMetadata, *metadata)
+		uniqueNames[name.Slug] = true
 		i++
 	}
+	allNames := make([]string, 0)
+	for name, _ := range uniqueNames {
+		allNames = append(allNames, name)
+	}
+	sort.Strings(allNames)
+	pokedex.WriteStructToFile(allNames, "build/assets/names.txt")
+	fmt.Println("wrote", len(allNames), "names to", "build/assets/names.txt", allNames)
+
 	fmt.Println("wrote", i, "name metadata files to", metadataDirPath)
 
 	// 2. Create the category struct using the cowfile paths, pokemon names and indexes\
