@@ -6,7 +6,6 @@ import (
 	"log"
 	"os"
 	"path"
-	"sort"
 	"strings"
 
 	"github.com/tmck-code/pokesay/src/bin"
@@ -113,38 +112,33 @@ func main() {
 
 	// 1. For each pokemon name, write a metadata file, containing the name information, and
 	// links to all of the matching cowfile indexes
+	fmt.Println("- Writing metadata to file")
 	pokemonMetadata := make([]pokedex.PokemonMetadata, 0)
 	uniqueNames := make(map[string][]int)
 	i := 0
+	pbar = bin.NewProgressBar(len(pokemonNames))
 	for key, name := range pokemonNames {
 		metadata := pokedex.CreateNameMetadata(i, key, name, args.FromDir, cowfileFpaths)
-		fmt.Printf("-- %d %+v\n", i, metadata)
 		pokedex.WriteStructToFile(metadata, pokedex.MetadataFpath(metadataDirPath, i))
 		pokemonMetadata = append(pokemonMetadata, *metadata)
 		uniqueNames[name.Slug] = append(uniqueNames[name.Slug], i)
 		i++
+		pbar.Add(1)
 	}
-	allNames := make([]string, 0)
-	for name, _ := range uniqueNames {
-		allNames = append(allNames, name)
-	}
-	sort.Strings(allNames)
-	pokedex.WriteStructToFile(uniqueNames, "build/assets/names.txt")
-	fmt.Println("wrote", len(allNames), "names to", "build/assets/names.txt", allNames)
 
-	fmt.Println("wrote", i, "name metadata files to", metadataDirPath)
+	pokedex.WriteStructToFile(uniqueNames, "build/assets/names.txt")
 
 	// 2. Create the category struct using the cowfile paths, pokemon names and indexes\
 	fmt.Println("- Writing categories to file")
-	_, categories := pokedex.CreateCategoryStruct(args.FromDir, pokemonMetadata, args.Debug)
-	// pokedex.WriteStructToFile(trie, categoryFpath)
-
+	categories := pokedex.CreateCategoryStruct(args.FromDir, pokemonMetadata, args.Debug)
 	pokedex.WriteStructToFile(categories, "build/assets/category_keys.txt")
 
 	fmt.Println("- Writing total metadata to file")
 	pokedex.WriteIntToFile(len(pokemonMetadata), totalFpath)
 
 	fmt.Println("✓ Complete! Indexed", len(cowfileFpaths), "total cowfiles")
+	fmt.Println("wrote", i, "names to", "build/assets/names.txt")
+
 	fmt.Println("✓ Wrote gzipped metadata to", metadataDirPath)
 	fmt.Println("✓ Wrote gzipped cowfiles to", entryDirPath)
 	fmt.Println("✓ Wrote 'total' metadata to", totalFpath, len(pokemonMetadata))
