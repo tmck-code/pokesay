@@ -14,8 +14,11 @@ import (
 )
 
 var (
-	//go:embed build/assets/pokedex.gob
-	GOBCategory []byte
+	//go:embed build/assets/category_keys.txt
+	GOBCategoryKeys []byte
+	//go:embed build/assets/names.txt
+	GOBAllNames []byte
+
 	//go:embed build/assets/total.txt
 	GOBTotal []byte
 	//go:embed build/assets/cows/*cow
@@ -24,10 +27,6 @@ var (
 	GOBCowNames embed.FS
 	//go:embed all:build/assets/categories
 	GOBCategories embed.FS
-	//go:embed build/assets/categories.txt
-	GOBCategoryKeys []byte
-	//go:embed build/assets/names.txt
-	GOBAllNames []byte
 
 	MetadataRoot string = "build/assets/metadata"
 	CowDataRoot  string = "build/assets/cows"
@@ -82,17 +81,22 @@ func MetadataFpath(idx int) string {
 }
 
 func runListCategories() {
-	keys := pokedex.ReadStructFromBytes[[]string](GOBCategoryKeys)
-	fmt.Printf("%s\n%d %s\n", strings.Join(keys, " "), len(keys), "total categories")
+	keys := pokedex.ReadStructFromBytes[map[string][]int](GOBCategoryKeys)
+	allKeys := make([]string, 0)
+	for key, _ := range keys {
+		allKeys = append(allKeys, key)
+	}
+	fmt.Printf("%s\n%d %s\n", strings.Join(allKeys, " "), len(allKeys), "total categories")
 }
 
 func runListNames() {
-	names := pokedex.ReadStructFromBytes[map[string]int](GOBAllNames)
+	fmt.Println("--", GOBAllNames)
+	names := pokedex.ReadStructFromBytes[map[string][]int](GOBAllNames)
 	allNames := make([]string, 0)
-	for name, _ := range names {
+	for name := range names {
 		allNames = append(allNames, name)
 	}
-	fmt.Printf("%s\n%d %s\n", strings.Join(allNames, " "), len(names), "total names")
+	fmt.Printf("%s\n%d %s\n", strings.Join(allNames, " "), len(allNames), "total names")
 }
 
 func GenerateNames(metadata pokedex.PokemonMetadata, args pokesay.Args) []string {
