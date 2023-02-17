@@ -132,13 +132,15 @@ func CreateNameMetadata(idx int, key string, name PokemonName, rootDir string, f
 	)
 }
 
-func CreateCategoryStruct(rootDir string, metadata []PokemonMetadata, debug bool) Trie {
+func CreateCategoryStruct(rootDir string, metadata []PokemonMetadata, debug bool) (Trie, []string) {
 	categories := NewTrie()
+	allCategories := make(map[string]bool)
 	for i, m := range metadata {
 		for j, entry := range m.Entries {
 			trieEntry := NewEntry(i, strings.ToLower(m.Name))
 			fmt.Printf("inserting %s, %+v\n", entry.Categories, trieEntry)
 			for _, cat := range entry.Categories {
+				allCategories[cat] = true
 				destDir := fmt.Sprintf(
 					"build/assets/categories/%s",
 					cat,
@@ -149,8 +151,12 @@ func CreateCategoryStruct(rootDir string, metadata []PokemonMetadata, debug bool
 			categories.Insert(entry.Categories, trieEntry)
 		}
 	}
+	var allCategoryKeys []string
+	for k, _ := range allCategories {
+		allCategoryKeys = append(allCategoryKeys, k)
+	}
 	// fmt.Println(categories.ToString(2))
-	return *categories
+	return *categories, allCategoryKeys
 }
 
 func createName(fpath string) string {

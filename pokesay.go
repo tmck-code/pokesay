@@ -4,6 +4,7 @@ import (
 	"embed"
 	"flag"
 	"fmt"
+	"path"
 	"strconv"
 	"strings"
 
@@ -23,6 +24,8 @@ var (
 	GOBCowNames embed.FS
 	//go:embed all:build/assets/categories
 	GOBCategories embed.FS
+	//go:embed build/assets/categories.txt
+	GOBCategoryKeys []byte
 
 	MetadataRoot string = "build/assets/metadata"
 	CowDataRoot  string = "build/assets/cows"
@@ -76,8 +79,8 @@ func MetadataFpath(idx int) string {
 	return pokedex.MetadataFpath(MetadataRoot, idx)
 }
 
-func runListCategories(categories pokedex.Trie) {
-	keys := pokesay.ListCategories(categories)
+func runListCategories() {
+	keys := pokedex.ReadStructFromBytes[[]string](GOBCategoryKeys)
 	fmt.Printf("%s\n%d %s\n", strings.Join(keys, " "), len(keys), "total categories")
 }
 
@@ -185,9 +188,7 @@ func main() {
 	t := timer.NewTimer("main", true)
 
 	if args.ListCategories {
-		c := pokedex.NewTrieFromBytes(GOBCategory)
-		t.Mark("trie")
-		runListCategories(c)
+		runListCategories()
 		t.Mark("op")
 	} else if args.ListNames {
 		runListNames()
@@ -197,8 +198,6 @@ func main() {
 		runPrintByName(args, c)
 		t.Mark("op")
 	} else if args.Category != "" {
-		// c := pokedex.NewTrieFromBytes(GOBCategory)
-		// t.Mark("trie")
 		runPrintByCategory(args)
 		t.Mark("op")
 	} else {
