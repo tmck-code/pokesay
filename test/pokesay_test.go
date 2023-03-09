@@ -13,20 +13,6 @@ var (
 	GOBTotal []byte
 )
 
-func TestListCategories(test *testing.T) {
-	t := pokedex.NewTrie()
-	t.Insert([]string{"small", "g1", "r"}, pokedex.NewEntry(0, "pikachu"))
-	t.Insert([]string{"small", "g1", "o"}, pokedex.NewEntry(1, "bulbasaur"))
-	t.Insert([]string{"medium", "g1", "o"}, pokedex.NewEntry(2, "bulbasaur"))
-	t.Insert([]string{"big", "g1", "o"}, pokedex.NewEntry(3, "bulbasaur"))
-	t.Insert([]string{"big", "g1"}, pokedex.NewEntry(4, "charmander"))
-
-	result := pokesay.ListCategories(*t)
-	expected := []string{"big", "g1", "medium", "o", "r", "small"}
-
-	Assert(expected, result, test)
-}
-
 func TestChooseByName(test *testing.T) {
 	t := pokedex.NewTrie()
 	t.Insert([]string{"small", "g1", "r"}, pokedex.NewEntry(0, "pikachu"))

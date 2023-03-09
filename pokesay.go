@@ -4,9 +4,6 @@ import (
 	"embed"
 	"flag"
 	"fmt"
-	"path"
-	"sort"
-	"strconv"
 	"strings"
 
 	"github.com/tmck-code/pokesay/src/pokedex"
@@ -29,6 +26,7 @@ var (
 	//go:embed all:build/assets/categories
 	GOBCategories embed.FS
 
+	CategoryRoot string = "build/assets/categories"
 	MetadataRoot string = "build/assets/metadata"
 	CowDataRoot  string = "build/assets/cows"
 )
@@ -81,23 +79,20 @@ func MetadataFpath(idx int) string {
 	return pokedex.MetadataFpath(MetadataRoot, idx)
 }
 
+func CategoryFpath(category string, fname string) string {
+	return pokedex.CategoryFpath(CategoryRoot, category, fname)
+}
+
 func runListCategories() {
-	keys := pokedex.ReadStructFromBytes[map[string][]int](GOBCategoryKeys)
-	allKeys := make([]string, 0)
-	for key, _ := range keys {
-		allKeys = append(allKeys, key)
-	}
-	fmt.Printf("%s\n%d %s\n", strings.Join(allKeys, " "), len(allKeys), "total categories")
+	categories := pokedex.ReadStructFromBytes[[]string](GOBCategoryKeys)
+	fmt.Printf("%s\n%d %s\n", strings.Join(categories, " "), len(categories), "total categories")
 }
 
 func runListNames() {
-	names := pokedex.ReadStructFromBytes[map[string][]int](GOBAllNames)
-	allNames := make([]string, 0)
-	for name := range names {
-		allNames = append(allNames, name)
-	}
-	sort.Strings(allNames)
-	fmt.Printf("%s\n%d %s\n", strings.Join(allNames, " "), len(allNames), "total names")
+	names := pokesay.ListNames(
+		pokedex.ReadStructFromBytes[map[string][]int](GOBAllNames),
+	)
+	fmt.Printf("%s\n%d %s\n", strings.Join(names, " "), len(names), "total names")
 }
 
 func GenerateNames(metadata pokedex.PokemonMetadata, args pokesay.Args) []string {
@@ -114,15 +109,11 @@ func GenerateNames(metadata pokedex.PokemonMetadata, args pokesay.Args) []string
 func runPrintByName(args pokesay.Args) {
 	t := timer.NewTimer("runPrintByName", true)
 
-	match := pokedex.ReadStructFromBytes[map[string][]int](GOBAllNames)[args.NameToken]
-	t.Mark("match")
-	nameChoice := match[pokesay.RandomInt(len(match))]
+	names := pokedex.ReadStructFromBytes[map[string][]int](GOBAllNames)
+	t.Mark("read name struct")
 
-	metadata := pokedex.ReadMetadataFromEmbedded(GOBCowNames, MetadataFpath(nameChoice))
-	t.Mark("read metadata")
-	choice := pokesay.RandomInt(len(metadata.Entries))
-	t.Mark("choice")
-	final := metadata.Entries[choice]
+	metadata, final := pokesay.ChooseByName(names, args.NameToken, GOBCowNames, MetadataRoot)
+	t.Mark("find and read metadata")
 
 	pokesay.Print(args, final.EntryIndex, GenerateNames(metadata, args), final.Categories, GOBCowData)
 	t.Mark("print")
@@ -134,29 +125,9 @@ func runPrintByName(args pokesay.Args) {
 func runPrintByCategory(args pokesay.Args) {
 	t := timer.NewTimer("runPrintByCategory", true)
 
-	dirPath := fmt.Sprintf("build/assets/categories/%s", args.Category)
+	dirPath := pokedex.CategoryDirpath(CategoryRoot, args.Category)
 	dir, _ := GOBCategories.ReadDir(dirPath)
-
-	choice := dir[pokesay.RandomInt(len(dir))]
-	t.Mark("chose random metadata")
-
-	categoryMetadata, err := GOBCategories.ReadFile(
-		fmt.Sprintf("build/assets/categories/%s/%s", args.Category, choice.Name()),
-	)
-	pokesay.Check(err)
-
-	parts := strings.Split(string(categoryMetadata), "/")
-	t.Mark("read category metadata")
-
-	metadata := pokedex.ReadMetadataFromEmbedded(
-		GOBCowNames,
-		path.Join(MetadataRoot, fmt.Sprintf("%s.metadata", parts[0])),
-	)
-	t.Mark("read metadata")
-
-	entryIndex, err := strconv.Atoi(string(parts[1]))
-	pokesay.Check(err)
-	final := metadata.Entries[entryIndex]
+	metadata, final := pokesay.ChooseByCategory(args.Category, dir, GOBCategories, CategoryRoot, GOBCowNames, MetadataRoot)
 
 	pokesay.Print(args, final.EntryIndex, GenerateNames(metadata, args), final.Categories, GOBCowData)
 	t.Mark("print")
@@ -167,7 +138,7 @@ func runPrintByCategory(args pokesay.Args) {
 
 func runPrintRandom(args pokesay.Args) {
 	t := timer.NewTimer("runPrintRandom", true)
-	_, choice := pokesay.ChooseByRandomIndex(GOBTotal)
+	choice := pokesay.RandomInt(pokedex.ReadIntFromBytes(GOBTotal))
 	t.Mark("choose index")
 	metadata := pokedex.ReadMetadataFromEmbedded(GOBCowNames, MetadataFpath(choice))
 	t.Mark("read metadata")
