@@ -14,8 +14,6 @@ var (
 	GOBCowNames embed.FS
 	//go:embed assets/cows/*cow
 	GOBCowFiles embed.FS
-	//go:embed assets/pokedex.gob
-	GOBCategory []byte
 
 	MetadataRoot string = "assets/metadata"
 	CowfileRoot  string = "assets/cows"
@@ -44,8 +42,6 @@ func EntryFpath(idx int) string {
 func main() {
 	args := parseFlags()
 	t := timer.NewTimer("read_assets", true)
-	pokedex.NewTrieFromBytes(GOBCategory)
-	t.Mark("trie")
 
 	metadata := pokedex.ReadMetadataFromEmbedded(GOBCowNames, MetadataFpath(args.Index))
 	t.Mark("metadata")

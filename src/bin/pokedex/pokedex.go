@@ -28,7 +28,6 @@ type PokedexArgs struct {
 	FromMetadataFname string
 	ToDir             string
 	Debug             bool
-	ToCategoryFname   string
 	ToDataSubDir      string
 	ToMetadataSubDir  string
 	ToTotalFname      string
@@ -41,7 +40,6 @@ func parseArgs() PokedexArgs {
 
 	toDataSubDir := flag.String("toDataSubDir", "cows/", "dir to write all binary (image) data to")
 	toMetadataSubDir := flag.String("toMetadataSubDir", "metadata/", "dir to write all binary (metadata) data to")
-	toCategoryFname := flag.String("toCategoryFpath", "pokedex.gob", "to fpath")
 	toTotalFname := flag.String("toTotalFname", "total.txt", "file to write the number of available entries to")
 	debug := flag.Bool("debug", false, "show debug logs")
 
@@ -51,7 +49,6 @@ func parseArgs() PokedexArgs {
 		FromDir:           normaliseRelativeDir(*fromDir),
 		FromMetadataFname: *fromMetadataFname,
 		ToDir:             normaliseRelativeDir(*toDir),
-		ToCategoryFname:   *toCategoryFname,
 		ToDataSubDir:      normaliseRelativeDir(*toDataSubDir),
 		ToMetadataSubDir:  normaliseRelativeDir(*toMetadataSubDir),
 		ToTotalFname:      *toTotalFname,
@@ -86,7 +83,6 @@ func main() {
 	args := parseArgs()
 
 	totalFpath := path.Join(args.ToDir, args.ToTotalFname)
-	categoryFpath := path.Join(args.ToDir, args.ToCategoryFname)
 	entryDirPath := path.Join(args.ToDir, args.ToDataSubDir)
 	metadataDirPath := path.Join(args.ToDir, args.ToMetadataSubDir)
 
@@ -142,5 +138,4 @@ func main() {
 	fmt.Println("✓ Wrote gzipped metadata to", metadataDirPath)
 	fmt.Println("✓ Wrote gzipped cowfiles to", entryDirPath)
 	fmt.Println("✓ Wrote 'total' metadata to", totalFpath, len(pokemonMetadata))
-	fmt.Println("✓ Wrote gzipped category trie to", categoryFpath)
 }
