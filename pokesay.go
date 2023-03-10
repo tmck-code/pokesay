@@ -168,6 +168,7 @@ func main() {
 	} else {
 		runPrintRandom(args)
 	}
+	t.Mark("op")
 
 	t.Stop()
 	t.PrintJson()
