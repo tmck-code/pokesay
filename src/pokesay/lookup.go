@@ -9,6 +9,7 @@ import (
 	"strconv"
 	"strings"
 	"time"
+	"log"
 
 	"github.com/tmck-code/pokesay/src/pokedex"
 )
@@ -58,6 +59,9 @@ func ListNames(names map[string][]int) []string {
 
 func ChooseByName(names map[string][]int, nameToken string, metadataFiles embed.FS, metadataRootDir string) (pokedex.PokemonMetadata, pokedex.PokemonEntryMapping) {
 	match := names[nameToken]
+	if len(match) == 0 {
+		log.Fatal(fmt.Sprintf("cannot find pokemon by name '%s'", nameToken))
+	}
 	nameChoice := match[RandomInt(len(match))]
 
 	metadata := pokedex.ReadMetadataFromEmbedded(
