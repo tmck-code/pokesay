@@ -26,6 +26,9 @@ func RandomInt(n int) int {
 }
 
 func ChooseByCategory(category string, categoryDir []fs.DirEntry, categoryFiles embed.FS, categoryRootDir string, metadataFiles embed.FS, metadataRootDir string) (pokedex.PokemonMetadata, pokedex.PokemonEntryMapping) {
+	if len(categoryDir) == 0 {
+		log.Fatal(fmt.Sprintf("cannot find pokemon by category '%s'", category))
+	}
 	choice := categoryDir[RandomInt(len(categoryDir))]
 
 	categoryMetadata, err := categoryFiles.ReadFile(
