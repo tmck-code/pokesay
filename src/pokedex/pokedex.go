@@ -38,6 +38,15 @@ func CategoryFpath(subdir string, category string, fname string) string {
 	return path.Join(subdir, category, fname)
 }
 
+func GatherMapKeys[T any](m map[string]T) []string {
+	keys := make([]string, 0)
+	for k, _ := range m {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
+	return keys
+}
+
 func ReadStructFromBytes[T any](data []byte) T {
 	var d T
 	gob.NewDecoder(bytes.NewBuffer(data)).Decode(&d)
@@ -156,12 +165,7 @@ func CreateCategoryStruct(rootDir string, metadata []PokemonMetadata, debug bool
 			}
 		}
 	}
-	keys := make([]string, 0)
-	for category := range uniqueCategories {
-		keys = append(keys, category)
-	}
-	sort.Strings(keys)
-	return keys
+	return GatherMapKeys(uniqueCategories)
 }
 
 func createCategories(fpath string, data []byte) []string {
