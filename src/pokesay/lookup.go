@@ -45,16 +45,8 @@ func ChooseByCategory(category string, categoryDir []fs.DirEntry, categoryFiles 
 	return metadata, metadata.Entries[entryIndex]
 }
 
-func GatherMapKeys(m map[string][]int) []string {
-	keys := make([]string, 0)
-	for k, _ := range m {
-		keys = append(keys, k)
-	}
-	return keys
-}
-
 func ListNames(names map[string][]int) []string {
-	return GatherMapKeys(names)
+	return pokedex.GatherMapKeys[[]int](names)
 }
 
 func ChooseByName(names map[string][]int, nameToken string, metadataFiles embed.FS, metadataRootDir string) (pokedex.PokemonMetadata, pokedex.PokemonEntryMapping) {
