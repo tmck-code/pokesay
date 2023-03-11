@@ -2,6 +2,7 @@ package pokedex
 
 import (
 	"embed"
+	"os"
 
 	"github.com/tmck-code/pokesay/src/timer"
 )
@@ -38,6 +39,20 @@ func NewMetadata(name string, japaneseName string, japanesePhonetic string, entr
 
 func ReadMetadataFromBytes(data []byte) PokemonMetadata {
 	return ReadStructFromBytes[PokemonMetadata](data)
+}
+
+func ReadMetadataFromFile(fpath string) PokemonMetadata {
+	t := timer.NewTimer("ReadMetadataFromEmbedded")
+	metadata, err := os.ReadFile(fpath)
+	Check(err)
+	t.Mark("read file")
+
+	data := ReadMetadataFromBytes(metadata)
+	t.Mark("read metadata")
+
+	t.Stop()
+	t.PrintJson()
+	return data
 }
 
 func ReadMetadataFromEmbedded(embeddedData embed.FS, fpath string) PokemonMetadata {
