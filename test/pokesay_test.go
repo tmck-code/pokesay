@@ -2,7 +2,6 @@ package test
 
 import (
 	"embed"
-	"fmt"
 	"testing"
 
 	"github.com/tmck-code/pokesay/src/pokedex"
@@ -44,19 +43,7 @@ func TestChooseByName(test *testing.T) {
 }
 
 func TestChooseByCategory(test *testing.T) {
-	// ChooseByCategory(
-	//	category string,
-	//	categoryDir []fs.DirEntry,
-	//	categoryFiles embed.FS,
-	//	categoryRootDir string,
-	//	metadataFiles embed.FS,
-	//	metadataRootDir string
-	//)
-	//(pokedex.PokemonMetadata, pokedex.PokemonEntryMapping)
-
 	dir, _ := GOBCategories.ReadDir("data/categories/small")
-
-	fmt.Printf("%#v\n", dir)
 
 	metadata, entry := pokesay.ChooseByCategory(
 		"small",
@@ -67,8 +54,25 @@ func TestChooseByCategory(test *testing.T) {
 		"data/cows",
 	)
 
-	Assert(metadata, "", test)
-	Assert(entry, "", test)
+	expectedMetadata := pokedex.PokemonMetadata{
+		Name:             "Hoothoot",
+		JapaneseName:     "ホーホー",
+		JapanesePhonetic: "ho-ho-",
+		Entries: []pokedex.PokemonEntryMapping{
+			{EntryIndex: 1586, Categories: []string{"small", "gen7x", "shiny"}},
+			{EntryIndex: 2960, Categories: []string{"small", "gen8", "regular"}},
+			{EntryIndex: 4285, Categories: []string{"small", "gen8", "shiny"}},
+			{EntryIndex: 428, Categories: []string{"small", "gen7x", "regular"}},
+		},
+	}
+
+	expectedEntry := pokedex.PokemonEntryMapping{
+		EntryIndex: 2960,
+		Categories: []string{"small", "gen8", "regular"},
+	}
+
+	Assert(expectedMetadata, metadata, test)
+	Assert(expectedEntry, entry, test)
 }
 
 func TestChooseByRandomIndex(test *testing.T) {
