@@ -12,15 +12,21 @@ import (
 )
 
 var (
-	//go:embed build/assets/pokedex.gob
-	GOBCategory []byte
+	//go:embed build/assets/category_keys.txt
+	GOBCategoryKeys []byte
+	//go:embed build/assets/names.txt
+	GOBAllNames []byte
+
 	//go:embed build/assets/total.txt
 	GOBTotal []byte
 	//go:embed build/assets/cows/*cow
 	GOBCowData embed.FS
 	//go:embed build/assets/metadata/*metadata
 	GOBCowNames embed.FS
+	//go:embed all:build/assets/categories
+	GOBCategories embed.FS
 
+	CategoryRoot string = "build/assets/categories"
 	MetadataRoot string = "build/assets/metadata"
 	CowDataRoot  string = "build/assets/cows"
 )
@@ -73,21 +79,20 @@ func MetadataFpath(idx int) string {
 	return pokedex.MetadataFpath(MetadataRoot, idx)
 }
 
-func runListCategories(categories pokedex.Trie) {
-	keys := pokesay.ListCategories(categories)
-	fmt.Printf("%s\n%d %s\n", strings.Join(keys, " "), len(keys), "total categories")
+func CategoryFpath(category string, fname string) string {
+	return pokedex.CategoryFpath(CategoryRoot, category, fname)
+}
+
+func runListCategories() {
+	categories := pokedex.ReadStructFromBytes[[]string](GOBCategoryKeys)
+	fmt.Printf("%s\n%d %s\n", strings.Join(categories, " "), len(categories), "total categories")
 }
 
 func runListNames() {
-	total := pokedex.ReadIntFromBytes(GOBTotal)
-	names := make([]string, total)
-
-	for i := 0; i < total; i++ {
-		metadata := pokedex.ReadMetadataFromEmbedded(GOBCowNames, MetadataFpath(i))
-		names[i] = metadata.Name
-	}
-	fmt.Println(strings.Join(names, " "))
-	fmt.Printf("\n%d %s\n", len(names), "total names")
+	names := pokesay.ListNames(
+		pokedex.ReadStructFromBytes[map[string][]int](GOBAllNames),
+	)
+	fmt.Printf("%s\n%d %s\n", strings.Join(names, " "), len(names), "total names")
 }
 
 func GenerateNames(metadata pokedex.PokemonMetadata, args pokesay.Args) []string {
@@ -101,16 +106,14 @@ func GenerateNames(metadata pokedex.PokemonMetadata, args pokesay.Args) []string
 	}
 }
 
-func runPrintByName(args pokesay.Args, categories pokedex.Trie) {
+func runPrintByName(args pokesay.Args) {
 	t := timer.NewTimer("runPrintByName", true)
-	match := pokesay.ChooseByName(args.NameToken, categories)
-	t.Mark("match")
-	metadata := pokedex.ReadMetadataFromEmbedded(GOBCowNames, MetadataFpath(match.Entry.Index))
-	t.Mark("read metadata")
-	choice := pokesay.RandomInt(len(metadata.Entries))
-	t.Mark("choice")
-	final := metadata.Entries[choice]
-	// fmt.Println(pokedex.StructToJSON(metadata), "\n", choice, "\n", final)
+
+	names := pokedex.ReadStructFromBytes[map[string][]int](GOBAllNames)
+	t.Mark("read name struct")
+
+	metadata, final := pokesay.ChooseByName(names, args.NameToken, GOBCowNames, MetadataRoot)
+	t.Mark("find and read metadata")
 
 	pokesay.Print(args, final.EntryIndex, GenerateNames(metadata, args), final.Categories, GOBCowData)
 	t.Mark("print")
@@ -119,15 +122,14 @@ func runPrintByName(args pokesay.Args, categories pokedex.Trie) {
 	t.PrintJson()
 }
 
-func runPrintByCategory(args pokesay.Args, categories pokedex.Trie) {
+func runPrintByCategory(args pokesay.Args) {
 	t := timer.NewTimer("runPrintByCategory", true)
-	choice, keys := pokesay.ChooseByCategory(args.Category, categories)
-	t.Mark("choose by category")
 
-	metadata := pokedex.ReadMetadataFromEmbedded(GOBCowNames, MetadataFpath(choice.Index))
-	t.Mark("read metadata")
+	dirPath := pokedex.CategoryDirpath(CategoryRoot, args.Category)
+	dir, _ := GOBCategories.ReadDir(dirPath)
+	metadata, final := pokesay.ChooseByCategory(args.Category, dir, GOBCategories, CategoryRoot, GOBCowNames, MetadataRoot)
 
-	pokesay.Print(args, choice.Index, GenerateNames(metadata, args), keys, GOBCowData)
+	pokesay.Print(args, final.EntryIndex, GenerateNames(metadata, args), final.Categories, GOBCowData)
 	t.Mark("print")
 
 	t.Stop()
@@ -136,7 +138,7 @@ func runPrintByCategory(args pokesay.Args, categories pokedex.Trie) {
 
 func runPrintRandom(args pokesay.Args) {
 	t := timer.NewTimer("runPrintRandom", true)
-	_, choice := pokesay.ChooseByRandomIndex(GOBTotal)
+	choice := pokesay.RandomInt(pokedex.ReadIntFromBytes(GOBTotal))
 	t.Mark("choose index")
 	metadata := pokedex.ReadMetadataFromEmbedded(GOBCowNames, MetadataFpath(choice))
 	t.Mark("read metadata")
@@ -156,26 +158,17 @@ func main() {
 	t := timer.NewTimer("main", true)
 
 	if args.ListCategories {
-		c := pokedex.NewTrieFromBytes(GOBCategory)
-		t.Mark("trie")
-		runListCategories(c)
-		t.Mark("op")
+		runListCategories()
 	} else if args.ListNames {
 		runListNames()
 	} else if args.NameToken != "" {
-		c := pokedex.NewTrieFromBytes(GOBCategory)
-		t.Mark("trie")
-		runPrintByName(args, c)
-		t.Mark("op")
+		runPrintByName(args)
 	} else if args.Category != "" {
-		c := pokedex.NewTrieFromBytes(GOBCategory)
-		t.Mark("trie")
-		runPrintByCategory(args, c)
-		t.Mark("op")
+		runPrintByCategory(args)
 	} else {
 		runPrintRandom(args)
-		t.Mark("op")
 	}
+	t.Mark("op")
 
 	t.Stop()
 	t.PrintJson()
