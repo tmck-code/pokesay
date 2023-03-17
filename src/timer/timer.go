@@ -88,5 +88,6 @@ func (t *Timer) PrintJson() {
 		return
 	}
 	json, _ := json.MarshalIndent(t, "", strings.Repeat(" ", 2))
-	fmt.Println(string(json))
+	// json, _ := json.Marshal(t)
+	fmt.Fprintln(os.Stderr, string(json))
 }

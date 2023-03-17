@@ -1,8 +1,14 @@
 package pokesay
 
 import (
+	"embed"
+	"fmt"
+	"io/fs"
+	"log"
 	"math/rand"
-	"sort"
+	"path"
+	"strconv"
+	"strings"
 	"time"
 
 	"github.com/tmck-code/pokesay/src/pokedex"
@@ -19,46 +25,47 @@ func RandomInt(n int) int {
 	return rand.New(Rand).Intn(n)
 }
 
-func ChooseByCategory(categoryKey string, categories pokedex.Trie) (*pokedex.Entry, []string) {
-	matches, err := categories.FindKeyPaths(categoryKey)
+func ChooseByCategory(category string, categoryDir []fs.DirEntry, categoryFiles embed.FS, categoryRootDir string, metadataFiles embed.FS, metadataRootDir string) (pokedex.PokemonMetadata, pokedex.PokemonEntryMapping) {
+	if len(categoryDir) == 0 {
+		log.Fatalf("cannot find pokemon by category '%s'", category)
+	}
+	choice := categoryDir[RandomInt(len(categoryDir))]
+
+	categoryMetadata, err := categoryFiles.ReadFile(
+		pokedex.CategoryFpath(categoryRootDir, category, choice.Name()),
+	)
 	Check(err)
 
-	keyPath := matches[RandomInt(len(matches)-1)]
-	category, err := categories.FindByKeyPath(keyPath)
+	parts := strings.Split(string(categoryMetadata), "/")
+
+	metadata := pokedex.ReadMetadataFromEmbedded(
+		metadataFiles,
+		path.Join(metadataRootDir, fmt.Sprintf("%s.metadata", parts[0])),
+	)
+
+	entryIndex, err := strconv.Atoi(string(parts[1]))
 	Check(err)
 
-	choice := category[RandomInt(len(category))]
-
-	return choice, keyPath
+	return metadata, metadata.Entries[entryIndex]
 }
 
-func ListCategories(categories pokedex.Trie) []string {
-	ukm := map[string]bool{}
-	for _, v := range categories.KeyPaths {
-		for _, k := range v {
-			ukm[k] = true
-		}
-	}
-	keys := make([]string, len(ukm))
-	i := 0
-	for k := range ukm {
-		keys[i] = k
-		i++
-	}
-	sort.Strings(keys)
-	return keys
+func ListNames(names map[string][]int) []string {
+	return pokedex.GatherMapKeys(names)
 }
 
-func ChooseByName(name string, categories pokedex.Trie) *pokedex.PokemonMatch {
-	matches, err := categories.Find(name, true)
-	Check(err)
-	// for i, m := range matches {
-	// 	fmt.Printf("name matches for %s: %v (%d)\n", name, m, i)
-	// }
-	choice := matches[RandomInt(len(matches))]
+func ChooseByName(names map[string][]int, nameToken string, metadataFiles embed.FS, metadataRootDir string) (pokedex.PokemonMetadata, pokedex.PokemonEntryMapping) {
+	match := names[nameToken]
+	if len(match) == 0 {
+		log.Fatalf("cannot find pokemon by name '%s'", nameToken)
+	}
+	nameChoice := match[RandomInt(len(match))]
 
-	// fmt.Printf("name choice for %s\n", choice)
-	return choice
+	metadata := pokedex.ReadMetadataFromEmbedded(
+		metadataFiles,
+		pokedex.MetadataFpath(metadataRootDir, nameChoice),
+	)
+	choice := RandomInt(len(metadata.Entries))
+	return metadata, metadata.Entries[choice]
 }
 
 func ChooseByRandomIndex(totalInBytes []byte) (int, int) {
