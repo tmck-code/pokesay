@@ -157,9 +157,10 @@ DEBUG=test go test -v ./test/
 ## TODO
 
 - Short-term
-  - [ ] Store metadata and names in a more storage-efficient manner
+  - [ ] Make the category struct faster to load - currently takes up to 80% of the execution time
 - Longer-term
 - Completed
+  - [x] Store metadata and names in a more storage-efficient manner
   - [x] Import japanese names from data/pokemon.json
   - [x] Fix bad whitespace stripping when building assets
   - [x] List all names
