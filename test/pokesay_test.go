@@ -1,7 +1,7 @@
 package test
 
 import (
-	_ "embed"
+	"embed"
 	"testing"
 
 	"github.com/tmck-code/pokesay/src/pokedex"
@@ -11,56 +11,68 @@ import (
 var (
 	//go:embed data/total.txt
 	GOBTotal []byte
+	//go:embed data/cows/*.metadata
+	GOBCowNames embed.FS
+	//go:embed all:data/categories
+	GOBCategories embed.FS
 )
 
-func TestListCategories(test *testing.T) {
-	t := pokedex.NewTrie()
-	t.Insert([]string{"small", "g1", "r"}, pokedex.NewEntry(0, "pikachu"))
-	t.Insert([]string{"small", "g1", "o"}, pokedex.NewEntry(1, "bulbasaur"))
-	t.Insert([]string{"medium", "g1", "o"}, pokedex.NewEntry(2, "bulbasaur"))
-	t.Insert([]string{"big", "g1", "o"}, pokedex.NewEntry(3, "bulbasaur"))
-	t.Insert([]string{"big", "g1"}, pokedex.NewEntry(4, "charmander"))
+func TestChooseByName(test *testing.T) {
+	names := make(map[string][]int)
+	names["hoothoot"] = []int{4}
+	result, _ := pokesay.ChooseByName(
+		names,
+		"hoothoot",
+		GOBCowNames,
+		"data/cows",
+	)
 
-	result := pokesay.ListCategories(*t)
-	expected := []string{"big", "g1", "medium", "o", "r", "small"}
+	expected := pokedex.PokemonMetadata{
+		Name:             "Hoothoot",
+		JapaneseName:     "ホーホー",
+		JapanesePhonetic: "ho-ho-",
+		Entries: []pokedex.PokemonEntryMapping{
+			{EntryIndex: 1586, Categories: []string{"small", "gen7x", "shiny"}},
+			{EntryIndex: 2960, Categories: []string{"small", "gen8", "regular"}},
+			{EntryIndex: 4285, Categories: []string{"small", "gen8", "shiny"}},
+			{EntryIndex: 428, Categories: []string{"small", "gen7x", "regular"}},
+		},
+	}
 
 	Assert(expected, result, test)
 }
 
-func TestChooseByName(test *testing.T) {
-	t := pokedex.NewTrie()
-	t.Insert([]string{"small", "g1", "r"}, pokedex.NewEntry(0, "pikachu"))
-	t.Insert([]string{"small", "g1", "o"}, pokedex.NewEntry(1, "bulbasaur"))
-	t.Insert([]string{"medium", "g1", "o"}, pokedex.NewEntry(2, "charmander"))
-	t.Insert([]string{"big", "g1", "o"}, pokedex.NewEntry(3, "bulbasaur"))
-	t.Insert([]string{"big", "g1"}, pokedex.NewEntry(4, "charmander"))
-
-	result := pokesay.ChooseByName("charmander", *t)
-	expected := []pokedex.PokemonMatch{
-		{Entry: &pokedex.Entry{Index: 2, Value: "charmander"}, Keys: []string{"medium", "g1", "o"}},
-		{Entry: &pokedex.Entry{Index: 4, Value: "charmander"}, Keys: []string{"big", "g1"}},
-	}
-
-	AssertContains(expected, *result, test)
-}
-
 func TestChooseByCategory(test *testing.T) {
-	t := pokedex.NewTrie()
-	t.Insert([]string{"small", "g1", "r"}, pokedex.NewEntry(0, "pikachu"))
-	t.Insert([]string{"small", "g1", "o"}, pokedex.NewEntry(1, "bulbasaur"))
-	t.Insert([]string{"medium", "g1", "o"}, pokedex.NewEntry(2, "bulbasaur"))
-	t.Insert([]string{"big", "g1", "o"}, pokedex.NewEntry(3, "bulbasaur"))
-	t.Insert([]string{"big", "g1"}, pokedex.NewEntry(4, "charmander"))
+	dir, _ := GOBCategories.ReadDir("data/categories/small")
 
-	result, keys := pokesay.ChooseByCategory("big", *t)
+	metadata, entry := pokesay.ChooseByCategory(
+		"small",
+		dir,
+		GOBCategories,
+		"data/categories",
+		GOBCowNames,
+		"data/cows",
+	)
 
-	expectedKeys := [][]string{{"big", "g1", "o"}, {"big", "g1"}}
-	expectedResult := []pokedex.Entry{
-		{Index: 3, Value: "bulbasaur"},
-		{Index: 4, Value: "charmander"},
+	expectedMetadata := pokedex.PokemonMetadata{
+		Name:             "Hoothoot",
+		JapaneseName:     "ホーホー",
+		JapanesePhonetic: "ho-ho-",
+		Entries: []pokedex.PokemonEntryMapping{
+			{EntryIndex: 1586, Categories: []string{"small", "gen7x", "shiny"}},
+			{EntryIndex: 2960, Categories: []string{"small", "gen8", "regular"}},
+			{EntryIndex: 4285, Categories: []string{"small", "gen8", "shiny"}},
+			{EntryIndex: 428, Categories: []string{"small", "gen7x", "regular"}},
+		},
 	}
-	AssertContains(expectedResult, *result, test)
-	AssertContains(expectedKeys, keys, test)
+
+	expectedEntry := pokedex.PokemonEntryMapping{
+		EntryIndex: 2960,
+		Categories: []string{"small", "gen8", "regular"},
+	}
+
+	Assert(expectedMetadata, metadata, test)
+	Assert(expectedEntry, entry, test)
 }
 
 func TestChooseByRandomIndex(test *testing.T) {

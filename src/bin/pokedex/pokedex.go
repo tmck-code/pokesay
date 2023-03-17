@@ -28,7 +28,6 @@ type PokedexArgs struct {
 	FromMetadataFname string
 	ToDir             string
 	Debug             bool
-	ToCategoryFname   string
 	ToDataSubDir      string
 	ToMetadataSubDir  string
 	ToTotalFname      string
@@ -41,7 +40,6 @@ func parseArgs() PokedexArgs {
 
 	toDataSubDir := flag.String("toDataSubDir", "cows/", "dir to write all binary (image) data to")
 	toMetadataSubDir := flag.String("toMetadataSubDir", "metadata/", "dir to write all binary (metadata) data to")
-	toCategoryFname := flag.String("toCategoryFpath", "pokedex.gob", "to fpath")
 	toTotalFname := flag.String("toTotalFname", "total.txt", "file to write the number of available entries to")
 	debug := flag.Bool("debug", false, "show debug logs")
 
@@ -51,7 +49,6 @@ func parseArgs() PokedexArgs {
 		FromDir:           normaliseRelativeDir(*fromDir),
 		FromMetadataFname: *fromMetadataFname,
 		ToDir:             normaliseRelativeDir(*toDir),
-		ToCategoryFname:   *toCategoryFname,
 		ToDataSubDir:      normaliseRelativeDir(*toDataSubDir),
 		ToMetadataSubDir:  normaliseRelativeDir(*toMetadataSubDir),
 		ToTotalFname:      *toTotalFname,
@@ -86,7 +83,6 @@ func main() {
 	args := parseArgs()
 
 	totalFpath := path.Join(args.ToDir, args.ToTotalFname)
-	categoryFpath := path.Join(args.ToDir, args.ToCategoryFname)
 	entryDirPath := path.Join(args.ToDir, args.ToDataSubDir)
 	metadataDirPath := path.Join(args.ToDir, args.ToMetadataSubDir)
 
@@ -112,30 +108,34 @@ func main() {
 
 	// 1. For each pokemon name, write a metadata file, containing the name information, and
 	// links to all of the matching cowfile indexes
+	fmt.Println("- Writing metadata to file")
 	pokemonMetadata := make([]pokedex.PokemonMetadata, 0)
+	uniqueNames := make(map[string][]int)
 	i := 0
+	pbar = bin.NewProgressBar(len(pokemonNames))
 	for key, name := range pokemonNames {
 		metadata := pokedex.CreateNameMetadata(i, key, name, args.FromDir, cowfileFpaths)
-		fmt.Printf("-- %d %+v\n", i, metadata)
 		pokedex.WriteStructToFile(metadata, pokedex.MetadataFpath(metadataDirPath, i))
 		pokemonMetadata = append(pokemonMetadata, *metadata)
+		uniqueNames[name.Slug] = append(uniqueNames[name.Slug], i)
 		i++
+		pbar.Add(1)
 	}
-	fmt.Println("wrote", i, "name metadata files to", metadataDirPath)
+
+	pokedex.WriteStructToFile(uniqueNames, "build/assets/names.txt")
 
 	// 2. Create the category struct using the cowfile paths, pokemon names and indexes\
 	fmt.Println("- Writing categories to file")
-	pokedex.WriteStructToFile(
-		pokedex.CreateCategoryStruct(args.FromDir, pokemonMetadata, args.Debug),
-		categoryFpath,
-	)
+	categories := pokedex.CreateCategoryStruct(args.FromDir, pokemonMetadata, args.Debug)
+	pokedex.WriteStructToFile(categories, "build/assets/category_keys.txt")
 
 	fmt.Println("- Writing total metadata to file")
 	pokedex.WriteIntToFile(len(pokemonMetadata), totalFpath)
 
 	fmt.Println("✓ Complete! Indexed", len(cowfileFpaths), "total cowfiles")
+	fmt.Println("wrote", i, "names to", "build/assets/names.txt")
+
 	fmt.Println("✓ Wrote gzipped metadata to", metadataDirPath)
 	fmt.Println("✓ Wrote gzipped cowfiles to", entryDirPath)
 	fmt.Println("✓ Wrote 'total' metadata to", totalFpath, len(pokemonMetadata))
-	fmt.Println("✓ Wrote gzipped category trie to", categoryFpath)
 }

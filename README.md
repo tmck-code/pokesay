@@ -120,7 +120,7 @@ dependencies are installed (see the dockerfile for the dependencies)
 # Generate binary asset files from the cowfiles
 ./build/build_assets.sh
 
-# Finally, build the pokesay tool (this builds and uses the build/pokedex.gob file automatically)
+# Finally, build the pokesay tool
 go build pokesay.go
 ```
 

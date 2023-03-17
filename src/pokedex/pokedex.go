@@ -11,6 +11,7 @@ import (
 	"log"
 	"os"
 	"path"
+	"sort"
 	"strconv"
 	"strings"
 )
@@ -27,6 +28,23 @@ func EntryFpath(subdir string, idx int) string {
 
 func MetadataFpath(subdir string, idx int) string {
 	return path.Join(subdir, fmt.Sprintf("%d.metadata", idx))
+}
+
+func CategoryDirpath(subdir string, cat string) string {
+	return path.Join(subdir, cat)
+}
+
+func CategoryFpath(subdir string, category string, fname string) string {
+	return path.Join(subdir, category, fname)
+}
+
+func GatherMapKeys[T any](m map[string]T) []string {
+	keys := make([]string, 0)
+	for k, _ := range m {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
+	return keys
 }
 
 func ReadStructFromBytes[T any](data []byte) T {
@@ -132,22 +150,22 @@ func CreateNameMetadata(idx int, key string, name PokemonName, rootDir string, f
 	)
 }
 
-func CreateCategoryStruct(rootDir string, metadata []PokemonMetadata, debug bool) Trie {
-	categories := NewTrie()
+func CreateCategoryStruct(rootDir string, metadata []PokemonMetadata, debug bool) []string {
+	uniqueCategories := make(map[string]bool)
 	for i, m := range metadata {
-		for _, entry := range m.Entries {
-			trieEntry := NewEntry(i, strings.ToLower(m.Name))
-			fmt.Printf("inserting %s, %+v\n", entry.Categories, trieEntry)
-			categories.Insert(entry.Categories, trieEntry)
+		for j, entry := range m.Entries {
+			for _, cat := range entry.Categories {
+				uniqueCategories[cat] = true
+				destDir := fmt.Sprintf(
+					"build/assets/categories/%s",
+					cat,
+				)
+				os.MkdirAll(destDir, 0755)
+				WriteBytesToFile([]byte(fmt.Sprintf("%d/%d", i, j)), fmt.Sprintf("%s/%02d%s", destDir, i, ".cat"), false)
+			}
 		}
 	}
-	// fmt.Println(categories.ToString(2))
-	return *categories
-}
-
-func createName(fpath string) string {
-	parts := strings.Split(fpath, "/")
-	return strings.Split(parts[len(parts)-1], ".")[0]
+	return GatherMapKeys(uniqueCategories)
 }
 
 func createCategories(fpath string, data []byte) []string {
