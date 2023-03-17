@@ -2,6 +2,7 @@ package test
 
 import (
 	"embed"
+	"fmt"
 	"testing"
 
 	"github.com/tmck-code/pokesay/src/pokedex"
@@ -13,6 +14,8 @@ var (
 	GOBTotal []byte
 	//go:embed data/cows/*.metadata
 	GOBCowNames embed.FS
+	//go:embed all:data/categories
+	GOBCategories embed.FS
 )
 
 func TestChooseByName(test *testing.T) {
@@ -41,6 +44,31 @@ func TestChooseByName(test *testing.T) {
 }
 
 func TestChooseByCategory(test *testing.T) {
+	// ChooseByCategory(
+	//	category string,
+	//	categoryDir []fs.DirEntry,
+	//	categoryFiles embed.FS,
+	//	categoryRootDir string,
+	//	metadataFiles embed.FS,
+	//	metadataRootDir string
+	//)
+	//(pokedex.PokemonMetadata, pokedex.PokemonEntryMapping)
+
+	dir, _ := GOBCategories.ReadDir("data/categories/small")
+
+	fmt.Printf("%#v\n", dir)
+
+	metadata, entry := pokesay.ChooseByCategory(
+		"small",
+		dir,
+		GOBCategories,
+		"data/categories",
+		GOBCowNames,
+		"data/cows",
+	)
+
+	Assert(metadata, "", test)
+	Assert(entry, "", test)
 }
 
 func TestChooseByRandomIndex(test *testing.T) {
