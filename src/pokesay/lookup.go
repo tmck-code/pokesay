@@ -4,12 +4,12 @@ import (
 	"embed"
 	"fmt"
 	"io/fs"
+	"log"
 	"math/rand"
 	"path"
 	"strconv"
 	"strings"
 	"time"
-	"log"
 
 	"github.com/tmck-code/pokesay/src/pokedex"
 )
@@ -27,7 +27,7 @@ func RandomInt(n int) int {
 
 func ChooseByCategory(category string, categoryDir []fs.DirEntry, categoryFiles embed.FS, categoryRootDir string, metadataFiles embed.FS, metadataRootDir string) (pokedex.PokemonMetadata, pokedex.PokemonEntryMapping) {
 	if len(categoryDir) == 0 {
-		log.Fatal(fmt.Sprintf("cannot find pokemon by category '%s'", category))
+		log.Fatalf("cannot find pokemon by category '%s'", category)
 	}
 	choice := categoryDir[RandomInt(len(categoryDir))]
 
@@ -45,17 +45,18 @@ func ChooseByCategory(category string, categoryDir []fs.DirEntry, categoryFiles 
 
 	entryIndex, err := strconv.Atoi(string(parts[1]))
 	Check(err)
+
 	return metadata, metadata.Entries[entryIndex]
 }
 
 func ListNames(names map[string][]int) []string {
-	return pokedex.GatherMapKeys[[]int](names)
+	return pokedex.GatherMapKeys(names)
 }
 
 func ChooseByName(names map[string][]int, nameToken string, metadataFiles embed.FS, metadataRootDir string) (pokedex.PokemonMetadata, pokedex.PokemonEntryMapping) {
 	match := names[nameToken]
 	if len(match) == 0 {
-		log.Fatal(fmt.Sprintf("cannot find pokemon by name '%s'", nameToken))
+		log.Fatalf("cannot find pokemon by name '%s'", nameToken)
 	}
 	nameChoice := match[RandomInt(len(match))]
 
