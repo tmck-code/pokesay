@@ -160,8 +160,13 @@ func CreateCategoryStruct(rootDir string, metadata []PokemonMetadata, debug bool
 					"build/assets/categories/%s",
 					cat,
 				)
+				fpath := fmt.Sprintf("%s/%02d%s", destDir, i, ".cat")
 				os.MkdirAll(destDir, 0755)
-				WriteBytesToFile([]byte(fmt.Sprintf("%d/%d", i, j)), fmt.Sprintf("%s/%02d%s", destDir, i, ".cat"), false)
+				WriteBytesToFile(
+					[]byte(fmt.Sprintf("%d/%d", i, j)),
+					fpath,
+					false,
+				)
 			}
 		}
 	}
@@ -169,7 +174,7 @@ func CreateCategoryStruct(rootDir string, metadata []PokemonMetadata, debug bool
 }
 
 func createCategories(fpath string, data []byte) []string {
-	parts := strings.Split(fpath, "/")
+	parts := strings.Split(strings.TrimLeft(fpath, "/"), "/")
 	height := sizeCategory(len(strings.Split(string(data), "\n")))
 
 	return append([]string{height}, parts[0:len(parts)-1]...)
