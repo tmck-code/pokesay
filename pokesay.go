@@ -43,6 +43,7 @@ func parseFlags() pokesay.Args {
 	listCategories := flag.Bool("list-categories", false, "list all available categories")
 	listNames := flag.Bool("list-names", false, "list all available names")
 	japaneseName := flag.Bool("japanese-name", false, "print the japanese name")
+	unicodeBox := flg.Bool("unicode-box", false, "use unicode characters to draw the speech box")
 
 	flag.Parse()
 	var args pokesay.Args
@@ -66,6 +67,7 @@ func parseFlags() pokesay.Args {
 			Category:       *category,
 			NameToken:      *name,
 			JapaneseName:   *japaneseName,
+			UnicodeBox:     *unicodeBox,
 		}
 	}
 	return args
