@@ -28,7 +28,9 @@ type Args struct {
 	Category       string
 	NameToken      string
 	JapaneseName   bool
+	Unicode        bool
 }
+
 
 // The main print function! This uses a chosen pokemon's index, names and categories, and an
 // embedded filesystem of cowfile data
