@@ -43,16 +43,18 @@ func parseFlags() pokesay.Args {
 	listCategories := flag.Bool("list-categories", false, "list all available categories")
 	listNames := flag.Bool("list-names", false, "list all available names")
 	japaneseName := flag.Bool("japanese-name", false, "print the japanese name")
+	unicodeBox := flag.Bool("unicode-box", false, "use unicode characters to draw the speech box")
 
 	flag.Parse()
 	var args pokesay.Args
 
 	if *fastest {
 		args = pokesay.Args{
-			Width:       *width,
-			NoWrap:      true,
-			TabSpaces:   "    ",
-			NoTabSpaces: true,
+			Width:         *width,
+			NoWrap:        true,
+			TabSpaces:     "    ",
+			NoTabSpaces:   true,
+			BoxCharacters: pokesay.DetermineBoxCharacters(false),
 		}
 	} else {
 		args = pokesay.Args{
@@ -66,6 +68,7 @@ func parseFlags() pokesay.Args {
 			Category:       *category,
 			NameToken:      *name,
 			JapaneseName:   *japaneseName,
+			BoxCharacters:  pokesay.DetermineBoxCharacters(*unicodeBox),
 		}
 	}
 	return args
