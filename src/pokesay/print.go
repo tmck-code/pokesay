@@ -63,7 +63,7 @@ var (
 		BottomLeftCorner:  "╰",
 		BalloonString:     "╲",
 		Separator:         "│",
-		RightArrow:        "→ ",
+		RightArrow:        "→",
 		CategorySeparator: "/",
 	}
 )
@@ -130,30 +130,72 @@ func printWrappedText(boxCharacters *BoxCharacters, line string, width int, tabS
 	}
 }
 
+func nameLength(names []string) int {
+	totalLen := 0
+	for _, name := range names {
+		for _, c := range name {
+			// check if ascii
+			if c < 128 {
+				totalLen++
+			} else {
+				totalLen += 2
+			}
+		}
+	}
+	return totalLen
+}
+
 // Prints a pokemon with its name & category information.
 func printPokemon(args Args, index int, names []string, categoryKeys []string, GOBCowData embed.FS) {
 	d, _ := GOBCowData.ReadFile(pokedex.EntryFpath("build/assets/cows", index))
 
+	width := nameLength(names)
+	fmt.Println("length", width)
 	namesFmt := make([]string, 0)
 	for _, name := range names {
 		namesFmt = append(namesFmt, textStyleBold.Sprint(name))
 	}
+	// count name separators
+	width += (len(namesFmt) - 1) * 3
+	width += 2 + 2 // for the arrows
+	width += 2 + 2 // for the end box characters
+
+	infoLine := ""
 
 	if args.NoCategoryInfo {
-		fmt.Printf(
-			"%s%s %s\n",
-			pokedex.Decompress(d),
+		width = len(names[0]) + 3 + 1
+		infoLine = fmt.Sprintf(
+			"%s %s",
 			args.BoxCharacters.RightArrow,
 			strings.Join(namesFmt, fmt.Sprintf(" %s ", args.BoxCharacters.Separator)),
 		)
+
 	} else {
-		fmt.Printf(
-			"%s%s %s %s %s\n",
-			pokedex.Decompress(d),
+		infoLine = fmt.Sprintf(
+			"%s %s %s %s",
 			args.BoxCharacters.RightArrow,
 			strings.Join(namesFmt, fmt.Sprintf(" %s ", args.BoxCharacters.Separator)),
 			args.BoxCharacters.Separator,
 			textStyleItalic.Sprint(strings.Join(categoryKeys, args.BoxCharacters.CategorySeparator)),
 		)
 	}
+	topBorder := fmt.Sprintf(
+		"%s%s%s\n",
+		args.BoxCharacters.TopLeftCorner,
+		strings.Repeat(args.BoxCharacters.HorizontalEdge, width),
+		args.BoxCharacters.TopRightCorner,
+	)
+	bottomBorder := fmt.Sprintf(
+		"%s%s%s\n",
+		args.BoxCharacters.BottomLeftCorner,
+		strings.Repeat(args.BoxCharacters.HorizontalEdge, width),
+		args.BoxCharacters.BottomRightCorner,
+	)
+	fmt.Printf(
+		"%s%s%s\n%s",
+		pokedex.Decompress(d),
+		topBorder,
+		infoLine,
+		bottomBorder,
+	)
 }
