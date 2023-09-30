@@ -150,20 +150,18 @@ func printPokemon(args Args, index int, names []string, categoryKeys []string, G
 	d, _ := GOBCowData.ReadFile(pokedex.EntryFpath("build/assets/cows", index))
 
 	width := nameLength(names)
-	fmt.Println("length", width)
 	namesFmt := make([]string, 0)
 	for _, name := range names {
 		namesFmt = append(namesFmt, textStyleBold.Sprint(name))
 	}
 	// count name separators
-	width += (len(namesFmt) - 1) * 3
-	width += 2 + 2 // for the arrows
+	width += (len(names) - 1) * 3
+	width += 2     // for the arrow
 	width += 2 + 2 // for the end box characters
 
 	infoLine := ""
 
 	if args.NoCategoryInfo {
-		width = len(names[0]) + 3 + 1
 		infoLine = fmt.Sprintf(
 			"%s %s",
 			args.BoxCharacters.RightArrow,
@@ -178,24 +176,30 @@ func printPokemon(args Args, index int, names []string, categoryKeys []string, G
 			args.BoxCharacters.Separator,
 			textStyleItalic.Sprint(strings.Join(categoryKeys, args.BoxCharacters.CategorySeparator)),
 		)
+		for _, category := range categoryKeys {
+			width += len(category)
+		}
+		width += len(categoryKeys) - 1 + 1 + 2
 	}
 	topBorder := fmt.Sprintf(
 		"%s%s%s\n",
 		args.BoxCharacters.TopLeftCorner,
-		strings.Repeat(args.BoxCharacters.HorizontalEdge, width),
+		strings.Repeat(args.BoxCharacters.HorizontalEdge, width-2),
 		args.BoxCharacters.TopRightCorner,
 	)
 	bottomBorder := fmt.Sprintf(
 		"%s%s%s\n",
 		args.BoxCharacters.BottomLeftCorner,
-		strings.Repeat(args.BoxCharacters.HorizontalEdge, width),
+		strings.Repeat(args.BoxCharacters.HorizontalEdge, width-2),
 		args.BoxCharacters.BottomRightCorner,
 	)
 	fmt.Printf(
-		"%s%s%s\n%s",
+		"%s%s%s %s %s\n%s",
 		pokedex.Decompress(d),
 		topBorder,
+		args.BoxCharacters.VerticalEdge,
 		infoLine,
+		args.BoxCharacters.VerticalEdge,
 		bottomBorder,
 	)
 }
