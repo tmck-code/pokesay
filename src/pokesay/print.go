@@ -37,6 +37,7 @@ type Args struct {
 	NameToken      string
 	JapaneseName   bool
 	BoxCharacters  *BoxCharacters
+	DrawInfoBorder bool
 }
 
 var (
@@ -62,7 +63,7 @@ var (
 		BottomRightCorner: "╯",
 		BottomLeftCorner:  "╰",
 		BalloonString:     "╲",
-		Separator:         "│",
+		Separator:         "┆",
 		RightArrow:        "→",
 		CategorySeparator: "/",
 	}
@@ -193,13 +194,21 @@ func printPokemon(args Args, index int, names []string, categoryKeys []string, G
 		strings.Repeat(args.BoxCharacters.HorizontalEdge, width-2),
 		args.BoxCharacters.BottomRightCorner,
 	)
-	fmt.Printf(
-		"%s%s%s %s %s\n%s",
-		pokedex.Decompress(d),
-		topBorder,
-		args.BoxCharacters.VerticalEdge,
-		infoLine,
-		args.BoxCharacters.VerticalEdge,
-		bottomBorder,
-	)
+	if args.DrawInfoBorder {
+		fmt.Printf(
+			"%s%s%s %s %s\n%s",
+			pokedex.Decompress(d),
+			topBorder,
+			args.BoxCharacters.VerticalEdge,
+			infoLine,
+			args.BoxCharacters.VerticalEdge,
+			bottomBorder,
+		)
+	} else {
+		fmt.Printf(
+			"%s%s\n",
+			pokedex.Decompress(d),
+			infoLine,
+		)
+	}
 }
