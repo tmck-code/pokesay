@@ -182,22 +182,22 @@ func printPokemon(args Args, index int, names []string, categoryKeys []string, G
 		}
 		width += len(categoryKeys) - 1 + 1 + 2
 	}
-	topBorder := fmt.Sprintf(
-		"%s%s%s\n",
-		args.BoxCharacters.TopLeftCorner,
-		strings.Repeat(args.BoxCharacters.HorizontalEdge, width-2),
-		args.BoxCharacters.TopRightCorner,
-	)
-	bottomBorder := fmt.Sprintf(
-		"%s%s%s\n",
-		args.BoxCharacters.BottomLeftCorner,
-		strings.Repeat(args.BoxCharacters.HorizontalEdge, width-2),
-		args.BoxCharacters.BottomRightCorner,
-	)
+
 	if args.DrawInfoBorder {
-		fmt.Printf(
-			"%s%s%s %s %s\n%s",
-			pokedex.Decompress(d),
+		topBorder := fmt.Sprintf(
+			"%s%s%s",
+			args.BoxCharacters.TopLeftCorner,
+			strings.Repeat(args.BoxCharacters.HorizontalEdge, width-2),
+			args.BoxCharacters.TopRightCorner,
+		)
+		bottomBorder := fmt.Sprintf(
+			"%s%s%s",
+			args.BoxCharacters.BottomLeftCorner,
+			strings.Repeat(args.BoxCharacters.HorizontalEdge, width-2),
+			args.BoxCharacters.BottomRightCorner,
+		)
+		infoLine = fmt.Sprintf(
+			"%s\n%s %s %s\n%s\n",
 			topBorder,
 			args.BoxCharacters.VerticalEdge,
 			infoLine,
@@ -205,10 +205,7 @@ func printPokemon(args Args, index int, names []string, categoryKeys []string, G
 			bottomBorder,
 		)
 	} else {
-		fmt.Printf(
-			"%s%s\n",
-			pokedex.Decompress(d),
-			infoLine,
-		)
+		infoLine = fmt.Sprintf("%s\n", infoLine)
 	}
+	fmt.Printf("%s%s", pokedex.Decompress(d), infoLine)
 }
