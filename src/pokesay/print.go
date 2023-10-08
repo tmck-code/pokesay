@@ -63,7 +63,7 @@ var (
 		BottomRightCorner: "╯",
 		BottomLeftCorner:  "╰",
 		BalloonString:     "╲",
-		Separator:         "┆",
+		Separator:         "│",
 		RightArrow:        "→",
 		CategorySeparator: "/",
 	}
