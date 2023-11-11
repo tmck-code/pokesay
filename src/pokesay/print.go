@@ -37,6 +37,7 @@ type Args struct {
 	NameToken      string
 	JapaneseName   bool
 	BoxCharacters  *BoxCharacters
+	DrawInfoBorder bool
 }
 
 var (
@@ -63,7 +64,7 @@ var (
 		BottomLeftCorner:  "╰",
 		BalloonString:     "╲",
 		Separator:         "│",
-		RightArrow:        "→ ",
+		RightArrow:        "→",
 		CategorySeparator: "/",
 	}
 )
@@ -130,30 +131,81 @@ func printWrappedText(boxCharacters *BoxCharacters, line string, width int, tabS
 	}
 }
 
+func nameLength(names []string) int {
+	totalLen := 0
+	for _, name := range names {
+		for _, c := range name {
+			// check if ascii
+			if c < 128 {
+				totalLen++
+			} else {
+				totalLen += 2
+			}
+		}
+	}
+	return totalLen
+}
+
 // Prints a pokemon with its name & category information.
 func printPokemon(args Args, index int, names []string, categoryKeys []string, GOBCowData embed.FS) {
 	d, _ := GOBCowData.ReadFile(pokedex.EntryFpath("build/assets/cows", index))
 
+	width := nameLength(names)
 	namesFmt := make([]string, 0)
 	for _, name := range names {
 		namesFmt = append(namesFmt, textStyleBold.Sprint(name))
 	}
+	// count name separators
+	width += (len(names) - 1) * 3
+	width += 2     // for the arrow
+	width += 2 + 2 // for the end box characters
+
+	infoLine := ""
 
 	if args.NoCategoryInfo {
-		fmt.Printf(
-			"%s%s %s\n",
-			pokedex.Decompress(d),
+		infoLine = fmt.Sprintf(
+			"%s %s",
 			args.BoxCharacters.RightArrow,
 			strings.Join(namesFmt, fmt.Sprintf(" %s ", args.BoxCharacters.Separator)),
 		)
+
 	} else {
-		fmt.Printf(
-			"%s%s %s %s %s\n",
-			pokedex.Decompress(d),
+		infoLine = fmt.Sprintf(
+			"%s %s %s %s",
 			args.BoxCharacters.RightArrow,
 			strings.Join(namesFmt, fmt.Sprintf(" %s ", args.BoxCharacters.Separator)),
 			args.BoxCharacters.Separator,
 			textStyleItalic.Sprint(strings.Join(categoryKeys, args.BoxCharacters.CategorySeparator)),
 		)
+		for _, category := range categoryKeys {
+			width += len(category)
+		}
+		width += len(categoryKeys) - 1 + 1 + 2
 	}
+
+	if args.DrawInfoBorder {
+		topBorder := fmt.Sprintf(
+			"%s%s%s",
+			args.BoxCharacters.TopLeftCorner,
+			strings.Repeat(args.BoxCharacters.HorizontalEdge, width-2),
+			args.BoxCharacters.TopRightCorner,
+		)
+		bottomBorder := fmt.Sprintf(
+			"%s%s%s",
+			args.BoxCharacters.BottomLeftCorner,
+			strings.Repeat(args.BoxCharacters.HorizontalEdge, width-2),
+			args.BoxCharacters.BottomRightCorner,
+		)
+		infoLine = fmt.Sprintf(
+			"%s\n%s %s %s\n%s\n",
+			topBorder,
+			args.BoxCharacters.VerticalEdge,
+			infoLine,
+			args.BoxCharacters.VerticalEdge,
+			bottomBorder,
+		)
+	} else {
+		infoLine = fmt.Sprintf("%s\n", infoLine)
+	}
+	fmt.Printf("%s%s", pokedex.Decompress(d), infoLine)
 }
