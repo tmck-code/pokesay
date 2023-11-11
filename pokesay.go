@@ -32,18 +32,28 @@ var (
 )
 
 func parseFlags() pokesay.Args {
+	// list operations
+	listCategories := flag.Bool("list-categories", false, "list all available categories")
+	listNames := flag.Bool("list-names", false, "list all available names")
+
+	// selection/filtering
+	category := flag.String("category", "", "choose a pokemon from a specific category")
+	name := flag.String("name", "", "choose a pokemon from a specific name")
 	width := flag.Int("width", 80, "the max speech bubble width")
+
+	// speech bubble options
 	noWrap := flag.Bool("no-wrap", false, "disable text wrapping (fastest)")
 	tabWidth := flag.Int("tab-width", 4, "replace any tab characters with N spaces")
 	noTabSpaces := flag.Bool("no-tab-spaces", false, "do not replace tab characters (fastest)")
-	noCategoryInfo := flag.Bool("no-category-info", false, "do not print pokemon categories")
 	fastest := flag.Bool("fastest", false, "run with the fastest possible configuration (-nowrap -notabspaces)")
-	category := flag.String("category", "", "choose a pokemon from a specific category")
-	name := flag.String("name", "", "choose a pokemon from a specific name")
-	listCategories := flag.Bool("list-categories", false, "list all available categories")
-	listNames := flag.Bool("list-names", false, "list all available names")
+
+	// info box options
 	japaneseName := flag.Bool("japanese-name", false, "print the japanese name")
-	unicodeBox := flag.Bool("unicode-box", false, "use unicode characters to draw the speech box")
+	noCategoryInfo := flag.Bool("no-category-info", false, "do not print pokemon categories")
+	drawInfoBorder := flag.Bool("info-border", false, "draw a border around the info line")
+
+	// other option
+	unicodeBorders := flag.Bool("unicode-borders", false, "use unicode characters to draw the border around the speech box (and info box if -info-border is enabled)")
 
 	flag.Parse()
 	var args pokesay.Args
@@ -68,7 +78,8 @@ func parseFlags() pokesay.Args {
 			Category:       *category,
 			NameToken:      *name,
 			JapaneseName:   *japaneseName,
-			BoxCharacters:  pokesay.DetermineBoxCharacters(*unicodeBox),
+			BoxCharacters:  pokesay.DetermineBoxCharacters(*unicodeBorders),
+			DrawInfoBorder: *drawInfoBorder,
 		}
 	}
 	return args
