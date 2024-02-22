@@ -69,11 +69,10 @@ func ChooseByName(names map[string][]int, nameToken string, metadataFiles embed.
 	if category == "" {
 		choice := RandomInt(len(metadata.Entries))
 		return metadata, metadata.Entries[choice]
-	// try to filter by desired category
+		// try to filter by desired category
 	} else {
 		matching := make([]pokedex.PokemonEntryMapping, 0)
 		for _, entry := range metadata.Entries {
-			log.Printf("entry: %v", entry)
 			for _, entryCategory := range entry.Categories {
 				if entryCategory == category {
 					matching = append(matching, entry)
