@@ -53,7 +53,7 @@ func ListNames(names map[string][]int) []string {
 	return pokedex.GatherMapKeys(names)
 }
 
-func ChooseByName(names map[string][]int, nameToken string, metadataFiles embed.FS, metadataRootDir string) (pokedex.PokemonMetadata, pokedex.PokemonEntryMapping) {
+func ChooseByName(names map[string][]int, nameToken string, metadataFiles embed.FS, metadataRootDir string, category string) (pokedex.PokemonMetadata, pokedex.PokemonEntryMapping) {
 	match := names[nameToken]
 	if len(match) == 0 {
 		log.Fatalf("cannot find pokemon by name '%s'", nameToken)
@@ -64,8 +64,29 @@ func ChooseByName(names map[string][]int, nameToken string, metadataFiles embed.
 		metadataFiles,
 		pokedex.MetadataFpath(metadataRootDir, nameChoice),
 	)
-	choice := RandomInt(len(metadata.Entries))
-	return metadata, metadata.Entries[choice]
+
+	// pick a random entry
+	if category == "" {
+		choice := RandomInt(len(metadata.Entries))
+		return metadata, metadata.Entries[choice]
+	// try to filter by desired category
+	} else {
+		matching := make([]pokedex.PokemonEntryMapping, 0)
+		for _, entry := range metadata.Entries {
+			log.Printf("entry: %v", entry)
+			for _, entryCategory := range entry.Categories {
+				if entryCategory == category {
+					matching = append(matching, entry)
+				}
+			}
+		}
+		// if the category is not found for this pokemon, return a random entry
+		if len(matching) == 0 {
+			return metadata, metadata.Entries[RandomInt(len(metadata.Entries))]
+		} else {
+			return metadata, matching[RandomInt(len(matching))]
+		}
+	}
 }
 
 func ChooseByRandomIndex(totalInBytes []byte) (int, int) {
