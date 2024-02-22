@@ -126,7 +126,7 @@ func runPrintByName(args pokesay.Args) {
 	names := pokedex.ReadStructFromBytes[map[string][]int](GOBAllNames)
 	t.Mark("read name struct")
 
-	metadata, final := pokesay.ChooseByName(names, args.NameToken, GOBCowNames, MetadataRoot)
+	metadata, final := pokesay.ChooseByName(names, args.NameToken, GOBCowNames, MetadataRoot, "")
 	t.Mark("find and read metadata")
 
 	pokesay.Print(args, final.EntryIndex, GenerateNames(metadata, args), final.Categories, GOBCowData)
@@ -142,6 +142,22 @@ func runPrintByCategory(args pokesay.Args) {
 	dirPath := pokedex.CategoryDirpath(CategoryRoot, args.Category)
 	dir, _ := GOBCategories.ReadDir(dirPath)
 	metadata, final := pokesay.ChooseByCategory(args.Category, dir, GOBCategories, CategoryRoot, GOBCowNames, MetadataRoot)
+
+	pokesay.Print(args, final.EntryIndex, GenerateNames(metadata, args), final.Categories, GOBCowData)
+	t.Mark("print")
+
+	t.Stop()
+	t.PrintJson()
+}
+
+func runPrintByNameAndCategory(args pokesay.Args) {
+	t := timer.NewTimer("runPrintByNameAndCategory", true)
+
+	names := pokedex.ReadStructFromBytes[map[string][]int](GOBAllNames)
+	t.Mark("read name struct")
+
+	metadata, final := pokesay.ChooseByName(names, args.NameToken, GOBCowNames, MetadataRoot, args.Category)
+	t.Mark("find and read metadata")
 
 	pokesay.Print(args, final.EntryIndex, GenerateNames(metadata, args), final.Categories, GOBCowData)
 	t.Mark("print")
@@ -175,6 +191,8 @@ func main() {
 		runListCategories()
 	} else if args.ListNames {
 		runListNames()
+	} else if args.NameToken != "" && args.Category != "" {
+		runPrintByNameAndCategory(args)
 	} else if args.NameToken != "" {
 		runPrintByName(args)
 	} else if args.Category != "" {
