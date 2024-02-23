@@ -157,6 +157,7 @@ DEBUG=test go test -v ./test/
 ## TODO
 
 - Short-term
+  - [ ] add short versions of command line args
 - Longer-term
 - Completed
   - [x] Make the category struct faster to load - currently takes up to 80% of the execution time
