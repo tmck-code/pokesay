@@ -2,10 +2,10 @@ package main
 
 import (
 	"embed"
-	"flag"
 	"fmt"
 	"strings"
 
+	"github.com/pborman/getopt/v2"
 	"github.com/tmck-code/pokesay/src/pokedex"
 	"github.com/tmck-code/pokesay/src/pokesay"
 	"github.com/tmck-code/pokesay/src/timer"
@@ -29,33 +29,37 @@ var (
 	CategoryRoot string = "build/assets/categories"
 	MetadataRoot string = "build/assets/metadata"
 	CowDataRoot  string = "build/assets/cows"
+
+	verbose bool
 )
 
 func parseFlags() pokesay.Args {
 	// list operations
-	listCategories := flag.Bool("list-categories", false, "list all available categories")
-	listNames := flag.Bool("list-names", false, "list all available names")
+	listCategories := getopt.BoolLong("list-categories", 'L', "list all available categories")
+	listNames := getopt.BoolLong("list-names", 'l', "list all available names")
 
 	// selection/filtering
-	category := flag.String("category", "", "choose a pokemon from a specific category")
-	name := flag.String("name", "", "choose a pokemon from a specific name")
-	width := flag.Int("width", 80, "the max speech bubble width")
+	category := getopt.StringLong("category", 'c', "", "choose a pokemon from a specific category")
+	name := getopt.StringLong("name", 'n', "", "choose a pokemon from a specific name")
+	width := getopt.IntLong("width", 'w', 80, "the max speech bubble width")
+
+	getopt.FlagLong(&verbose, "verbose", 'v', "print verbose output", "verbose")
 
 	// speech bubble options
-	noWrap := flag.Bool("no-wrap", false, "disable text wrapping (fastest)")
-	tabWidth := flag.Int("tab-width", 4, "replace any tab characters with N spaces")
-	noTabSpaces := flag.Bool("no-tab-spaces", false, "do not replace tab characters (fastest)")
-	fastest := flag.Bool("fastest", false, "run with the fastest possible configuration (-nowrap -notabspaces)")
+	noWrap := getopt.BoolLong("no-wrap", 'W', "disable text wrapping Long(fastest)")
+	tabWidth := getopt.IntLong("tab-width", 't', 4, "replace any tab characters with N spaces")
+	noTabSpaces := getopt.BoolLong("no-tab-spaces", 's', "do not replace tab characters Long(fastest)")
+	fastest := getopt.BoolLong("fastest", 'f', "run with the fastest possible configuration Long(-nowrap -notabspaces)")
 
 	// info box options
-	japaneseName := flag.Bool("japanese-name", false, "print the japanese name")
-	noCategoryInfo := flag.Bool("no-category-info", false, "do not print pokemon categories")
-	drawInfoBorder := flag.Bool("info-border", false, "draw a border around the info line")
+	japaneseName := getopt.BoolLong("japanese-name", 'j', "print the japanese name")
+	noCategoryInfo := getopt.BoolLong("no-category-info", 'C', "do not print pokemon categories")
+	drawInfoBorder := getopt.BoolLong("info-border", 'b', "draw a border around the info line")
 
 	// other option
-	unicodeBorders := flag.Bool("unicode-borders", false, "use unicode characters to draw the border around the speech box (and info box if -info-border is enabled)")
+	unicodeBorders := getopt.BoolLong("unicode-borders", 'u', "use unicode characters to draw the border around the speech box Long(and info box if -info-border is enabled)")
 
-	flag.Parse()
+	getopt.Parse()
 	var args pokesay.Args
 
 	if *fastest {
