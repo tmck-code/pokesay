@@ -156,7 +156,7 @@ func runPrintByNameAndCategory(args pokesay.Args) {
 	names := pokedex.ReadStructFromBytes[map[string][]int](GOBAllNames)
 	t.Mark("read name struct")
 
-	metadata, final := pokesay.ChooseByName(names, args.NameToken, GOBCowNames, MetadataRoot, args.Category)
+	metadata, final := pokesay.ChooseByNameAndCategory(names, args.NameToken, GOBCowNames, MetadataRoot, args.Category)
 	t.Mark("find and read metadata")
 
 	pokesay.Print(args, final.EntryIndex, GenerateNames(metadata, args), final.Categories, GOBCowData)
