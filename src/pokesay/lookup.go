@@ -25,6 +25,17 @@ func RandomInt(n int) int {
 	return rand.New(Rand).Intn(n)
 }
 
+// ChooseByCategory chooses a pokemon via a requested category
+// 1. It loads the category search structure and finds the name of a random Pokemon matching the entry
+// e.g. if given the category "small", this function might pick the file `1.cat` in
+// - categories/
+//   - small/
+//   - 1.cat
+//   - 44.cat
+//
+// This file contains entries representing the <pokemon metadata index>/<the pokemon entry index>,
+// e.g. "4/1" would represent 4.metadata, and the 2nd entry in that file
+// 2. Using the indexes, load the corresponding metadata file and entry, and then return it
 func ChooseByCategory(category string, categoryDir []fs.DirEntry, categoryFiles embed.FS, categoryRootDir string, metadataFiles embed.FS, metadataRootDir string) (pokedex.PokemonMetadata, pokedex.PokemonEntryMapping) {
 	if len(categoryDir) == 0 {
 		log.Fatalf("cannot find pokemon by category '%s'", category)
