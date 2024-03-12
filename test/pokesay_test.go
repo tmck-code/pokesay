@@ -75,6 +75,21 @@ func TestChooseByCategory(test *testing.T) {
 	Assert(expectedEntry, entry, test)
 }
 
+func TestChooseByNameAndCategory(test *testing.T) {
+	names := make(map[string][]int)
+	names["hoothoot"] = []int{4}
+	metadata, entry := pokesay.ChooseByNameAndCategory(
+		names,
+		"hoothoot",
+		GOBCowNames,
+		"data/cows",
+		"small",
+	)
+
+	Assert("small", entry.Categories[0], test)
+	Assert("Hoothoot", metadata.Name, test)
+}
+
 func TestChooseByRandomIndex(test *testing.T) {
 	resultTotal, result := pokesay.ChooseByRandomIndex(GOBTotal)
 	Assert(9, resultTotal, test)
