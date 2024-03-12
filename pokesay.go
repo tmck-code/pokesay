@@ -150,6 +150,22 @@ func runPrintByCategory(args pokesay.Args) {
 	t.PrintJson()
 }
 
+func runPrintByNameAndCategory(args pokesay.Args) {
+	t := timer.NewTimer("runPrintByNameAndCategory", true)
+
+	names := pokedex.ReadStructFromBytes[map[string][]int](GOBAllNames)
+	t.Mark("read name struct")
+
+	metadata, final := pokesay.ChooseByNameAndCategory(names, args.NameToken, GOBCowNames, MetadataRoot, args.Category)
+	t.Mark("find and read metadata")
+
+	pokesay.Print(args, final.EntryIndex, GenerateNames(metadata, args), final.Categories, GOBCowData)
+	t.Mark("print")
+
+	t.Stop()
+	t.PrintJson()
+}
+
 func runPrintRandom(args pokesay.Args) {
 	t := timer.NewTimer("runPrintRandom", true)
 	choice := pokesay.RandomInt(pokedex.ReadIntFromBytes(GOBTotal))
@@ -175,6 +191,8 @@ func main() {
 		runListCategories()
 	} else if args.ListNames {
 		runListNames()
+	} else if args.NameToken != "" && args.Category != "" {
+		runPrintByNameAndCategory(args)
 	} else if args.NameToken != "" {
 		runPrintByName(args)
 	} else if args.Category != "" {
