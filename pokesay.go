@@ -166,6 +166,12 @@ func runPrintByNameAndCategory(args pokesay.Args) {
 	t.PrintJson()
 }
 
+// runPrintRandom prints a random pokemon
+// - This loads a specific GOB file from the embedded filesystem that contains the number of pokemon
+// - generates a random number between 0 and the number of pokemon
+// - reads the metadata file of at `<index>.metadata` as a PokemonMetadata struct
+// - chooses a random entry from the metadata file
+// - finally prints the pokemon
 func runPrintRandom(args pokesay.Args) {
 	t := timer.NewTimer("runPrintRandom", true)
 	choice := pokesay.RandomInt(pokedex.ReadIntFromBytes(GOBTotal))
