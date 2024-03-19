@@ -50,7 +50,7 @@ func parseFlags() pokesay.Args {
 	tabWidth := getopt.IntLong("tab-width", 't', 4, "replace any tab characters with N spaces")
 	noWrap := getopt.BoolLong("no-wrap", 'W', "disable text wrapping (fastest)")
 	noTabSpaces := getopt.BoolLong("no-tab-spaces", 's', "do not replace tab characters (fastest)")
-	fastest := getopt.BoolLong("fastest", 'f', "run with the fastest possible configuration (-nowrap -notabspaces)")
+	fastest := getopt.BoolLong("fastest", 'f', "run with the fastest possible configuration (--nowrap & --notabspaces)")
 
 	// info box options
 	japaneseName := getopt.BoolLong("japanese-name", 'j', "print the japanese name in the info box")
@@ -58,7 +58,7 @@ func parseFlags() pokesay.Args {
 	drawInfoBorder := getopt.BoolLong("info-border", 'b', "draw a border around the info box")
 
 	// other option
-	unicodeBorders := getopt.BoolLong("unicode-borders", 'u', "use unicode characters to draw the border around the speech box (and info box if -info-border is enabled)")
+	unicodeBorders := getopt.BoolLong("unicode-borders", 'u', "use unicode characters to draw the border around the speech box (and info box if --info-border is enabled)")
 
 	getopt.Parse()
 	var args pokesay.Args
