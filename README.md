@@ -2,6 +2,10 @@
 
 Print pokemon in the CLI! An adaptation of the classic "cowsay"
 
+![pokesay demo](https://github.com/tmck-code/pokesay/assets/9894426/0bf51c06-6b41-4df4-b057-ac060bae7814)
+
+---
+
 - [pokesay](#pokesay)
   - [One-line installs](#one-line-installs)
   - [Usage](#usage)
@@ -14,10 +18,6 @@ Print pokemon in the CLI! An adaptation of the classic "cowsay"
     - [Testing](#testing)
     - [Deploying](#deploying)
   - [TODO](#todo)
-
----
-
-![pokesay demo](https://github.com/tmck-code/pokesay/assets/9894426/0bf51c06-6b41-4df4-b057-ac060bae7814)
 
 ---
 
