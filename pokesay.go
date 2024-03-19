@@ -29,13 +29,13 @@ var (
 	CategoryRoot string = "build/assets/categories"
 	MetadataRoot string = "build/assets/metadata"
 	CowDataRoot  string = "build/assets/cows"
-
-	verbose bool
 )
 
 func parseFlags() pokesay.Args {
-	// print usage with -h, --help
+	// print usage
 	help := getopt.BoolLong("help", 'h', "display this help message")
+	// print verbose output (currently timer output)
+	verbose := getopt.BoolLong("verbose", 'v', "print verbose output", "verbose")
 
 	// selection/filtering
 	name := getopt.StringLong("name", 'n', "", "choose a pokemon from a specific name")
@@ -46,8 +46,6 @@ func parseFlags() pokesay.Args {
 	listNames := getopt.BoolLong("list-names", 'l', "list all available names")
 
 	width := getopt.IntLong("width", 'w', 80, "the max speech bubble width")
-
-	getopt.FlagLong(&verbose, "verbose", 'v', "print verbose output", "verbose")
 
 	// speech bubble options
 	noWrap := getopt.BoolLong("no-wrap", 'W', "disable text wrapping Long(fastest)")
@@ -74,6 +72,7 @@ func parseFlags() pokesay.Args {
 			NoTabSpaces:   true,
 			BoxCharacters: pokesay.DetermineBoxCharacters(false),
 			Help:          *help,
+			Verbose:       *verbose,
 		}
 	} else {
 		args = pokesay.Args{
@@ -90,6 +89,7 @@ func parseFlags() pokesay.Args {
 			BoxCharacters:  pokesay.DetermineBoxCharacters(*unicodeBorders),
 			DrawInfoBorder: *drawInfoBorder,
 			Help:           *help,
+			Verbose:        *verbose,
 		}
 	}
 	return args
@@ -137,7 +137,7 @@ func runPrintByName(args pokesay.Args) {
 	t.Mark("read name struct")
 
 	metadata, final := pokesay.ChooseByName(names, args.NameToken, GOBCowNames, MetadataRoot)
-	t.Mark("find and read metadata")
+	t.Mark("find/read metadata")
 
 	pokesay.Print(args, final.EntryIndex, GenerateNames(metadata, args), final.Categories, GOBCowData)
 	t.Mark("print")
@@ -167,7 +167,7 @@ func runPrintByNameAndCategory(args pokesay.Args) {
 	t.Mark("read name struct")
 
 	metadata, final := pokesay.ChooseByNameAndCategory(names, args.NameToken, GOBCowNames, MetadataRoot, args.Category)
-	t.Mark("find and read metadata")
+	t.Mark("find/read metadata")
 
 	pokesay.Print(args, final.EntryIndex, GenerateNames(metadata, args), final.Categories, GOBCowData)
 	t.Mark("print")
@@ -199,6 +199,10 @@ func main() {
 	if args.Help {
 		getopt.Usage()
 		return
+	}
+	if args.Verbose {
+		fmt.Println("Verbose output enabled")
+		timer.DEBUG = true
 	}
 
 	t := timer.NewTimer("main", true)
