@@ -85,18 +85,6 @@ func parseFlags() pokesay.Args {
 	return args
 }
 
-func EntryFpath(idx int) string {
-	return pokedex.EntryFpath(CowDataRoot, idx)
-}
-
-func MetadataFpath(idx int) string {
-	return pokedex.MetadataFpath(MetadataRoot, idx)
-}
-
-func CategoryFpath(category string, fname string) string {
-	return pokedex.CategoryFpath(CategoryRoot, category, fname)
-}
-
 func runListCategories() {
 	categories := pokedex.ReadStructFromBytes[[]string](GOBCategoryKeys)
 	fmt.Printf("%s\n%d %s\n", strings.Join(categories, " "), len(categories), "total categories")
@@ -170,7 +158,7 @@ func runPrintRandom(args pokesay.Args) {
 	t := timer.NewTimer("runPrintRandom", true)
 	choice := pokesay.RandomInt(pokedex.ReadIntFromBytes(GOBTotal))
 	t.Mark("choose index")
-	metadata := pokedex.ReadMetadataFromEmbedded(GOBCowNames, MetadataFpath(choice))
+	metadata := pokedex.ReadMetadataFromEmbedded(GOBCowNames, pokedex.MetadataFpath(MetadataRoot, choice))
 	t.Mark("read metadata")
 
 	final := metadata.Entries[pokesay.RandomInt(len(metadata.Entries))]

@@ -45,7 +45,7 @@ func ChooseByCategory(category string, categoryDir []fs.DirEntry, categoryFiles 
 	categoryMetadata, err := categoryFiles.ReadFile(
 		pokedex.CategoryFpath(categoryRootDir, category, choice.Name()),
 	)
-	Check(err)
+	pokedex.Check(err)
 
 	parts := strings.Split(string(categoryMetadata), "/")
 
@@ -55,7 +55,7 @@ func ChooseByCategory(category string, categoryDir []fs.DirEntry, categoryFiles 
 	)
 
 	entryIndex, err := strconv.Atoi(string(parts[1]))
-	Check(err)
+	pokedex.Check(err)
 
 	return metadata, metadata.Entries[entryIndex]
 }
