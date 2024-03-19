@@ -201,9 +201,10 @@ DEBUG=test go test -v ./test/
 ## TODO
 
 - Short-term
-  - [ ] support long and short cli args (e.g. --name/-n)
   - [ ] optionally print ID assigned to each pokemon, support deterministic selection via the same ID
 - Longer-term
+- In Beta
+  - [x] support long and short cli args (e.g. --name/-n)
 - Completed
   - [x] Make the category struct faster to load - currently takes up to 80% of the execution time
   - [x] Store metadata and names in a more storage-efficient manner
