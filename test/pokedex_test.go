@@ -6,7 +6,6 @@ import (
 	"testing"
 
 	"github.com/tmck-code/pokesay/src/pokedex"
-	"github.com/tmck-code/pokesay/src/pokesay"
 )
 
 var (
@@ -32,7 +31,7 @@ func TestReadEntry(test *testing.T) {
 	result := pokedex.ReadPokemonCow(GOBCowData, "data/cows/1.cow")
 
 	expected, err := os.ReadFile("data/cows/egg.cow")
-	pokesay.Check(err)
+	pokedex.Check(err)
 
 	Assert(expected, result, test)
 }
