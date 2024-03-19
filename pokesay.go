@@ -37,13 +37,14 @@ func parseFlags() pokesay.Args {
 	// print usage with -h, --help
 	help := getopt.BoolLong("help", 'h', "display this help message")
 
+	// selection/filtering
+	name := getopt.StringLong("name", 'n', "", "choose a pokemon from a specific name")
+	category := getopt.StringLong("category", 'c', "", "choose a pokemon from a specific category")
+
 	// list operations
 	listCategories := getopt.BoolLong("list-categories", 'L', "list all available categories")
 	listNames := getopt.BoolLong("list-names", 'l', "list all available names")
 
-	// selection/filtering
-	category := getopt.StringLong("category", 'c', "", "choose a pokemon from a specific category")
-	name := getopt.StringLong("name", 'n', "", "choose a pokemon from a specific name")
 	width := getopt.IntLong("width", 'w', 80, "the max speech bubble width")
 
 	getopt.FlagLong(&verbose, "verbose", 'v', "print verbose output", "verbose")
