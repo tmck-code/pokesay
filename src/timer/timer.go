@@ -23,10 +23,10 @@ type Timer struct {
 	Enabled          bool
 }
 
-func NewTimer(name string, alignKeys ...bool) *Timer {
+func NewTimer(name string, boolArgs ...bool) *Timer {
 	align := false
-	if len(alignKeys) == 1 {
-		align = alignKeys[0]
+	if len(boolArgs) == 1 {
+		align = boolArgs[0]
 	}
 	t := &Timer{
 		Name:             name,
@@ -48,7 +48,7 @@ func (t *Timer) Mark(stage string) {
 	}
 	now := time.Now()
 	if t.AlignKeys {
-		stage = fmt.Sprintf("%02d.%-15s", len(t.stageNames), stage)
+		stage = fmt.Sprintf("%02d.%-20s", len(t.stageNames), stage)
 	} else {
 		stage = fmt.Sprintf("%02d.%s", len(t.stageNames), stage)
 	}

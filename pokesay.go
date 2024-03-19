@@ -2,10 +2,10 @@ package main
 
 import (
 	"embed"
-	"flag"
 	"fmt"
 	"strings"
 
+	"github.com/pborman/getopt/v2"
 	"github.com/tmck-code/pokesay/src/pokedex"
 	"github.com/tmck-code/pokesay/src/pokesay"
 	"github.com/tmck-code/pokesay/src/timer"
@@ -32,30 +32,35 @@ var (
 )
 
 func parseFlags() pokesay.Args {
-	// list operations
-	listCategories := flag.Bool("list-categories", false, "list all available categories")
-	listNames := flag.Bool("list-names", false, "list all available names")
+	help := getopt.BoolLong("help", 'h', "display this help message")
+	// print verbose output (currently timer output)
+	verbose := getopt.BoolLong("verbose", 'v', "print verbose output", "verbose")
 
 	// selection/filtering
-	category := flag.String("category", "", "choose a pokemon from a specific category")
-	name := flag.String("name", "", "choose a pokemon from a specific name")
-	width := flag.Int("width", 80, "the max speech bubble width")
+	name := getopt.StringLong("name", 'n', "", "choose a pokemon from a specific name")
+	category := getopt.StringLong("category", 'c', "", "choose a pokemon from a specific category")
+
+	// list operations
+	listNames := getopt.BoolLong("list-names", 'l', "list all available names")
+	listCategories := getopt.BoolLong("list-categories", 'L', "list all available categories")
+
+	width := getopt.IntLong("width", 'w', 80, "the max speech bubble width")
 
 	// speech bubble options
-	noWrap := flag.Bool("no-wrap", false, "disable text wrapping (fastest)")
-	tabWidth := flag.Int("tab-width", 4, "replace any tab characters with N spaces")
-	noTabSpaces := flag.Bool("no-tab-spaces", false, "do not replace tab characters (fastest)")
-	fastest := flag.Bool("fastest", false, "run with the fastest possible configuration (-nowrap -notabspaces)")
+	tabWidth := getopt.IntLong("tab-width", 't', 4, "replace any tab characters with N spaces")
+	noWrap := getopt.BoolLong("no-wrap", 'W', "disable text wrapping (fastest)")
+	noTabSpaces := getopt.BoolLong("no-tab-spaces", 's', "do not replace tab characters (fastest)")
+	fastest := getopt.BoolLong("fastest", 'f', "run with the fastest possible configuration (--nowrap & --notabspaces)")
 
 	// info box options
-	japaneseName := flag.Bool("japanese-name", false, "print the japanese name")
-	noCategoryInfo := flag.Bool("no-category-info", false, "do not print pokemon categories")
-	drawInfoBorder := flag.Bool("info-border", false, "draw a border around the info line")
+	japaneseName := getopt.BoolLong("japanese-name", 'j', "print the japanese name in the info box")
+	noCategoryInfo := getopt.BoolLong("no-category-info", 'C', "do not print pokemon category information in the info box")
+	drawInfoBorder := getopt.BoolLong("info-border", 'b', "draw a border around the info box")
 
 	// other option
-	unicodeBorders := flag.Bool("unicode-borders", false, "use unicode characters to draw the border around the speech box (and info box if -info-border is enabled)")
+	unicodeBorders := getopt.BoolLong("unicode-borders", 'u', "use unicode characters to draw the border around the speech box (and info box if --info-border is enabled)")
 
-	flag.Parse()
+	getopt.Parse()
 	var args pokesay.Args
 
 	if *fastest {
@@ -65,6 +70,8 @@ func parseFlags() pokesay.Args {
 			TabSpaces:     "    ",
 			NoTabSpaces:   true,
 			BoxCharacters: pokesay.DetermineBoxCharacters(false),
+			Help:          *help,
+			Verbose:       *verbose,
 		}
 	} else {
 		args = pokesay.Args{
@@ -80,6 +87,8 @@ func parseFlags() pokesay.Args {
 			JapaneseName:   *japaneseName,
 			BoxCharacters:  pokesay.DetermineBoxCharacters(*unicodeBorders),
 			DrawInfoBorder: *drawInfoBorder,
+			Help:           *help,
+			Verbose:        *verbose,
 		}
 	}
 	return args
@@ -115,7 +124,7 @@ func runPrintByName(args pokesay.Args) {
 	t.Mark("read name struct")
 
 	metadata, final := pokesay.ChooseByName(names, args.NameToken, GOBCowNames, MetadataRoot)
-	t.Mark("find and read metadata")
+	t.Mark("find/read metadata")
 
 	pokesay.Print(args, final.EntryIndex, GenerateNames(metadata, args), final.Categories, GOBCowData)
 	t.Mark("print")
@@ -145,7 +154,7 @@ func runPrintByNameAndCategory(args pokesay.Args) {
 	t.Mark("read name struct")
 
 	metadata, final := pokesay.ChooseByNameAndCategory(names, args.NameToken, GOBCowNames, MetadataRoot, args.Category)
-	t.Mark("find and read metadata")
+	t.Mark("find/read metadata")
 
 	pokesay.Print(args, final.EntryIndex, GenerateNames(metadata, args), final.Categories, GOBCowData)
 	t.Mark("print")
@@ -173,6 +182,16 @@ func runPrintRandom(args pokesay.Args) {
 
 func main() {
 	args := parseFlags()
+	// if the -h/--help flag is set, print usage and exit
+	if args.Help {
+		getopt.Usage()
+		return
+	}
+	if args.Verbose {
+		fmt.Println("Verbose output enabled")
+		timer.DEBUG = true
+	}
+
 	t := timer.NewTimer("main", true)
 
 	if args.ListCategories {
