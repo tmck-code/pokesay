@@ -34,6 +34,9 @@ var (
 )
 
 func parseFlags() pokesay.Args {
+	// print usage with -h, --help
+	help := getopt.BoolLong("help", 'h', "display this help message")
+
 	// list operations
 	listCategories := getopt.BoolLong("list-categories", 'L', "list all available categories")
 	listNames := getopt.BoolLong("list-names", 'l', "list all available names")
@@ -84,6 +87,7 @@ func parseFlags() pokesay.Args {
 			JapaneseName:   *japaneseName,
 			BoxCharacters:  pokesay.DetermineBoxCharacters(*unicodeBorders),
 			DrawInfoBorder: *drawInfoBorder,
+			Help:           *help,
 		}
 	}
 	return args
@@ -189,6 +193,12 @@ func runPrintRandom(args pokesay.Args) {
 
 func main() {
 	args := parseFlags()
+	// if the -h/--help flag is set, print usage and exit
+	if args.Help {
+		getopt.Usage()
+		return
+	}
+
 	t := timer.NewTimer("main", true)
 
 	if args.ListCategories {
