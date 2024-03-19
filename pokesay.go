@@ -32,7 +32,6 @@ var (
 )
 
 func parseFlags() pokesay.Args {
-	// print usage
 	help := getopt.BoolLong("help", 'h', "display this help message")
 	// print verbose output (currently timer output)
 	verbose := getopt.BoolLong("verbose", 'v', "print verbose output", "verbose")
@@ -42,24 +41,24 @@ func parseFlags() pokesay.Args {
 	category := getopt.StringLong("category", 'c', "", "choose a pokemon from a specific category")
 
 	// list operations
-	listCategories := getopt.BoolLong("list-categories", 'L', "list all available categories")
 	listNames := getopt.BoolLong("list-names", 'l', "list all available names")
+	listCategories := getopt.BoolLong("list-categories", 'L', "list all available categories")
 
 	width := getopt.IntLong("width", 'w', 80, "the max speech bubble width")
 
 	// speech bubble options
-	noWrap := getopt.BoolLong("no-wrap", 'W', "disable text wrapping Long(fastest)")
 	tabWidth := getopt.IntLong("tab-width", 't', 4, "replace any tab characters with N spaces")
-	noTabSpaces := getopt.BoolLong("no-tab-spaces", 's', "do not replace tab characters Long(fastest)")
-	fastest := getopt.BoolLong("fastest", 'f', "run with the fastest possible configuration Long(-nowrap -notabspaces)")
+	noWrap := getopt.BoolLong("no-wrap", 'W', "disable text wrapping (fastest)")
+	noTabSpaces := getopt.BoolLong("no-tab-spaces", 's', "do not replace tab characters (fastest)")
+	fastest := getopt.BoolLong("fastest", 'f', "run with the fastest possible configuration (-nowrap -notabspaces)")
 
 	// info box options
-	japaneseName := getopt.BoolLong("japanese-name", 'j', "print the japanese name")
-	noCategoryInfo := getopt.BoolLong("no-category-info", 'C', "do not print pokemon categories")
-	drawInfoBorder := getopt.BoolLong("info-border", 'b', "draw a border around the info line")
+	japaneseName := getopt.BoolLong("japanese-name", 'j', "print the japanese name in the info box")
+	noCategoryInfo := getopt.BoolLong("no-category-info", 'C', "do not print pokemon category information in the info box")
+	drawInfoBorder := getopt.BoolLong("info-border", 'b', "draw a border around the info box")
 
 	// other option
-	unicodeBorders := getopt.BoolLong("unicode-borders", 'u', "use unicode characters to draw the border around the speech box Long(and info box if -info-border is enabled)")
+	unicodeBorders := getopt.BoolLong("unicode-borders", 'u', "use unicode characters to draw the border around the speech box (and info box if -info-border is enabled)")
 
 	getopt.Parse()
 	var args pokesay.Args
