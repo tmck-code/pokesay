@@ -39,6 +39,7 @@ type Args struct {
 	BoxCharacters  *BoxCharacters
 	DrawInfoBorder bool
 	Help           bool
+	Verbose        bool
 }
 
 var (
