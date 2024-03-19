@@ -72,6 +72,7 @@ func parseFlags() pokesay.Args {
 			TabSpaces:     "    ",
 			NoTabSpaces:   true,
 			BoxCharacters: pokesay.DetermineBoxCharacters(false),
+			Help:          *help,
 		}
 	} else {
 		args = pokesay.Args{
