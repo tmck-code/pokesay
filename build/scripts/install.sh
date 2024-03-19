@@ -25,8 +25,30 @@ function download_bin() {
   if [ "$GOOS" == "windows" ]; then
     pokesay_bin="${pokesay_bin}.exe"
   fi
+
   url="https://github.com/tmck-code/pokesay/releases/download/${release_version}/${pokesay_bin}"
   echo "- VERSION: $release_version, GOOS=$GOOS, GOARCH=$GOARCH"
+
+  # check if the release version is 0.13.0 or later
+  # and if it is, warn the user of breaking changes to the CLI args
+  local continue="y"
+  if test -f $HOME/bin/pokesay; then
+    echo "- Checking for breaking changes in $release_version..."
+
+    if [ $release_version == "v0.13.0" ]; then
+      continue="n"
+      echo -e "\nWARNING: This version of pokesay has breaking changes to the CLI args!"
+      echo -e "         Please check the release for the changes to the CLI args:"
+      echo -e "         https://github.com/tmck-code/pokesay/releases/tag/v0.13.0\n"
+      echo -e "         continue? (y/n)"
+      read -r continue
+    fi
+  fi
+  if [ $continue != "y" ]; then
+    echo "Exiting..."
+    exit 1
+  fi
+
   echo "- Downloading $url"
   curl -sLo pokesay "$url"
   echo -n "- Downloaded! "
