@@ -5,6 +5,7 @@ Print pokemon in the CLI! An adaptation of the classic "cowsay"
 - [pokesay](#pokesay)
   - [One-line installs](#one-line-installs)
   - [Usage](#usage)
+    - [Full Usage](#full-usage)
   - [How it works](#how-it-works)
   - [Building binaries](#building-binaries)
     - [On your host OS](#on-your-host-os)
@@ -63,6 +64,38 @@ echo 'fortune | pokesay' >> $HOME/.bashrc
 ```
 
 > _Note: The pokesay tool is intended to only be used with piped text input from STDIN, entering text by typing (or other methods) might not work as expected!_
+
+### Full Usage
+
+> Run pokesay with `-h` or `--help` to see the full usage
+
+```shell
+Usage: pokesay [-bCfhjLlsuvW] [-c value] [-n value] [-t value] [-w value] [parameters ...]
+ -b, --info-border  draw a border around the info box
+ -c, --category=value
+                    choose a pokemon from a specific category
+ -C, --no-category-info
+                    do not print pokemon category information in the info box
+ -f, --fastest      run with the fastest possible configuration (--nowrap &
+                    --notabspaces)
+ -h, --help         display this help message
+ -j, --japanese-name
+                    print the japanese name in the info box
+ -L, --list-categories
+                    list all available categories
+ -l, --list-names   list all available names
+ -n, --name=value   choose a pokemon from a specific name
+ -s, --no-tab-spaces
+                    do not replace tab characters (fastest)
+ -t, --tab-width=value
+                    replace any tab characters with N spaces [4]
+ -u, --unicode-borders
+                    use unicode characters to draw the border around the speech
+                    box (and info box if --info-border is enabled)
+ -v, --verbose      print verbose output
+ -W, --no-wrap      disable text wrapping (fastest)
+ -w, --width=value  the max speech bubble width [80]
+ ```
 
 ---
 
