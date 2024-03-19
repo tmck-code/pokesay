@@ -3,7 +3,6 @@ package main
 import (
 	"flag"
 	"fmt"
-	"log"
 	"os"
 	"path"
 	"strings"
@@ -11,12 +10,6 @@ import (
 	"github.com/tmck-code/pokesay/src/bin"
 	"github.com/tmck-code/pokesay/src/pokedex"
 )
-
-func check(e error) {
-	if e != nil {
-		log.Fatal(e)
-	}
-}
 
 // Strips the leading "./" from a path e.g. "./cows/ -> cows/"
 func normaliseRelativeDir(dirPath string) string {
@@ -63,7 +56,7 @@ func parseArgs() PokedexArgs {
 func mkDirs(dirPaths []string) {
 	for _, dirPath := range dirPaths {
 		err := os.MkdirAll(dirPath, 0755)
-		check(err)
+		pokedex.Check(err)
 	}
 }
 
