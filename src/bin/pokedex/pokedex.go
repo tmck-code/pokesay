@@ -26,6 +26,20 @@ type PokedexArgs struct {
 	ToTotalFname      string
 }
 
+type PokedexPaths struct {
+	EntryDirPath    string
+	MetadataDirPath string
+	TotalFpath      string
+}
+
+func NewPokedexPaths(args PokedexArgs) PokedexPaths {
+	return PokedexPaths{
+		EntryDirPath:    path.Join(args.ToDir, args.ToDataSubDir),
+		MetadataDirPath: path.Join(args.ToDir, args.ToMetadataSubDir),
+		TotalFpath:      path.Join(args.ToDir, args.ToTotalFname),
+	}
+}
+
 func parseArgs() PokedexArgs {
 	fromDir := flag.String("from", "/tmp/cows", "from dir")
 	fromMetadataFname := flag.String("fromMetadata", "/tmp/cows/pokemon.json", "metadata file")
@@ -74,13 +88,10 @@ func mkDirs(dirPaths []string) {
 //   - contains the total number of pokemon files, used for random selection
 func main() {
 	args := parseArgs()
-
-	totalFpath := path.Join(args.ToDir, args.ToTotalFname)
-	entryDirPath := path.Join(args.ToDir, args.ToDataSubDir)
-	metadataDirPath := path.Join(args.ToDir, args.ToMetadataSubDir)
+	paths := NewPokedexPaths(args)
 
 	// ensure that the destination directories exist
-	mkDirs([]string{entryDirPath, metadataDirPath})
+	mkDirs([]string{paths.EntryDirPath, paths.MetadataDirPath})
 
 	// Find all the cowfiles
 	cowfileFpaths := pokedex.FindFiles(args.FromDir, ".cow", make([]string, 0))
@@ -95,7 +106,7 @@ func main() {
 		data, err := os.ReadFile(fpath)
 		pokedex.Check(err)
 
-		pokedex.WriteBytesToFile(data, pokedex.EntryFpath(entryDirPath, i), true)
+		pokedex.WriteBytesToFile(data, pokedex.EntryFpath(paths.EntryDirPath, i), true)
 		pbar.Add(1)
 	}
 
@@ -108,7 +119,7 @@ func main() {
 	pbar = bin.NewProgressBar(len(pokemonNames))
 	for key, name := range pokemonNames {
 		metadata := pokedex.CreateNameMetadata(i, key, name, args.FromDir, cowfileFpaths)
-		pokedex.WriteStructToFile(metadata, pokedex.MetadataFpath(metadataDirPath, i))
+		pokedex.WriteStructToFile(metadata, pokedex.MetadataFpath(paths.MetadataDirPath, i))
 		pokemonMetadata = append(pokemonMetadata, *metadata)
 		uniqueNames[name.Slug] = append(uniqueNames[name.Slug], i)
 		i++
@@ -123,12 +134,12 @@ func main() {
 	pokedex.WriteStructToFile(categories, "build/assets/category_keys.txt")
 
 	fmt.Println("- Writing total metadata to file")
-	pokedex.WriteIntToFile(len(pokemonMetadata), totalFpath)
+	pokedex.WriteIntToFile(len(pokemonMetadata), paths.TotalFpath)
 
 	fmt.Println("✓ Complete! Indexed", len(cowfileFpaths), "total cowfiles")
 	fmt.Println("wrote", i, "names to", "build/assets/names.txt")
 
-	fmt.Println("✓ Wrote gzipped metadata to", metadataDirPath)
-	fmt.Println("✓ Wrote gzipped cowfiles to", entryDirPath)
-	fmt.Println("✓ Wrote 'total' metadata to", totalFpath, len(pokemonMetadata))
+	fmt.Println("✓ Wrote gzipped metadata to", paths.MetadataDirPath)
+	fmt.Println("✓ Wrote gzipped cowfiles to", paths.EntryDirPath)
+	fmt.Println("✓ Wrote 'total' metadata to", paths.TotalFpath, len(pokemonMetadata))
 }
