@@ -2,17 +2,11 @@
 
 Print pokemon in the CLI! An adaptation of the classic "cowsay"
 
-- [pokesay](#pokesay)
-  - [One-line installs](#one-line-installs)
-  - [Usage](#usage)
-  - [How it works](#how-it-works)
-  - [Building binaries](#building-binaries)
-    - [On your host OS](#on-your-host-os)
-    - [In docker](#in-docker)
-  - [Developing](#developing)
-    - [Testing](#testing)
-    - [Deploying](#deploying)
-  - [TODO](#todo)
+- [One-line installs](#one-line-installs)
+- [Usage](#usage)
+- [How it works](#how-it-works)
+- [TODO](#todo)
+- [Other docs](#other-docs)
 
 ---
 
