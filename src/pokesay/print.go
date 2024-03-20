@@ -38,6 +38,8 @@ type Args struct {
 	JapaneseName   bool
 	BoxCharacters  *BoxCharacters
 	DrawInfoBorder bool
+	Help           bool
+	Verbose        bool
 }
 
 var (
