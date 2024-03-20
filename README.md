@@ -8,11 +8,13 @@ Print pokemon in the CLI! An adaptation of the classic "cowsay"
     - [Full Usage](#full-usage)
   - [How it works](#how-it-works)
   - [TODO](#todo)
-  - [Other docs](#other-docs)
-
-![pokesay demo](https://github.com/tmck-code/pokesay/assets/9894426/0bf51c06-6b41-4df4-b057-ac060bae7814)
+- Other docs
+  - [Building binaries](./docs/build.md)
+  - [Developing/Deploying](./docs/development.md)
 
 ---
+
+![pokesay demo](https://github.com/tmck-code/pokesay/assets/9894426/0bf51c06-6b41-4df4-b057-ac060bae7814)
 
 ## One-line installs
 
@@ -154,5 +156,3 @@ Navigate to the Releases and download the latest binary.
 
 ## Other docs
 
-- [Building binaries](./docs/build.md)
-- [Developing/Deploying](./docs/development.md)
