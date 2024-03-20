@@ -12,6 +12,7 @@ var (
 	DEBUG bool = os.Getenv("DEBUG") != ""
 )
 
+// Timer is a simple timer that can be used to time the duration of program stages.
 type Timer struct {
 	Name             string
 	stageNames       []string
@@ -23,6 +24,8 @@ type Timer struct {
 	Enabled          bool
 }
 
+// NewTimer creates a new Timer with the given name.
+// If align is true, values will be vertially aligned in the JSON output
 func NewTimer(name string, boolArgs ...bool) *Timer {
 	align := false
 	if len(boolArgs) == 1 {
@@ -42,6 +45,11 @@ func NewTimer(name string, boolArgs ...bool) *Timer {
 	return t
 }
 
+// Mark records the current time as the end of a stage.
+// e.g. to time a block of code:
+// t = NewTimer("MyTimer");
+// SomeCode();
+// t.Mark("Some Code");
 func (t *Timer) Mark(stage string) {
 	if !t.Enabled {
 		return
@@ -57,6 +65,9 @@ func (t *Timer) Mark(stage string) {
 	t.stageNames = append(t.stageNames, stage)
 }
 
+// Stop records the current time as the end of the last stage,
+// calculates the duration of each stage, the total duration,
+// and the percentage of the total duration that each stage took.
 func (t *Timer) Stop() {
 	if !t.Enabled {
 		return
@@ -83,6 +94,8 @@ func (t *Timer) Stop() {
 	}
 }
 
+// Print prints the timer's stage names, durations, and percentages to stderr as
+// indented JSON
 func (t *Timer) PrintJson() {
 	if !t.Enabled {
 		return
