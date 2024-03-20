@@ -102,63 +102,6 @@ Navigate to the Releases and download the latest binary.
 
 ---
 
-## Building binaries
-
-### On your host OS
-
-_Dependencies_: `Go 1.19`
-
-You'll have to install a golang version that matches the go.mod, and ensure that other package
-dependencies are installed (see the dockerfile for the dependencies)
-
-```shell
-# Generate binary asset files from the cowfiles
-./build/build_assets.sh
-
-# Finally, build the pokesay tool
-go build pokesay.go
-```
-
-### In docker
-
-_Dependencies:_ `docker`
-
-In order to re/build the binaries from scratch, along with all the cowfile conversion, use the handy
-Makefile tasks
-
-```shell
-make -C build build/docker build/assets build/release
-```
-
-This will produce 4 executable bin files inside the `build/bin` directory, and a heap of binary asset files in `build/assets`.
-
----
-
-## Developing
-
-### Testing
-
-Run tests with
-
-```shell
-go test -v ./test/
-
-# or, with debug information printed
-DEBUG=test go test -v ./test/
-```
-
-### Deploying
-
-1. Make a PR, and merge it into master
-2. Draft a new release [https://github.com/tmck-code/pokesay/releases/new](https://github.com/tmck-code/pokesay/releases/new)
-3. Give it a new tag and identical release title by incrementing the version
-   1. Generate the release notes automatically
-4. Run `make all` (or some variation) locally to create the binaries under `build/bin/`
-   1. Upload the bins to the release page
-5. Then click "Publish Release"! The install script downloads binaries from the most recently-published released
-
----
-
 ## TODO
 
 - Short-term
@@ -175,3 +118,8 @@ DEBUG=test go test -v ./test/
   - [x] Increase speed
   - [x] Improve categories to be more specific than shiny/regular
   - [x] Filter by both name and category
+
+## Other docs
+
+- [Building binaries](./docs/build.md)
+- [Developing/Deploying](./docs/development.md)
