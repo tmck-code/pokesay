@@ -2,15 +2,15 @@
 
 Print pokemon in the CLI! An adaptation of the classic "cowsay"
 
-- [One-line installs](#one-line-installs)
-- [Usage](#usage)
-- [How it works](#how-it-works)
-- [TODO](#todo)
-- [Other docs](#other-docs)
+- [pokesay](#pokesay)
+  - [One-line installs](#one-line-installs)
+  - [Usage](#usage)
+    - [Full Usage](#full-usage)
+  - [How it works](#how-it-works)
+  - [TODO](#todo)
+  - [Other docs](#other-docs)
 
----
-
-![pokesay demo](https://user-images.githubusercontent.com/9894426/212685620-762e87be-248c-4276-bae6-282c2991db68.png)
+![pokesay demo](https://github.com/tmck-code/pokesay/assets/9894426/0bf51c06-6b41-4df4-b057-ac060bae7814)
 
 ---
 
@@ -57,6 +57,38 @@ echo 'fortune | pokesay' >> $HOME/.bashrc
 ```
 
 > _Note: The pokesay tool is intended to only be used with piped text input from STDIN, entering text by typing (or other methods) might not work as expected!_
+
+### Full Usage
+
+> Run pokesay with `-h` or `--help` to see the full usage
+
+```shell
+Usage: pokesay [-bCfhjLlsuvW] [-c value] [-n value] [-t value] [-w value] [parameters ...]
+ -b, --info-border  draw a border around the info box
+ -c, --category=value
+                    choose a pokemon from a specific category
+ -C, --no-category-info
+                    do not print pokemon category information in the info box
+ -f, --fastest      run with the fastest possible configuration (--nowrap &
+                    --notabspaces)
+ -h, --help         display this help message
+ -j, --japanese-name
+                    print the japanese name in the info box
+ -L, --list-categories
+                    list all available categories
+ -l, --list-names   list all available names
+ -n, --name=value   choose a pokemon from a specific name
+ -s, --no-tab-spaces
+                    do not replace tab characters (fastest)
+ -t, --tab-width=value
+                    replace any tab characters with N spaces [4]
+ -u, --unicode-borders
+                    use unicode characters to draw the border around the speech
+                    box (and info box if --info-border is enabled)
+ -v, --verbose      print verbose output
+ -W, --no-wrap      disable text wrapping (fastest)
+ -w, --width=value  the max speech bubble width [80]
+ ```
 
 ---
 
@@ -105,9 +137,10 @@ Navigate to the Releases and download the latest binary.
 ## TODO
 
 - Short-term
-  - [ ] support long and short cli args (e.g. --name/-n)
   - [ ] optionally print ID assigned to each pokemon, support deterministic selection via the same ID
 - Longer-term
+- In Beta
+  - [x] support long and short cli args (e.g. --name/-n)
 - Completed
   - [x] Make the category struct faster to load - currently takes up to 80% of the execution time
   - [x] Store metadata and names in a more storage-efficient manner
