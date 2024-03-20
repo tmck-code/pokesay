@@ -8,9 +8,11 @@ Print pokemon in the CLI! An adaptation of the classic "cowsay"
     - [Full Usage](#full-usage)
   - [How it works](#how-it-works)
   - [TODO](#todo)
-- Other docs
-  - [Building binaries](./docs/build.md)
-  - [Developing/Deploying](./docs/development.md)
+
+**Other docs**
+
+- [Building binaries](./docs/build.md)
+- [Developing/Deploying](./docs/development.md)
 
 ---
 
