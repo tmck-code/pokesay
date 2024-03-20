@@ -26,11 +26,12 @@ var (
 	//go:embed all:build/assets/categories
 	GOBCategories embed.FS
 
-	CategoryRoot string = "build/assets/categories"
-	MetadataRoot string = "build/assets/metadata"
-	CowDataRoot  string = "build/assets/cows"
+	CategoryRoot string = "build/assets/categories" // the root directory of the pokemon categories
+	MetadataRoot string = "build/assets/metadata"   // the root directory of the pokemon metadata
+	CowDataRoot  string = "build/assets/cows"       // the root directory of the pokemon cow data
 )
 
+// parseFlags parses the command line flags and returns a pokesay.Args struct
 func parseFlags() pokesay.Args {
 	help := getopt.BoolLong("help", 'h', "display this help message")
 	// print verbose output (currently timer output)
@@ -94,11 +95,17 @@ func parseFlags() pokesay.Args {
 	return args
 }
 
+// runListCategories prints all available categories
+// - This reads a list of categories from the embedded filesystem
+// - prints the list of categories, and the total number of categories
 func runListCategories() {
 	categories := pokedex.ReadStructFromBytes[[]string](GOBCategoryKeys)
 	fmt.Printf("%s\n%d %s\n", strings.Join(categories, " "), len(categories), "total categories")
 }
 
+// runListNames prints all available pokemon names
+// - This reads a struct of {name -> metadata indexes} from the embedded filesystem
+// - prints all the keys of the struct, and the total number of names
 func runListNames() {
 	names := pokesay.ListNames(
 		pokedex.ReadStructFromBytes[map[string][]int](GOBAllNames),
@@ -106,6 +113,9 @@ func runListNames() {
 	fmt.Printf("%s\n%d %s\n", strings.Join(names, " "), len(names), "total names")
 }
 
+// GenerateNames returns a list of names to print
+// - If the japanese name flag is set, it returns both the english and japanese names
+// - Otherwise, it returns just the english name
 func GenerateNames(metadata pokedex.PokemonMetadata, args pokesay.Args) []string {
 	if args.JapaneseName {
 		return []string{
@@ -117,6 +127,11 @@ func GenerateNames(metadata pokedex.PokemonMetadata, args pokesay.Args) []string
 	}
 }
 
+// runPrintByName prints a pokemon matched by a name
+// The name must match the lowercase name of the pokemon (TODO: improve this behaviour)
+// - This reads a struct of {name -> metadata indexes} from the embedded filesystem
+// - It matches the name to a metadata index, loads the corresponding metadata file, and then chooses a random entry
+// - Finally, it prints the pokemon
 func runPrintByName(args pokesay.Args) {
 	t := timer.NewTimer("runPrintByName", true)
 
@@ -133,6 +148,15 @@ func runPrintByName(args pokesay.Args) {
 	t.PrintJson()
 }
 
+// runPrintByCategory prints a pokemon matched by a category
+// - This loads a GOB file containing a pokemon "category" search struct from the embedded filesystem
+// - It chooses a random category file from the corresponding category directory
+// - It reads the category file and chooses a random pokemon from the category
+//   - # TODO: as each category dir contains files with a singular entry of {metadata index/entry index},
+//   - # this means that pokemon that are in the same category multiple times will be chosen more often
+//
+// - It reads the metadata file of the chosen pokemon and chooses the corresponding entry from the category search
+// - Finally, it prints the pokemon
 func runPrintByCategory(args pokesay.Args) {
 	t := timer.NewTimer("runPrintByCategory", true)
 
@@ -147,6 +171,10 @@ func runPrintByCategory(args pokesay.Args) {
 	t.PrintJson()
 }
 
+// runPrintByNameAndCategory prints a pokemon matched by a name and category
+// - This reads a struct of {name -> metadata indexes} from the embedded filesystem
+// - It matches the name to a metadata index, loads the corresponding metadata file, and then randomly chooses an entry that matches the category
+// - Finally, it prints the pokemon
 func runPrintByNameAndCategory(args pokesay.Args) {
 	t := timer.NewTimer("runPrintByNameAndCategory", true)
 
