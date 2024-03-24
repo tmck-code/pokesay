@@ -6,8 +6,10 @@ Print pokemon in the CLI! An adaptation of the classic "cowsay"
   - [One-line installs](#one-line-installs)
   - [Usage](#usage)
     - [Full Usage](#full-usage)
+    - [Examples](#examples)
   - [How it works](#how-it-works)
   - [TODO](#todo)
+  - [Similar projects](#similar-projects)
 
 **Other docs**
 
@@ -187,5 +189,19 @@ Navigate to the Releases and download the latest binary.
   - [x] Improve categories to be more specific than shiny/regular
   - [x] Filter by both name and category
 
-## Other docs
+## Similar projects
 
+There are many other projects that bring pokemon to the terminal!
+Check them out via the links.
+
+Inspired by the [pokeshell](https://github.com/acxz/pokeshell) project, I've included a comparison table
+
+| project | dependencies | speed | japanese names | size categories | selection by name | selection by category | animated sprites |
+|--|--|--|--|--|--|--|--|
+| [pokeshell](https://github.com/acxz/pokeshell) | imagemagick, chafa | ? | ? | ? | ? | ? | ? |
+| [pokemon-icat](https://github.com/aflaag/pokemon-icat) | python | ? | ? | ? | ? | ? | ? |
+| [pokemon-colorscripts](https://gitlab.com/phoneybadger/pokemon-colorscripts) | python3 | ? | ? | ? | ? | ? | ? |
+| [pokemonsay-newgenerations](https://github.com/HRKings/pokemonsay-newgenerations) | cowsay (perl) | ? | ? | ? | ? | ? | ? |
+| [pokeTerm](https://github.com/31marcosalsa/pokeTerm) | python3 | ? | ? | ? | ? | ? | ? |
+| [krabby](https://github.com/yannjor/krabby) | rust, cargo | ? | ❌ | ❌ | ✓ | ❌ | ❌ |
+| [pokemonsay](https://github.com/dfrankland/pokemonsay) | npm | ? | ? | ? | ? | ? | ? |
