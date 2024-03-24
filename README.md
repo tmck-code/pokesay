@@ -92,7 +92,38 @@ Usage: pokesay [-bCfhjLlsuvW] [-c value] [-n value] [-t value] [-w value] [param
  -v, --verbose      print verbose output
  -W, --no-wrap      disable text wrapping (fastest)
  -w, --width=value  the max speech bubble width [80]
- ```
+```
+
+### Examples
+
+- List all available categories
+  ```shell
+  pokesay -L
+  ```
+- List all available names
+  ```shell
+  pokesay -l
+  ```
+- Print a message with a random pokemon
+  ```shell
+  echo 'Hello, world!' | pokesay
+  ```
+- Print a message with a specific pokemon
+  ```shell
+  echo 'Hello, world!' | pokesay -n pikachu
+  ```
+- Print a message with a specific pokemon category
+  ```shell
+  # big pokemon (i.e. with a large dimensions in the terminal)
+  echo 'Hello, world!' | pokesay -c big
+  # shiny pokemon
+  echo 'Hello, world!' | pokesay -c shiny
+  ```
+- Print a message with a specific pokemon category and name
+  ```shell
+  # for shiny charizards
+  echo 'Hello, world!' | pokesay -c shiny -n charizard
+  ```
 
 ---
 
