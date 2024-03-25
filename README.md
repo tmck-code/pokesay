@@ -2,6 +2,10 @@
 
 Print pokemon in the CLI! An adaptation of the classic "cowsay"
 
+<p align="center">
+  <img src="./docs/demo.gif" alt="demo"/>
+</p>
+
 - [pokesay](#pokesay)
   - [One-line installs](#one-line-installs)
   - [Usage](#usage)
@@ -17,12 +21,6 @@ Print pokemon in the CLI! An adaptation of the classic "cowsay"
 - [Developing/Deploying](./docs/development.md)
 
 ---
-
-## Demo
-
-<p align="center">
-  <img src="./docs/demo.gif" alt="demo"/>
-</p>
 
 ## One-line installs
 
@@ -99,6 +97,8 @@ Usage: pokesay [-bCfhjLlsuvW] [-c value] [-n value] [-t value] [-w value] [param
  -W, --no-wrap      disable text wrapping (fastest)
  -w, --width=value  the max speech bubble width [80]
 ```
+
+### Examples
 
 - List all available categories
   ```shell
