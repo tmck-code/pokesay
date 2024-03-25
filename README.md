@@ -18,7 +18,11 @@ Print pokemon in the CLI! An adaptation of the classic "cowsay"
 
 ---
 
-![pokesay demo](https://github.com/tmck-code/pokesay/assets/9894426/0bf51c06-6b41-4df4-b057-ac060bae7814)
+## Demo
+
+<p align="center">
+  <img src="./docs/demo.gif" alt="demo"/>
+</p>
 
 ## One-line installs
 
@@ -95,12 +99,6 @@ Usage: pokesay [-bCfhjLlsuvW] [-c value] [-n value] [-t value] [-w value] [param
  -W, --no-wrap      disable text wrapping (fastest)
  -w, --width=value  the max speech bubble width [80]
 ```
-
-### Examples
-
-<p align="center">
-  <img src="./docs/demo.gif" alt="demo"/>
-</p>
 
 - List all available categories
   ```shell
