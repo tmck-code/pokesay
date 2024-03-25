@@ -98,8 +98,9 @@ Usage: pokesay [-bCfhjLlsuvW] [-c value] [-n value] [-t value] [-w value] [param
 
 ### Examples
 
-![demo](./docs/render1711358020551.gif)
-
+<p align="center">
+  <img src="./docs/demo.gif" alt="demo"/>
+</p>
 
 - List all available categories
   ```shell
