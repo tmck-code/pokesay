@@ -98,6 +98,9 @@ Usage: pokesay [-bCfhjLlsuvW] [-c value] [-n value] [-t value] [-w value] [param
 
 ### Examples
 
+![demo](./docs/render1711358020551.gif)
+
+
 - List all available categories
   ```shell
   pokesay -L
