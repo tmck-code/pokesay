@@ -78,7 +78,7 @@ config:
   fontFamily: "Iosevka Term, Monaco, Lucida Console, Ubuntu Mono, Monospace"
 
   # The size of the font
-  fontSize: 14
+  fontSize: 16
 
   # The height of lines
   lineHeight: 1
