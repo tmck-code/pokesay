@@ -2,24 +2,27 @@
 
 Print pokemon in the CLI! An adaptation of the classic "cowsay"
 
-![pokesay demo](https://github.com/tmck-code/pokesay/assets/9894426/0bf51c06-6b41-4df4-b057-ac060bae7814)
-
----
-
 - [pokesay](#pokesay)
   - [One-line installs](#one-line-installs)
   - [Usage](#usage)
     - [Full Usage](#full-usage)
+    - [Examples](#examples)
   - [How it works](#how-it-works)
-  - [Building binaries](#building-binaries)
-    - [On your host OS](#on-your-host-os)
-    - [In docker](#in-docker)
-  - [Developing](#developing)
-    - [Testing](#testing)
-    - [Deploying](#deploying)
   - [TODO](#todo)
+  - [Similar projects](#similar-projects)
+
+**Other docs**
+
+- [Building binaries](./docs/build.md)
+- [Developing/Deploying](./docs/development.md)
 
 ---
+
+## Demo
+
+<p align="center">
+  <img src="./docs/demo.gif" alt="demo"/>
+</p>
 
 ## One-line installs
 
@@ -95,7 +98,36 @@ Usage: pokesay [-bCfhjLlsuvW] [-c value] [-n value] [-t value] [-w value] [param
  -v, --verbose      print verbose output
  -W, --no-wrap      disable text wrapping (fastest)
  -w, --width=value  the max speech bubble width [80]
- ```
+```
+
+- List all available categories
+  ```shell
+  pokesay -L
+  ```
+- List all available names
+  ```shell
+  pokesay -l
+  ```
+- Print a message with a random pokemon
+  ```shell
+  echo 'Hello, world!' | pokesay
+  ```
+- Print a message with a specific pokemon
+  ```shell
+  echo 'Hello, world!' | pokesay -n pikachu
+  ```
+- Print a message with a specific pokemon category
+  ```shell
+  # big pokemon (i.e. with a large dimensions in the terminal)
+  echo 'Hello, world!' | pokesay -c big
+  # shiny pokemon
+  echo 'Hello, world!' | pokesay -c shiny
+  ```
+- Print a message with a specific pokemon category and name
+  ```shell
+  # for shiny charizards
+  echo 'Hello, world!' | pokesay -c shiny -n charizard
+  ```
 
 ---
 
@@ -141,63 +173,6 @@ Navigate to the Releases and download the latest binary.
 
 ---
 
-## Building binaries
-
-### On your host OS
-
-_Dependencies_: `Go 1.19`
-
-You'll have to install a golang version that matches the go.mod, and ensure that other package
-dependencies are installed (see the dockerfile for the dependencies)
-
-```shell
-# Generate binary asset files from the cowfiles
-./build/build_assets.sh
-
-# Finally, build the pokesay tool
-go build pokesay.go
-```
-
-### In docker
-
-_Dependencies:_ `docker`
-
-In order to re/build the binaries from scratch, along with all the cowfile conversion, use the handy
-Makefile tasks
-
-```shell
-make -C build build/docker build/assets build/release
-```
-
-This will produce 4 executable bin files inside the `build/bin` directory, and a heap of binary asset files in `build/assets`.
-
----
-
-## Developing
-
-### Testing
-
-Run tests with
-
-```shell
-go test -v ./test/
-
-# or, with debug information printed
-DEBUG=test go test -v ./test/
-```
-
-### Deploying
-
-1. Make a PR, and merge it into master
-2. Draft a new release [https://github.com/tmck-code/pokesay/releases/new](https://github.com/tmck-code/pokesay/releases/new)
-3. Give it a new tag and identical release title by incrementing the version
-   1. Generate the release notes automatically
-4. Run `make all` (or some variation) locally to create the binaries under `build/bin/`
-   1. Upload the bins to the release page
-5. Then click "Publish Release"! The install script downloads binaries from the most recently-published released
-
----
-
 ## TODO
 
 - Short-term
@@ -215,3 +190,20 @@ DEBUG=test go test -v ./test/
   - [x] Increase speed
   - [x] Improve categories to be more specific than shiny/regular
   - [x] Filter by both name and category
+
+## Similar projects
+
+There are many other projects that bring pokemon to the terminal!
+Check them out via the links.
+
+Inspired by the [pokeshell](https://github.com/acxz/pokeshell) project, I've included a comparison table
+
+| project | dependencies | speed | japanese names | size categories | selection by name | selection by category | animated sprites |
+|--|--|--|--|--|--|--|--|
+| [pokeshell](https://github.com/acxz/pokeshell) | imagemagick, chafa | ? | ? | ? | ? | ? | ? |
+| [pokemon-icat](https://github.com/aflaag/pokemon-icat) | python | ? | ? | ? | ? | ? | ? |
+| [pokemon-colorscripts](https://gitlab.com/phoneybadger/pokemon-colorscripts) | python3 | ? | ? | ? | ? | ? | ? |
+| [pokemonsay-newgenerations](https://github.com/HRKings/pokemonsay-newgenerations) | cowsay (perl) | ? | ? | ? | ? | ? | ? |
+| [pokeTerm](https://github.com/31marcosalsa/pokeTerm) | python3 | ? | ? | ? | ? | ? | ? |
+| [krabby](https://github.com/yannjor/krabby) | rust, cargo | ? | ❌ | ❌ | ✓ | ❌ | ❌ |
+| [pokemonsay](https://github.com/dfrankland/pokemonsay) | npm | ? | ? | ? | ? | ? | ? |
