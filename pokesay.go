@@ -4,6 +4,7 @@ import (
 	"embed"
 	"encoding/json"
 	"fmt"
+	"log"
 	"os"
 	"strconv"
 	"strings"
@@ -158,7 +159,10 @@ func GenerateNames(metadata pokedex.PokemonMetadata, args pokesay.Args, final po
 			fmt.Sprintf("%s.%04d", metadata.Idx, final.EntryIndex),
 		}
 	} else {
-		return []string{metadata.Name}
+		return []string{
+			metadata.Name,
+			fmt.Sprintf("%s.%04d", metadata.Idx, final.EntryIndex),
+		}
 	}
 }
 
@@ -199,10 +203,12 @@ func runPrintByID(args pokesay.Args) {
 	idx, _ := strconv.Atoi(idxs[0])
 	subIdx, _ := strconv.Atoi(idxs[1])
 
-	match := sorted[idx]
 	t.Mark("find name via ID")
 
-	metadata, final := pokesay.ChooseByName(names, match, GOBCowNames, MetadataRoot)
+	metadata, final, err := pokesay.ChooseByIndex(idx, subIdx, GOBCowNames, MetadataRoot)
+	if err != nil {
+		log.Fatal(err)
+	}
 	t.Mark("find/read metadata")
 
 	pokesay.Print(args, subIdx, GenerateNames(metadata, args, final), final.Categories, GOBCowData)
