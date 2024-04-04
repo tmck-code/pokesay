@@ -192,16 +192,13 @@ func runPrintByName(args pokesay.Args) {
 // - Finally, it prints the pokemon
 func runPrintByID(args pokesay.Args) {
 	t := timer.NewTimer("runPrintByName", true)
-	names := pokedex.ReadStructFromBytes[map[string][]int](GOBAllNames)
-	sorted := pokesay.ListNames(names)
-	t.Mark("read name struct")
 
 	idxs := strings.Split(args.IDToken, ".")
 
 	idx, _ := strconv.Atoi(idxs[0])
 	subIdx, _ := strconv.Atoi(idxs[1])
 
-	t.Mark("find name via ID")
+	t.Mark("format IDs")
 
 	metadata, final, err := pokesay.ChooseByIndex(idx, subIdx, GOBCowNames, MetadataRoot)
 	if err != nil {
