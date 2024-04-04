@@ -3,7 +3,7 @@
 Print pokemon in the CLI! An adaptation of the classic "cowsay"
 
 <p align="center">
-  <img src="https://github.com/tmck-code/pokesay/assets/9894426/794ee42d-4bc2-4d0c-bce0-aafa3dca2e78" alt="demo"/>
+  <kbd><img src="https://github.com/tmck-code/pokesay/assets/9894426/794ee42d-4bc2-4d0c-bce0-aafa3dca2e78" alt="demo"/></kbd>
 </p>
 
 - [pokesay](#pokesay)
