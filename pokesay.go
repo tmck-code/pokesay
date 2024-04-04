@@ -112,12 +112,25 @@ func runListCategories() {
 // - This reads a struct of {name -> metadata indexes} from the embedded filesystem
 // - prints all the keys of the struct, and the total number of names
 func runListNames() {
-	names := pokesay.ListNames(
-		pokedex.ReadStructFromBytes[map[string][]int](GOBAllNames),
-	)
-	s := make(map[string]string)
-	for i, name := range names {
-		s[fmt.Sprintf("%03d", i)] = name
+	t := timer.NewTimer("runListNames", true)
+
+	pokedex.ReadStructFromBytes[map[string][]int](GOBAllNames)
+	namesSorted := pokedex.GatherMapKeys(pokedex.ReadStructFromBytes[map[string][]int](GOBAllNames))
+
+	t.Mark("read metadata")
+
+	s := make(map[string]map[string]string)
+	for i, name := range namesSorted {
+		metadata := pokedex.ReadMetadataFromEmbedded(GOBCowNames, pokedex.MetadataFpath(MetadataRoot, i))
+
+		entries := make(map[string]string, 0)
+
+		for _, entry := range metadata.Entries {
+			k := fmt.Sprintf("%d.%d", i, entry.EntryIndex)
+			entries[k] = strings.Join(entry.Categories, ", ")
+		}
+		fmt.Println(i, name, metadata)
+		s[name] = entries
 	}
 	json, _ := json.MarshalIndent(s, "", strings.Repeat(" ", 2))
 	fmt.Fprintln(os.Stderr, string(json))
