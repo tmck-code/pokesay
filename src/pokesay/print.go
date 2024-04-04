@@ -35,6 +35,7 @@ type Args struct {
 	ListNames      bool
 	Category       string
 	NameToken      string
+	IDToken        string
 	JapaneseName   bool
 	BoxCharacters  *BoxCharacters
 	DrawInfoBorder bool

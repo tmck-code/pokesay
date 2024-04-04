@@ -2,7 +2,10 @@ package main
 
 import (
 	"embed"
+	"encoding/json"
 	"fmt"
+	"os"
+	"strconv"
 	"strings"
 
 	"github.com/pborman/getopt/v2"
@@ -39,6 +42,7 @@ func parseFlags() pokesay.Args {
 
 	// selection/filtering
 	name := getopt.StringLong("name", 'n', "", "choose a pokemon from a specific name")
+	id := getopt.StringLong("id", 'i', "", "choose a pokemon from a specific ID (see `pokesay -l` for IDs)")
 	category := getopt.StringLong("category", 'c', "", "choose a pokemon from a specific category")
 
 	// list operations
@@ -85,6 +89,7 @@ func parseFlags() pokesay.Args {
 			ListNames:      *listNames,
 			Category:       *category,
 			NameToken:      *name,
+			IDToken:        *id,
 			JapaneseName:   *japaneseName,
 			BoxCharacters:  pokesay.DetermineBoxCharacters(*unicodeBorders),
 			DrawInfoBorder: *drawInfoBorder,
@@ -110,7 +115,12 @@ func runListNames() {
 	names := pokesay.ListNames(
 		pokedex.ReadStructFromBytes[map[string][]int](GOBAllNames),
 	)
-	fmt.Printf("%s\n%d %s\n", strings.Join(names, " "), len(names), "total names")
+	s := make(map[string]string)
+	for i, name := range names {
+		s[fmt.Sprintf("%03d", i)] = name
+	}
+	json, _ := json.MarshalIndent(s, "", strings.Repeat(" ", 2))
+	fmt.Fprintln(os.Stderr, string(json))
 }
 
 // GenerateNames returns a list of names to print
@@ -139,6 +149,31 @@ func runPrintByName(args pokesay.Args) {
 	t.Mark("read name struct")
 
 	metadata, final := pokesay.ChooseByName(names, args.NameToken, GOBCowNames, MetadataRoot)
+	t.Mark("find/read metadata")
+
+	pokesay.Print(args, final.EntryIndex, GenerateNames(metadata, args), final.Categories, GOBCowData)
+	t.Mark("print")
+
+	t.Stop()
+	t.PrintJson()
+}
+
+// runPrintByID prints a pokemon corresponding to a specific ID
+// - This reads a list of names from the embedded filesystem
+// - It finds the name at alphabetical index `IDToken`
+// - It matches the name to a metadata index, loads the corresponding metadata file, and then chooses a random entry
+// - Finally, it prints the pokemon
+func runPrintByID(args pokesay.Args) {
+	t := timer.NewTimer("runPrintByName", true)
+	names := pokedex.ReadStructFromBytes[map[string][]int](GOBAllNames)
+	sorted := pokesay.ListNames(names)
+	t.Mark("read name struct")
+
+	idx, _ := strconv.Atoi(args.IDToken)
+	match := sorted[idx]
+	t.Mark("find name via ID")
+
+	metadata, final := pokesay.ChooseByName(names, match, GOBCowNames, MetadataRoot)
 	t.Mark("find/read metadata")
 
 	pokesay.Print(args, final.EntryIndex, GenerateNames(metadata, args), final.Categories, GOBCowData)
@@ -236,6 +271,8 @@ func main() {
 		runPrintByNameAndCategory(args)
 	} else if args.NameToken != "" {
 		runPrintByName(args)
+	} else if args.IDToken != "" {
+		runPrintByID(args)
 	} else if args.Category != "" {
 		runPrintByCategory(args)
 	} else {
