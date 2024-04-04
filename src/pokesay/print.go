@@ -142,16 +142,11 @@ func nameLength(names []string) int {
 
 	for _, name := range names {
 		for _, c := range name {
-			// check if ascii
-			if c < 128 {
+			// check if ascii or single-width unicode
+			if (c < 128) || (SingleWidthCars[string(c)]) {
 				totalLen++
 			} else {
-				// check if single width character
-				if SingleWidthCars[string(c)] {
-					totalLen++
-				} else {
-					totalLen += 2
-				}
+				totalLen += 2
 			}
 		}
 	}
