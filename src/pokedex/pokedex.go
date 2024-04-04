@@ -130,7 +130,7 @@ func Decompress(data []byte) []byte {
 	return resB.Bytes()
 }
 
-func CreateNameMetadata(idx int, key string, name PokemonName, rootDir string, fpaths []string) *PokemonMetadata {
+func CreateNameMetadata(idx string, key string, name PokemonName, rootDir string, fpaths []string) *PokemonMetadata {
 	entryCategories := make(map[int][][]string, 0)
 
 	for i, fpath := range fpaths {
@@ -143,6 +143,7 @@ func CreateNameMetadata(idx int, key string, name PokemonName, rootDir string, f
 		}
 	}
 	return NewMetadata(
+		idx,
 		name.English,
 		name.Japanese,
 		name.JapanesePhonetic,

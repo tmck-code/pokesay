@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path"
+	"sort"
 	"strings"
 
 	"github.com/tmck-code/pokesay/src/bin"
@@ -98,6 +99,9 @@ func main() {
 	fmt.Println("- Found", len(cowfileFpaths), "cowfiles")
 	// Read pokemon names
 	pokemonNames := pokedex.ReadNames(args.FromMetadataFname)
+	nameTokens := pokedex.GatherMapKeys(pokemonNames)
+	sort.Strings(nameTokens)
+
 	fmt.Println("- Read", len(pokemonNames), "pokemon names from", args.FromMetadataFname)
 
 	fmt.Println("- Writing entries to file")
@@ -117,8 +121,9 @@ func main() {
 	uniqueNames := make(map[string][]int)
 	i := 0
 	pbar = bin.NewProgressBar(len(pokemonNames))
-	for key, name := range pokemonNames {
-		metadata := pokedex.CreateNameMetadata(i, key, name, args.FromDir, cowfileFpaths)
+	for i, key := range nameTokens {
+		name := pokemonNames[key]
+		metadata := pokedex.CreateNameMetadata(fmt.Sprintf("%04d", i), key, name, args.FromDir, cowfileFpaths)
 		pokedex.WriteStructToFile(metadata, pokedex.MetadataFpath(paths.MetadataDirPath, i))
 		pokemonMetadata = append(pokemonMetadata, *metadata)
 		uniqueNames[name.Slug] = append(uniqueNames[name.Slug], i)
