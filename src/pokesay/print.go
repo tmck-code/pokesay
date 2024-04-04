@@ -5,7 +5,6 @@ import (
 	"embed"
 	"fmt"
 	"os"
-	"slices"
 	"strings"
 
 	"github.com/fatih/color"
@@ -70,7 +69,10 @@ var (
 		RightArrow:        "→",
 		CategorySeparator: "/",
 	}
-	SingleWidthCars []string = []string{"♀", "♂"}
+	SingleWidthCars map[string]bool = map[string]bool{
+		"♀": true,
+		"♂": true,
+	}
 )
 
 func DetermineBoxCharacters(unicodeBox bool) *BoxCharacters {
@@ -145,7 +147,7 @@ func nameLength(names []string) int {
 				totalLen++
 			} else {
 				// check if single width character
-				if slices.Contains(SingleWidthCars, string(c)) {
+				if SingleWidthCars[string(c)] {
 					totalLen++
 				} else {
 					totalLen += 2
