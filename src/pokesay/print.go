@@ -33,6 +33,7 @@ type Args struct {
 	NoCategoryInfo bool
 	ListCategories bool
 	ListNames      bool
+	ListNameToken  string
 	Category       string
 	NameToken      string
 	IDToken        string

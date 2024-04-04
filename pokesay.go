@@ -46,7 +46,8 @@ func parseFlags() pokesay.Args {
 	category := getopt.StringLong("category", 'c', "", "choose a pokemon from a specific category")
 
 	// list operations
-	listNames := getopt.BoolLong("list-names", 'l', "list all available names")
+	listNames := getopt.StringLong("list-names", 'l', "", "list all available names")
+	getopt.Lookup('l').SetOptional()
 	listCategories := getopt.BoolLong("list-categories", 'L', "list all available categories")
 
 	width := getopt.IntLong("width", 'w', 80, "the max speech bubble width")
@@ -86,7 +87,8 @@ func parseFlags() pokesay.Args {
 			NoTabSpaces:    *noTabSpaces,
 			NoCategoryInfo: *noCategoryInfo,
 			ListCategories: *listCategories,
-			ListNames:      *listNames,
+			ListNames:      getopt.GetCount("list-names") > 0,
+			ListNameToken:  *listNames,
 			Category:       *category,
 			NameToken:      *name,
 			IDToken:        *id,
@@ -111,29 +113,38 @@ func runListCategories() {
 // runListNames prints all available pokemon names
 // - This reads a struct of {name -> metadata indexes} from the embedded filesystem
 // - prints all the keys of the struct, and the total number of names
-func runListNames() {
+func runListNames(token string) {
 	t := timer.NewTimer("runListNames", true)
 
 	pokedex.ReadStructFromBytes[map[string][]int](GOBAllNames)
 	namesSorted := pokedex.GatherMapKeys(pokedex.ReadStructFromBytes[map[string][]int](GOBAllNames))
-
 	t.Mark("read metadata")
 
 	s := make(map[string]map[string]string)
+	exit := false
 	for i, name := range namesSorted {
 		metadata := pokedex.ReadMetadataFromEmbedded(GOBCowNames, pokedex.MetadataFpath(MetadataRoot, i))
 
 		entries := make(map[string]string, 0)
 
 		for _, entry := range metadata.Entries {
-			k := fmt.Sprintf("%d.%d", i, entry.EntryIndex)
+			k := fmt.Sprintf("%04d.%04d", i, entry.EntryIndex)
 			entries[k] = strings.Join(entry.Categories, ", ")
 		}
-		fmt.Println(i, name, metadata)
+		if token != "" && token == name {
+			json, _ := json.MarshalIndent(map[string]map[string]string{name: entries}, "", strings.Repeat(" ", 2))
+			fmt.Fprintln(os.Stdout, string(json))
+			exit = true
+			break
+		}
 		s[name] = entries
 	}
+	t.Mark("read metadata")
+	if exit {
+		return
+	}
 	json, _ := json.MarshalIndent(s, "", strings.Repeat(" ", 2))
-	fmt.Fprintln(os.Stderr, string(json))
+	fmt.Fprintln(os.Stdout, string(json))
 }
 
 // GenerateNames returns a list of names to print
@@ -283,7 +294,7 @@ func main() {
 	if args.ListCategories {
 		runListCategories()
 	} else if args.ListNames {
-		runListNames()
+		runListNames(args.ListNameToken)
 	} else if args.NameToken != "" && args.Category != "" {
 		runPrintByNameAndCategory(args)
 	} else if args.NameToken != "" {
