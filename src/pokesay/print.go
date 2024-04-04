@@ -69,6 +69,10 @@ var (
 		RightArrow:        "→",
 		CategorySeparator: "/",
 	}
+	SingleWidthCars map[string]bool = map[string]bool{
+		"♀": true,
+		"♂": true,
+	}
 )
 
 func DetermineBoxCharacters(unicodeBox bool) *BoxCharacters {
@@ -135,10 +139,11 @@ func printWrappedText(boxCharacters *BoxCharacters, line string, width int, tabS
 
 func nameLength(names []string) int {
 	totalLen := 0
+
 	for _, name := range names {
 		for _, c := range name {
-			// check if ascii
-			if c < 128 {
+			// check if ascii or single-width unicode
+			if (c < 128) || (SingleWidthCars[string(c)]) {
 				totalLen++
 			} else {
 				totalLen += 2
@@ -170,7 +175,6 @@ func printPokemon(args Args, index int, names []string, categoryKeys []string, G
 			args.BoxCharacters.RightArrow,
 			strings.Join(namesFmt, fmt.Sprintf(" %s ", args.BoxCharacters.Separator)),
 		)
-
 	} else {
 		infoLine = fmt.Sprintf(
 			"%s %s %s %s",
@@ -182,7 +186,7 @@ func printPokemon(args Args, index int, names []string, categoryKeys []string, G
 		for _, category := range categoryKeys {
 			width += len(category)
 		}
-		width += len(categoryKeys) - 1 + 1 + 2
+		width += len(categoryKeys) - 1 + 1 + 2 // lol why did I do this
 	}
 
 	if args.DrawInfoBorder {
