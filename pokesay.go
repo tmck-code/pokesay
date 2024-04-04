@@ -182,14 +182,18 @@ func runPrintByID(args pokesay.Args) {
 	sorted := pokesay.ListNames(names)
 	t.Mark("read name struct")
 
-	idx, _ := strconv.Atoi(args.IDToken)
+	idxs := strings.Split(args.IDToken, ".")
+
+	idx, _ := strconv.Atoi(idxs[0])
+	subIdx, _ := strconv.Atoi(idxs[1])
+
 	match := sorted[idx]
 	t.Mark("find name via ID")
 
 	metadata, final := pokesay.ChooseByName(names, match, GOBCowNames, MetadataRoot)
 	t.Mark("find/read metadata")
 
-	pokesay.Print(args, final.EntryIndex, GenerateNames(metadata, args), final.Categories, GOBCowData)
+	pokesay.Print(args, subIdx, GenerateNames(metadata, args), final.Categories, GOBCowData)
 	t.Mark("print")
 
 	t.Stop()
