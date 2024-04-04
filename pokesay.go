@@ -61,6 +61,7 @@ func parseFlags() pokesay.Args {
 
 	// info box options
 	japaneseName := getopt.BoolLong("japanese-name", 'j', "print the japanese name in the info box")
+	showId := getopt.BoolLong("id-info", 'I', "print the pokemon ID in the info box")
 	noCategoryInfo := getopt.BoolLong("no-category-info", 'C', "do not print pokemon category information in the info box")
 	drawInfoBorder := getopt.BoolLong("info-border", 'b', "draw a border around the info box")
 
@@ -94,6 +95,7 @@ func parseFlags() pokesay.Args {
 			NameToken:      *name,
 			IDToken:        *id,
 			JapaneseName:   *japaneseName,
+			ShowID:         *showId,
 			BoxCharacters:  pokesay.DetermineBoxCharacters(*unicodeBorders),
 			DrawInfoBorder: *drawInfoBorder,
 			Help:           *help,
@@ -152,18 +154,14 @@ func runListNames(token string) {
 // - If the japanese name flag is set, it returns both the english and japanese names
 // - Otherwise, it returns just the english name
 func GenerateNames(metadata pokedex.PokemonMetadata, args pokesay.Args, final pokedex.PokemonEntryMapping) []string {
+	nameParts := []string{metadata.Name}
 	if args.JapaneseName {
-		return []string{
-			metadata.Name,
-			fmt.Sprintf("%s (%s)", metadata.JapaneseName, metadata.JapanesePhonetic),
-			fmt.Sprintf("%s.%04d", metadata.Idx, final.EntryIndex),
-		}
-	} else {
-		return []string{
-			metadata.Name,
-			fmt.Sprintf("%s.%04d", metadata.Idx, final.EntryIndex),
-		}
+		nameParts = append(nameParts, fmt.Sprintf("%s (%s)", metadata.JapaneseName, metadata.JapanesePhonetic))
 	}
+	if args.ShowID {
+		nameParts = append(nameParts, fmt.Sprintf("%s.%04d", metadata.Idx, final.EntryIndex))
+	}
+	return nameParts
 }
 
 // runPrintByName prints a pokemon matched by a name

@@ -38,6 +38,7 @@ type Args struct {
 	NameToken      string
 	IDToken        string
 	JapaneseName   bool
+	ShowID         bool
 	BoxCharacters  *BoxCharacters
 	DrawInfoBorder bool
 	Help           bool
