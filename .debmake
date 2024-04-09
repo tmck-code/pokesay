@@ -9,3 +9,6 @@ DESCRIPTION_SHORT="An adaptation of the classic \"cowsay\""
 
 # Long description will be broken to multiple lines (at 80 characters)
 DESCRIPTION_LONG="pokesay is a configurable talking pokemon, written in Go."
+
+# Version
+VERSION="0.13.1"
