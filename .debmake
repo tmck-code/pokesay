@@ -1,0 +1,11 @@
+# Target is the path where the package files will be installed (without leading `/`)
+TARGET="usr/bin/pokesay"
+
+# The source of the software
+HOMEPAGE="https://github.com/tmck-code/pokesay"
+
+# Short description (max. 80 characters)
+DESCRIPTION_SHORT="An adaptation of the classic \"cowsay\""
+
+# Long description will be broken to multiple lines (at 80 characters)
+DESCRIPTION_LONG="pokesay is a configurable talking pokemon, written in Go."
