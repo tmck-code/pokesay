@@ -1,0 +1,36 @@
+Format: 1.8
+Date: Wed, 10 Apr 2024 00:28:29 +1000
+Source: pokesay
+Binary: bin
+Built-For-Profiles: noudeb
+Architecture: source amd64
+Version: 0.31.1-1
+Distribution: UNRELEASED
+Urgency: low
+Maintainer: Tom McKeesick <tmck01@gmail.com>
+Changed-By: Tom McKeesick <tmck01@gmail.com>
+Description:
+ bin        - auto-generated package by debmake
+Changes:
+ pokesay (0.31.1-1) UNRELEASED; urgency=low
+ .
+   * Initial release. Closes: #nnnn
+     <nnnn is the bug number of your ITP>
+Checksums-Sha1:
+ 7ccc9f9669de731eef98624fc203db582a9f9b87 829 pokesay_0.31.1-1.dsc
+ 42f9202a05d4cac770b877ebdb0f52a32fdaacff 3921995 pokesay_0.31.1.orig.tar.gz
+ ae87e1846e39c914405823559ac47cbaf8fbe1fe 1932 pokesay_0.31.1-1.debian.tar.xz
+ 1671e188d757c75fd1f861f929095a0e4c147455 2282 bin_0.31.1-1_amd64.deb
+ d2b7606df3f877f18ea3b9c82b5314c2d986fdfb 15951 pokesay_0.31.1-1_amd64.buildinfo
+Checksums-Sha256:
+ 82f269d86cddbf3301fe383fc5d11e9bf9ca27083e0a841efcc92153451d9ffe 829 pokesay_0.31.1-1.dsc
+ 09ae6cfa8db1970a923525b9e9377567acb166d98cf8aa5801a06d63dd7eff1b 3921995 pokesay_0.31.1.orig.tar.gz
+ c0969cff958778464f393b989283d4cf0321437d41c4236b0c3f1afd4c50040f 1932 pokesay_0.31.1-1.debian.tar.xz
+ be9a8ec3c246826d1d5bcca14967ec3e5384fd057cefd6b5b7f414b552b91680 2282 bin_0.31.1-1_amd64.deb
+ d2818e1a070a21f55b2fd116d967930e42114cce326dd07b7ae8713e8fea4195 15951 pokesay_0.31.1-1_amd64.buildinfo
+Files:
+ 19ccd3f63f8be4738d9b66454a6faec1 829 unknown optional pokesay_0.31.1-1.dsc
+ d27c7843f4054249c479d3753df7f478 3921995 unknown optional pokesay_0.31.1.orig.tar.gz
+ 7ca16f098ad8f921f1f4116dfb2875c5 1932 unknown optional pokesay_0.31.1-1.debian.tar.xz
+ 5d7fbced7a39ee80a4e812c4586dc939 2282 unknown optional bin_0.31.1-1_amd64.deb
+ f55dfdf70cda9516ba9600a20d848542 15951 unknown optional pokesay_0.31.1-1_amd64.buildinfo

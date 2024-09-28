@@ -1,0 +1,6 @@
+pokesay (0.31.1-1) UNRELEASED; urgency=low
+
+  * Initial release. Closes: #nnnn
+    <nnnn is the bug number of your ITP>
+
+ -- Tom McKeesick <tmck01@gmail.com>  Wed, 10 Apr 2024 00:28:29 +1000
