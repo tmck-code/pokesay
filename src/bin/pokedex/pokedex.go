@@ -100,12 +100,13 @@ func main() {
 	pokemonNames := pokedex.ReadNames(args.FromMetadataFname)
 	fmt.Println("- Read", len(pokemonNames), "pokemon names from", args.FromMetadataFname)
 
-	fmt.Println("- Writing entries to file")
+	fmt.Println("- Gzipping cowfiles")
 	pbar := bin.NewProgressBar(len(cowfileFpaths))
 	for i, fpath := range cowfileFpaths {
 		data, err := os.ReadFile(fpath)
 		pokedex.Check(err)
 
+		// Write the gzipped cowfile to the destination directory
 		pokedex.WriteBytesToFile(data, pokedex.EntryFpath(paths.EntryDirPath, i), true)
 		pbar.Add(1)
 	}
