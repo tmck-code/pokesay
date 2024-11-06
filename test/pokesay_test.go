@@ -18,8 +18,8 @@ var (
 )
 
 func TestChooseByName(test *testing.T) {
-	names := make(map[string][]int)
-	names["hoothoot"] = []int{4}
+	names := make(map[string]int)
+	names["hoothoot"] = 4
 	result, _ := pokesay.ChooseByName(
 		names,
 		"hoothoot",
@@ -76,8 +76,8 @@ func TestChooseByCategory(test *testing.T) {
 }
 
 func TestChooseByNameAndCategory(test *testing.T) {
-	names := make(map[string][]int)
-	names["hoothoot"] = []int{4}
+	names := make(map[string]int)
+	names["hoothoot"] = 4
 	metadata, entry := pokesay.ChooseByNameAndCategory(
 		names,
 		"hoothoot",

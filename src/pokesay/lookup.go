@@ -60,26 +60,19 @@ func ChooseByCategory(category string, categoryDir []fs.DirEntry, categoryFiles 
 	return metadata, metadata.Entries[entryIndex]
 }
 
-func ListNames(names map[string][]int) []string {
+func ListNames(names map[string]int) []string {
 	return pokedex.GatherMapKeys(names)
 }
 
-func fetchMetadataByName(names map[string][]int, nameToken string, metadataFiles embed.FS, metadataRootDir string) pokedex.PokemonMetadata {
-	match := names[nameToken]
-	if len(match) == 0 {
-		log.Fatalf("cannot find pokemon by name '%s'", nameToken)
-	}
-	nameChoice := match[RandomInt(len(match))]
-
-	metadata := pokedex.ReadMetadataFromEmbedded(
+func fetchMetadataByName(names map[string]int, nameToken string, metadataFiles embed.FS, metadataRootDir string) pokedex.PokemonMetadata {
+	return pokedex.ReadMetadataFromEmbedded(
 		metadataFiles,
-		pokedex.MetadataFpath(metadataRootDir, nameChoice),
+		pokedex.MetadataFpath(metadataRootDir, names[nameToken]),
 	)
-	return metadata
 
 }
 
-func ChooseByName(names map[string][]int, nameToken string, metadataFiles embed.FS, metadataRootDir string) (pokedex.PokemonMetadata, pokedex.PokemonEntryMapping) {
+func ChooseByName(names map[string]int, nameToken string, metadataFiles embed.FS, metadataRootDir string) (pokedex.PokemonMetadata, pokedex.PokemonEntryMapping) {
 	metadata := fetchMetadataByName(
 		names,
 		nameToken,
@@ -92,7 +85,7 @@ func ChooseByName(names map[string][]int, nameToken string, metadataFiles embed.
 	return metadata, metadata.Entries[choice]
 }
 
-func ChooseByNameAndCategory(names map[string][]int, nameToken string, metadataFiles embed.FS, metadataRootDir string, category string) (pokedex.PokemonMetadata, pokedex.PokemonEntryMapping) {
+func ChooseByNameAndCategory(names map[string]int, nameToken string, metadataFiles embed.FS, metadataRootDir string, category string) (pokedex.PokemonMetadata, pokedex.PokemonEntryMapping) {
 	// fetch the metadata of a pokemon matching the nameToken
 	metadata := fetchMetadataByName(
 		names,

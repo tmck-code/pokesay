@@ -108,7 +108,7 @@ func runListCategories() {
 // - prints all the keys of the struct, and the total number of names
 func runListNames() {
 	names := pokesay.ListNames(
-		pokedex.ReadStructFromBytes[map[string][]int](GOBAllNames),
+		pokedex.ReadStructFromBytes[map[string]int](GOBAllNames),
 	)
 	fmt.Printf("%s\n%d %s\n", strings.Join(names, " "), len(names), "total names")
 }
@@ -135,7 +135,7 @@ func GenerateNames(metadata pokedex.PokemonMetadata, args pokesay.Args) []string
 func runPrintByName(args pokesay.Args) {
 	t := timer.NewTimer("runPrintByName", true)
 
-	names := pokedex.ReadStructFromBytes[map[string][]int](GOBAllNames)
+	names := pokedex.ReadStructFromBytes[map[string]int](GOBAllNames)
 	t.Mark("read name struct")
 
 	metadata, final := pokesay.ChooseByName(names, args.NameToken, GOBCowNames, MetadataRoot)
@@ -178,7 +178,7 @@ func runPrintByCategory(args pokesay.Args) {
 func runPrintByNameAndCategory(args pokesay.Args) {
 	t := timer.NewTimer("runPrintByNameAndCategory", true)
 
-	names := pokedex.ReadStructFromBytes[map[string][]int](GOBAllNames)
+	names := pokedex.ReadStructFromBytes[map[string]int](GOBAllNames)
 	t.Mark("read name struct")
 
 	metadata, final := pokesay.ChooseByNameAndCategory(names, args.NameToken, GOBCowNames, MetadataRoot, args.Category)

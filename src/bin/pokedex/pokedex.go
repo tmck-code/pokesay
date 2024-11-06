@@ -114,14 +114,15 @@ func main() {
 	// links to all of the matching cowfile indexes
 	fmt.Println("- Writing metadata to file")
 	pokemonMetadata := make([]pokedex.PokemonMetadata, 0)
-	uniqueNames := make(map[string][]int)
+	uniqueNames := make(map[string]int)
 	i := 0
 	pbar = bin.NewProgressBar(len(pokemonNames))
 	for key, name := range pokemonNames {
 		metadata := pokedex.CreateNameMetadata(i, key, name, args.FromDir, cowfileFpaths)
 		pokedex.WriteStructToFile(metadata, pokedex.MetadataFpath(paths.MetadataDirPath, i))
+		fmt.Printf("%s %+v %+v\n", key, name, metadata)
 		pokemonMetadata = append(pokemonMetadata, *metadata)
-		uniqueNames[name.Slug] = append(uniqueNames[name.Slug], i)
+		uniqueNames[name.Slug] = i
 		i++
 		pbar.Add(1)
 	}
