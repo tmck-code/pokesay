@@ -36,7 +36,7 @@ build/release: build/assets
 		--rm --name pokesay \
 		  $(DOCKER_IMAGE) \
 		  build/scripts/build.sh
-	tree $(PWD)/bin/
+	tree -s $(PWD)/bin/
 
 test:
 	docker run \

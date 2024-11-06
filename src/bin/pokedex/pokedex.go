@@ -120,7 +120,7 @@ func main() {
 	for key, name := range pokemonNames {
 		metadata := pokedex.CreateNameMetadata(i, key, name, args.FromDir, cowfileFpaths)
 		pokedex.WriteStructToFile(metadata, pokedex.MetadataFpath(paths.MetadataDirPath, i))
-		fmt.Printf("%s %+v %+v\n", key, name, metadata)
+		// fmt.Printf("%s %+v %+v\n", key, name, metadata)
 		pokemonMetadata = append(pokemonMetadata, *metadata)
 		uniqueNames[name.Slug] = i
 		i++
