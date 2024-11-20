@@ -68,7 +68,7 @@ var (
 		BottomRightCorner: "╯",
 		BottomLeftCorner:  "╰",
 		BalloonString:     "╲",
-		BalloonTether:     "🯓",
+		BalloonTether:     "𜺯",
 		Separator:         "│",
 		RightArrow:        "→",
 		CategorySeparator: "/",
