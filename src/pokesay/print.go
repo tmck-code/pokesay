@@ -107,7 +107,7 @@ func printSpeechBubble(boxCharacters *BoxCharacters, scanner *bufio.Scanner, wid
 		if !noTabSpaces {
 			line = strings.Replace(line, "\t", tabSpaces, -1)
 		}
-		if noWrap || !drawBubble {
+		if noWrap {
 			printSpeechBubbleLine(boxCharacters, line, width, drawBubble)
 		} else {
 			printWrappedText(boxCharacters, line, width, tabSpaces, drawBubble)
@@ -115,6 +115,8 @@ func printSpeechBubble(boxCharacters *BoxCharacters, scanner *bufio.Scanner, wid
 	}
 	if drawBubble {
 		fmt.Println(boxCharacters.BottomLeftCorner + border + boxCharacters.BottomRightCorner)
+	} else {
+		fmt.Println(" " + border + " ")
 	}
 	for i := 0; i < 4; i++ {
 		fmt.Println(strings.Repeat(" ", i+8), boxCharacters.BalloonString)
