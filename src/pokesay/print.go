@@ -20,6 +20,7 @@ type BoxCharacters struct {
 	BottomRightCorner string
 	BottomLeftCorner  string
 	BalloonString     string
+	BalloonTether	  string
 	Separator         string
 	RightArrow        string
 	CategorySeparator string
@@ -54,6 +55,7 @@ var (
 		BottomRightCorner: "/",
 		BottomLeftCorner:  "\\",
 		BalloonString:     "\\",
+		BalloonTether:     "¡",
 		Separator:         "|",
 		RightArrow:        ">",
 		CategorySeparator: "/",
@@ -66,6 +68,7 @@ var (
 		BottomRightCorner: "╯",
 		BottomLeftCorner:  "╰",
 		BalloonString:     "╲",
+		BalloonTether:     "🯓",
 		Separator:         "│",
 		RightArrow:        "→",
 		CategorySeparator: "/",
@@ -96,9 +99,13 @@ func Print(args Args, choice int, names []string, categories []string, cows embe
 
 // Prints text from STDIN, surrounded by a speech bubble.
 func printSpeechBubble(boxCharacters *BoxCharacters, scanner *bufio.Scanner, width int, noTabSpaces bool, tabSpaces string, noWrap bool, drawBubble bool) {
-	border := strings.Repeat(boxCharacters.HorizontalEdge, width+2)
 	if drawBubble {
-		fmt.Println(boxCharacters.TopLeftCorner + border + boxCharacters.TopRightCorner)
+		fmt.Printf(
+			"%s%s%s\n",
+			boxCharacters.TopLeftCorner,
+			strings.Repeat(boxCharacters.HorizontalEdge, width+2),
+			boxCharacters.TopRightCorner,
+		)
 	}
 
 	for scanner.Scan() {
@@ -113,13 +120,18 @@ func printSpeechBubble(boxCharacters *BoxCharacters, scanner *bufio.Scanner, wid
 			printWrappedText(boxCharacters, line, width, tabSpaces, drawBubble)
 		}
 	}
+
+	bottomBorder := strings.Repeat(boxCharacters.HorizontalEdge, 6) +
+		boxCharacters.BalloonTether +
+		strings.Repeat(boxCharacters.HorizontalEdge, width+2-7)
+
 	if drawBubble {
-		fmt.Println(boxCharacters.BottomLeftCorner + border + boxCharacters.BottomRightCorner)
+		fmt.Printf("%s%s%s\n", boxCharacters.BottomLeftCorner, bottomBorder, boxCharacters.BottomRightCorner)
 	} else {
-		fmt.Println(" " + border + " ")
+		fmt.Printf(" %s \n", bottomBorder)
 	}
 	for i := 0; i < 4; i++ {
-		fmt.Println(strings.Repeat(" ", i+8), boxCharacters.BalloonString)
+		fmt.Printf("%s%s\n", strings.Repeat(" ", i+8), boxCharacters.BalloonString)
 	}
 }
 
@@ -183,8 +195,7 @@ func printPokemon(args Args, index int, names []string, categoryKeys []string, G
 	if args.NoCategoryInfo {
 		infoLine = fmt.Sprintf(
 			"%s %s",
-			args.BoxCharacters.RightArrow,
-			strings.Join(namesFmt, fmt.Sprintf(" %s ", args.BoxCharacters.Separator)),
+			args.BoxCharacters.RightArrow, strings.Join(namesFmt, fmt.Sprintf(" %s ", args.BoxCharacters.Separator)),
 		)
 	} else {
 		infoLine = fmt.Sprintf(
@@ -203,23 +214,15 @@ func printPokemon(args Args, index int, names []string, categoryKeys []string, G
 	if args.DrawInfoBorder {
 		topBorder := fmt.Sprintf(
 			"%s%s%s",
-			args.BoxCharacters.TopLeftCorner,
-			strings.Repeat(args.BoxCharacters.HorizontalEdge, width-2),
-			args.BoxCharacters.TopRightCorner,
+			args.BoxCharacters.TopLeftCorner, strings.Repeat(args.BoxCharacters.HorizontalEdge, width-2), args.BoxCharacters.TopRightCorner,
 		)
 		bottomBorder := fmt.Sprintf(
 			"%s%s%s",
-			args.BoxCharacters.BottomLeftCorner,
-			strings.Repeat(args.BoxCharacters.HorizontalEdge, width-2),
-			args.BoxCharacters.BottomRightCorner,
+			args.BoxCharacters.BottomLeftCorner, strings.Repeat(args.BoxCharacters.HorizontalEdge, width-2), args.BoxCharacters.BottomRightCorner,
 		)
 		infoLine = fmt.Sprintf(
 			"%s\n%s %s %s\n%s\n",
-			topBorder,
-			args.BoxCharacters.VerticalEdge,
-			infoLine,
-			args.BoxCharacters.VerticalEdge,
-			bottomBorder,
+			topBorder, args.BoxCharacters.VerticalEdge, infoLine, args.BoxCharacters.VerticalEdge, bottomBorder,
 		)
 	} else {
 		infoLine = fmt.Sprintf("%s\n", infoLine)
