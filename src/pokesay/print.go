@@ -165,7 +165,7 @@ func printSpeechBubbleLine(boxCharacters *BoxCharacters, line string, width int,
 
 // Prints line of text across multiple lines, wrapping it so that it doesn't exceed the desired width.
 func printWrappedText(boxCharacters *BoxCharacters, line string, width int, tabSpaces string, drawBubble bool) {
-	for _, wline := range strings.Split(wordwrap.WrapString(strings.Replace(line, "\t", tabSpaces, -1), uint(width)), "\n") {
+	for _, wline := range strings.Split(wordwrap.WrapString(line, uint(width)), "\n") {
 		printSpeechBubbleLine(boxCharacters, wline, width, drawBubble)
 	}
 }
