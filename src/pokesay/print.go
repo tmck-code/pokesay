@@ -48,6 +48,7 @@ type Args struct {
 var (
 	textStyleItalic    *color.Color   = color.New(color.Italic)
 	textStyleBold      *color.Color   = color.New(color.Bold)
+	resetColourANSI    string         = "\033[0m"
 	AsciiBoxCharacters *BoxCharacters = &BoxCharacters{
 		HorizontalEdge:    "-",
 		VerticalEdge:      "|",
@@ -138,20 +139,27 @@ func printSpeechBubble(boxCharacters *BoxCharacters, scanner *bufio.Scanner, wid
 
 // Prints a single speech bubble line
 func printSpeechBubbleLine(boxCharacters *BoxCharacters, line string, width int, drawBubble bool) {
-	if drawBubble {
-		lineLength := UnicodeStringLength(line)
-		if lineLength > width {
-			fmt.Printf("%s %s\n", boxCharacters.VerticalEdge, line)
-		} else if lineLength == width {
-			fmt.Printf("%s %s %s\n", boxCharacters.VerticalEdge, line, boxCharacters.VerticalEdge)
-		} else {
-			fmt.Printf(
-				"%s %s%s %s\n",
-				boxCharacters.VerticalEdge, line, strings.Repeat(" ", width-lineLength), boxCharacters.VerticalEdge,
-			)
-		}
-	} else {
+	if !drawBubble {
 		fmt.Println(line)
+	}
+
+	lineLen := UnicodeStringLength(line)
+	if lineLen <= width {
+		// print the line with padding, the most common case
+		fmt.Printf(
+			"%s %s%s%s %s\n",
+			boxCharacters.VerticalEdge, // left-hand side of the bubble
+			line, resetColourANSI,      // the text
+			strings.Repeat(" ", width-lineLen), // padding
+			boxCharacters.VerticalEdge,         // right-hand side of the bubble
+		)
+	} else if lineLen > width {
+		// print the line without padding or right-hand side of the bubble if the line is too long
+		fmt.Printf(
+			"%s %s%s\n",
+			boxCharacters.VerticalEdge, // left-hand side of the bubble
+			line, resetColourANSI,      // the text
+		)
 	}
 }
 
