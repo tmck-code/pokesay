@@ -24,15 +24,14 @@ build/cows:
 # generate embedded bin files for category/metadata/the actual pokemon
 build/assets:
 	docker run \
-		-v $(PWD)/assets:/usr/local/src/build/assets \
+		-v $(PWD)/../:/usr/local/src \
 		--rm --name pokesay \
 	    $(DOCKER_IMAGE) \
 			build/scripts/build_assets.sh
 
 build/release: build/assets
 	docker run \
-		-v $(PWD)/bin:/usr/local/src/build/bin \
-		-v $(PWD)/assets:/usr/local/src/build/assets \
+		-v $(PWD)/../:/usr/local/src \
 		--rm --name pokesay \
 		  $(DOCKER_IMAGE) \
 		  build/scripts/build.sh
