@@ -189,27 +189,29 @@ func nameLength(names []string) int {
 
 // Returns the length of a string, taking into account Unicode characters and ANSI escape codes.
 func UnicodeStringLength(s string) int {
-	nRunes := len(s)
-
-	totalLen, ansiCode := 0, false
+	nRunes, totalLen, ansiCode := len(s), 0, false
 
 	for i, r := range s {
 		if i < nRunes-1 {
+			// detect the beginning of an ANSI escape code
+			// e.g. "\033[38;5;196m"
+			//       ^^^ start    ^ end
 			if s[i:i+2] == "\033[" {
 				ansiCode = true
 			}
 		}
 		if ansiCode {
+			// detect the end of an ANSI escape code
 			if r == 'm' {
 				ansiCode = false
 			}
-			continue
-		}
-
-		if r < 128 {
-			totalLen++
 		} else {
-			totalLen += runewidth.RuneWidth(r)
+			if r < 128 {
+				// if ascii, then use width of 1. this saves some time
+				totalLen++
+			} else {
+				totalLen += runewidth.RuneWidth(r)
+			}
 		}
 	}
 	return totalLen
