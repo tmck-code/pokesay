@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/fatih/color"
+	"github.com/mattn/go-runewidth"
 	"github.com/mitchellh/go-wordwrap"
 	"github.com/tmck-code/pokesay/src/pokedex"
 )
@@ -20,7 +21,7 @@ type BoxCharacters struct {
 	BottomRightCorner string
 	BottomLeftCorner  string
 	BalloonString     string
-	BalloonTether	  string
+	BalloonTether     string
 	Separator         string
 	RightArrow        string
 	CategorySeparator string
@@ -29,7 +30,7 @@ type BoxCharacters struct {
 type Args struct {
 	Width          int
 	NoWrap         bool
-	DrawBubble   bool
+	DrawBubble     bool
 	TabSpaces      string
 	NoTabSpaces    bool
 	NoCategoryInfo bool
@@ -138,14 +139,15 @@ func printSpeechBubble(boxCharacters *BoxCharacters, scanner *bufio.Scanner, wid
 // Prints a single speech bubble line
 func printSpeechBubbleLine(boxCharacters *BoxCharacters, line string, width int, drawBubble bool) {
 	if drawBubble {
-		if len(line) > width {
+		lineLength := UnicodeStringLength(line)
+		if lineLength > width {
 			fmt.Printf("%s %s\n", boxCharacters.VerticalEdge, line)
-		} else if len(line) == width {
+		} else if lineLength == width {
 			fmt.Printf("%s %s %s\n", boxCharacters.VerticalEdge, line, boxCharacters.VerticalEdge)
 		} else {
 			fmt.Printf(
 				"%s %s%s %s\n",
-				boxCharacters.VerticalEdge, line, strings.Repeat(" ", width-len(line)), boxCharacters.VerticalEdge,
+				boxCharacters.VerticalEdge, line, strings.Repeat(" ", width-lineLength), boxCharacters.VerticalEdge,
 			)
 		}
 	} else {
@@ -171,6 +173,35 @@ func nameLength(names []string) int {
 			} else {
 				totalLen += 2
 			}
+		}
+
+	}
+	return totalLen
+}
+
+// Returns the length of a string, taking into account Unicode characters and ANSI escape codes.
+func UnicodeStringLength(s string) int {
+	nRunes := len(s)
+
+	totalLen, ansiCode := 0, false
+
+	for i, r := range s {
+		if i < nRunes-1 {
+			if s[i:i+2] == "\033[" {
+				ansiCode = true
+			}
+		}
+		if ansiCode {
+			if r == 'm' {
+				ansiCode = false
+			}
+			continue
+		}
+
+		if r < 128 {
+			totalLen++
+		} else {
+			totalLen += runewidth.RuneWidth(r)
 		}
 	}
 	return totalLen
