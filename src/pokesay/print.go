@@ -75,7 +75,7 @@ var (
 		RightArrow:        "→",
 		CategorySeparator: "/",
 	}
-	SingleWidthCars map[string]bool = map[string]bool{
+	SingleWidthChars map[string]bool = map[string]bool{
 		"♀": true,
 		"♂": true,
 	}
@@ -176,7 +176,7 @@ func nameLength(names []string) int {
 	for _, name := range names {
 		for _, c := range name {
 			// check if ascii or single-width unicode
-			if (c < 128) || (SingleWidthCars[string(c)]) {
+			if (c < 128) || (SingleWidthChars[string(c)]) {
 				totalLen++
 			} else {
 				totalLen += 2
