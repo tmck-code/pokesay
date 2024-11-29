@@ -139,20 +139,9 @@ func printSpeechBubble(boxChars *BoxChars, scanner *bufio.Scanner, args Args) {
 
 // Prints a single speech bubble line
 func printSpeechBubbleLine(boxChars *BoxChars, line string, args Args) {
-	if args.DrawBubble {
-		lineLength := UnicodeStringLength(line)
-		if lineLength > args.Width {
-			fmt.Printf("%s %s\n", boxChars.VerticalEdge, line)
-		} else if lineLength == args.Width {
-			fmt.Printf("%s %s %s\n", boxChars.VerticalEdge, line, boxChars.VerticalEdge)
-		} else {
-			fmt.Printf(
-				"%s %s%s %s\n",
-				boxChars.VerticalEdge, line, strings.Repeat(" ", args.Width-lineLength), boxChars.VerticalEdge,
-			)
-		}
-	} else {
+	if !args.DrawBubble {
 		fmt.Println(line)
+		return
 	}
 
 	lineLen := UnicodeStringLength(line)
