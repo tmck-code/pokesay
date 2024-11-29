@@ -156,21 +156,21 @@ func printSpeechBubbleLine(boxChars *BoxChars, line string, args Args) {
 	}
 
 	lineLen := UnicodeStringLength(line)
-	if lineLen <= width {
+	if lineLen <= args.Width {
 		// print the line with padding, the most common case
 		fmt.Printf(
 			"%s %s%s%s %s\n",
-			boxCharacters.VerticalEdge, // left-hand side of the bubble
-			line, resetColourANSI,      // the text
-			strings.Repeat(" ", width-lineLen), // padding
-			boxCharacters.VerticalEdge,         // right-hand side of the bubble
+			boxChars.VerticalEdge, // left-hand side of the bubble
+			line, resetColourANSI, // the text
+			strings.Repeat(" ", args.Width-lineLen), // padding
+			boxChars.VerticalEdge,                   // right-hand side of the bubble
 		)
-	} else if lineLen > width {
+	} else if lineLen > args.Width {
 		// print the line without padding or right-hand side of the bubble if the line is too long
 		fmt.Printf(
 			"%s %s%s\n",
-			boxCharacters.VerticalEdge, // left-hand side of the bubble
-			line, resetColourANSI,      // the text
+			boxChars.VerticalEdge, // left-hand side of the bubble
+			line, resetColourANSI, // the text
 		)
 	}
 }
