@@ -48,6 +48,7 @@ type Args struct {
 var (
 	textStyleItalic *color.Color = color.New(color.Italic)
 	textStyleBold   *color.Color = color.New(color.Bold)
+	resetColourANSI string       = "\033[0m"
 	AsciiBoxChars   *BoxChars    = &BoxChars{
 		HorizontalEdge:    "-",
 		VerticalEdge:      "|",
@@ -74,7 +75,7 @@ var (
 		RightArrow:        "→",
 		CategorySeparator: "/",
 	}
-	SingleWidthCars map[string]bool = map[string]bool{
+	SingleWidthChars map[string]bool = map[string]bool{
 		"♀": true,
 		"♂": true,
 	}
@@ -153,6 +154,25 @@ func printSpeechBubbleLine(boxChars *BoxChars, line string, args Args) {
 	} else {
 		fmt.Println(line)
 	}
+
+	lineLen := UnicodeStringLength(line)
+	if lineLen <= width {
+		// print the line with padding, the most common case
+		fmt.Printf(
+			"%s %s%s%s %s\n",
+			boxCharacters.VerticalEdge, // left-hand side of the bubble
+			line, resetColourANSI,      // the text
+			strings.Repeat(" ", width-lineLen), // padding
+			boxCharacters.VerticalEdge,         // right-hand side of the bubble
+		)
+	} else if lineLen > width {
+		// print the line without padding or right-hand side of the bubble if the line is too long
+		fmt.Printf(
+			"%s %s%s\n",
+			boxCharacters.VerticalEdge, // left-hand side of the bubble
+			line, resetColourANSI,      // the text
+		)
+	}
 }
 
 // Prints line of text across multiple lines, wrapping it so that it doesn't exceed the desired width.
@@ -168,7 +188,7 @@ func nameLength(names []string) int {
 	for _, name := range names {
 		for _, c := range name {
 			// check if ascii or single-width unicode
-			if (c < 128) || (SingleWidthCars[string(c)]) {
+			if (c < 128) || (SingleWidthChars[string(c)]) {
 				totalLen++
 			} else {
 				totalLen += 2
@@ -181,27 +201,29 @@ func nameLength(names []string) int {
 
 // Returns the length of a string, taking into account Unicode characters and ANSI escape codes.
 func UnicodeStringLength(s string) int {
-	nRunes := len(s)
-
-	totalLen, ansiCode := 0, false
+	nRunes, totalLen, ansiCode := len(s), 0, false
 
 	for i, r := range s {
 		if i < nRunes-1 {
+			// detect the beginning of an ANSI escape code
+			// e.g. "\033[38;5;196m"
+			//       ^^^ start    ^ end
 			if s[i:i+2] == "\033[" {
 				ansiCode = true
 			}
 		}
 		if ansiCode {
+			// detect the end of an ANSI escape code
 			if r == 'm' {
 				ansiCode = false
 			}
-			continue
-		}
-
-		if r < 128 {
-			totalLen++
 		} else {
-			totalLen += runewidth.RuneWidth(r)
+			if r < 128 {
+				// if ascii, then use width of 1. this saves some time
+				totalLen++
+			} else {
+				totalLen += runewidth.RuneWidth(r)
+			}
 		}
 	}
 	return totalLen
