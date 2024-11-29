@@ -95,14 +95,19 @@ func DetermineBoxChars(unicodeBox bool) *BoxChars {
 // 2. The cowfile data is retrieved using the matching index, decompressed (un-gzipped),
 // 3. The pokemon is printed along with the name & category information
 func Print(args Args, choice int, names []string, categories []string, cows embed.FS) {
-	printSpeechBubble(args.BoxChars, bufio.NewScanner(os.Stdin), args)
-	printPokemon(args, choice, names, categories, cows)
+	var b strings.Builder
+
+	// pass the buffer to the functions
+	drawSpeechBubble(args.BoxChars, bufio.NewScanner(os.Stdin), args, &b)
+	drawPokemon(args, choice, names, categories, cows, &b)
+	fmt.Print(b.String())
 }
 
 // Prints text from STDIN, surrounded by a speech bubble.
-func printSpeechBubble(boxChars *BoxChars, scanner *bufio.Scanner, args Args) {
+func drawSpeechBubble(boxChars *BoxChars, scanner *bufio.Scanner, args Args, b *strings.Builder) {
 	if args.DrawBubble {
-		fmt.Printf(
+		fmt.Fprintf(
+			b,
 			"%s%s%s\n",
 			boxChars.TopLeftCorner,
 			strings.Repeat(boxChars.HorizontalEdge, args.Width+2),
@@ -117,9 +122,9 @@ func printSpeechBubble(boxChars *BoxChars, scanner *bufio.Scanner, args Args) {
 			line = strings.Replace(line, "\t", args.TabSpaces, -1)
 		}
 		if args.NoWrap {
-			printSpeechBubbleLine(boxChars, line, args)
+			drawSpeechBubbleLine(boxChars, line, args, b)
 		} else {
-			printWrappedText(boxChars, line, args)
+			drawWrappedText(boxChars, line, args, b)
 		}
 	}
 
@@ -128,26 +133,27 @@ func printSpeechBubble(boxChars *BoxChars, scanner *bufio.Scanner, args Args) {
 		strings.Repeat(boxChars.HorizontalEdge, args.Width+2-7)
 
 	if args.DrawBubble {
-		fmt.Printf("%s%s%s\n", boxChars.BottomLeftCorner, bottomBorder, boxChars.BottomRightCorner)
+		fmt.Fprintf(b, "%s%s%s\n", boxChars.BottomLeftCorner, bottomBorder, boxChars.BottomRightCorner)
 	} else {
-		fmt.Printf(" %s \n", bottomBorder)
+		fmt.Fprintf(b, " %s \n", bottomBorder)
 	}
 	for i := 0; i < 4; i++ {
-		fmt.Printf("%s%s\n", strings.Repeat(" ", i+8), boxChars.BalloonString)
+		fmt.Fprintf(b, "%s%s\n", strings.Repeat(" ", i+8), boxChars.BalloonString)
 	}
 }
 
 // Prints a single speech bubble line
-func printSpeechBubbleLine(boxChars *BoxChars, line string, args Args) {
+func drawSpeechBubbleLine(boxChars *BoxChars, line string, args Args, b *strings.Builder) {
 	if !args.DrawBubble {
-		fmt.Println(line)
+		fmt.Fprintln(b, line)
 		return
 	}
 
 	lineLen := UnicodeStringLength(line)
 	if lineLen <= args.Width {
 		// print the line with padding, the most common case
-		fmt.Printf(
+		fmt.Fprintf(
+			b,
 			"%s %s%s%s %s\n",
 			boxChars.VerticalEdge, // left-hand side of the bubble
 			line, resetColourANSI, // the text
@@ -156,7 +162,8 @@ func printSpeechBubbleLine(boxChars *BoxChars, line string, args Args) {
 		)
 	} else if lineLen > args.Width {
 		// print the line without padding or right-hand side of the bubble if the line is too long
-		fmt.Printf(
+		fmt.Fprintf(
+			b,
 			"%s %s%s\n",
 			boxChars.VerticalEdge, // left-hand side of the bubble
 			line, resetColourANSI, // the text
@@ -165,9 +172,9 @@ func printSpeechBubbleLine(boxChars *BoxChars, line string, args Args) {
 }
 
 // Prints line of text across multiple lines, wrapping it so that it doesn't exceed the desired width.
-func printWrappedText(boxChars *BoxChars, line string, args Args) {
+func drawWrappedText(boxChars *BoxChars, line string, args Args, b *strings.Builder) {
 	for _, wline := range strings.Split(wordwrap.WrapString(strings.Replace(line, "\t", args.TabSpaces, -1), uint(args.Width)), "\n") {
-		printSpeechBubbleLine(boxChars, wline, args)
+		drawSpeechBubbleLine(boxChars, wline, args, b)
 	}
 }
 
@@ -219,7 +226,7 @@ func UnicodeStringLength(s string) int {
 }
 
 // Prints a pokemon with its name & category information.
-func printPokemon(args Args, index int, names []string, categoryKeys []string, GOBCowData embed.FS) {
+func drawPokemon(args Args, index int, names []string, categoryKeys []string, GOBCowData embed.FS, b *strings.Builder) {
 	d, _ := GOBCowData.ReadFile(pokedex.EntryFpath("build/assets/cows", index))
 
 	width := nameLength(names)
@@ -269,5 +276,5 @@ func printPokemon(args Args, index int, names []string, categoryKeys []string, G
 	} else {
 		infoLine = fmt.Sprintf("%s\n", infoLine)
 	}
-	fmt.Printf("%s%s", pokedex.Decompress(d), infoLine)
+	fmt.Fprintf(b, "%s%s", pokedex.Decompress(d), infoLine)
 }
