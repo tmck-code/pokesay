@@ -67,13 +67,13 @@ func parseFlags() pokesay.Args {
 
 	if *fastest {
 		args = pokesay.Args{
-			Width:         *width,
-			NoWrap:        true,
-			TabSpaces:     "    ",
-			NoTabSpaces:   true,
-			BoxCharacters: pokesay.DetermineBoxCharacters(false),
-			Help:          *help,
-			Verbose:       *verbose,
+			Width:       *width,
+			NoWrap:      true,
+			TabSpaces:   "    ",
+			NoTabSpaces: true,
+			BoxChars:    pokesay.DetermineBoxChars(false),
+			Help:        *help,
+			Verbose:     *verbose,
 		}
 	} else {
 		args = pokesay.Args{
@@ -88,7 +88,7 @@ func parseFlags() pokesay.Args {
 			Category:       *category,
 			NameToken:      *name,
 			JapaneseName:   *japaneseName,
-			BoxCharacters:  pokesay.DetermineBoxCharacters(*unicodeBorders),
+			BoxChars:       pokesay.DetermineBoxChars(*unicodeBorders),
 			DrawInfoBorder: *drawInfoBorder,
 			Help:           *help,
 			Verbose:        *verbose,
@@ -143,7 +143,7 @@ func runPrintByName(args pokesay.Args) {
 	metadata, final := pokesay.ChooseByName(names, args.NameToken, GOBCowNames, MetadataRoot)
 	t.Mark("find/read metadata")
 
-	pokesay.Print(args, final.EntryIndex, GenerateNames(metadata, args), final.Categories, GOBCowData, args.DrawBubble)
+	pokesay.Print(args, final.EntryIndex, GenerateNames(metadata, args), final.Categories, GOBCowData)
 	t.Mark("print")
 
 	t.Stop()
@@ -166,7 +166,7 @@ func runPrintByCategory(args pokesay.Args) {
 	dir, _ := GOBCategories.ReadDir(dirPath)
 	metadata, final := pokesay.ChooseByCategory(args.Category, dir, GOBCategories, CategoryRoot, GOBCowNames, MetadataRoot)
 
-	pokesay.Print(args, final.EntryIndex, GenerateNames(metadata, args), final.Categories, GOBCowData, args.DrawBubble)
+	pokesay.Print(args, final.EntryIndex, GenerateNames(metadata, args), final.Categories, GOBCowData)
 	t.Mark("print")
 
 	t.Stop()
@@ -186,7 +186,7 @@ func runPrintByNameAndCategory(args pokesay.Args) {
 	metadata, final := pokesay.ChooseByNameAndCategory(names, args.NameToken, GOBCowNames, MetadataRoot, args.Category)
 	t.Mark("find/read metadata")
 
-	pokesay.Print(args, final.EntryIndex, GenerateNames(metadata, args), final.Categories, GOBCowData, args.DrawBubble)
+	pokesay.Print(args, final.EntryIndex, GenerateNames(metadata, args), final.Categories, GOBCowData)
 	t.Mark("print")
 
 	t.Stop()
@@ -209,7 +209,7 @@ func runPrintRandom(args pokesay.Args) {
 	final := metadata.Entries[pokesay.RandomInt(len(metadata.Entries))]
 	t.Mark("choose entry")
 
-	pokesay.Print(args, final.EntryIndex, GenerateNames(metadata, args), final.Categories, GOBCowData, args.DrawBubble)
+	pokesay.Print(args, final.EntryIndex, GenerateNames(metadata, args), final.Categories, GOBCowData)
 	t.Mark("print")
 
 	t.Stop()

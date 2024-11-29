@@ -13,7 +13,7 @@ import (
 	"github.com/tmck-code/pokesay/src/pokedex"
 )
 
-type BoxCharacters struct {
+type BoxChars struct {
 	HorizontalEdge    string
 	VerticalEdge      string
 	TopRightCorner    string
@@ -39,17 +39,17 @@ type Args struct {
 	Category       string
 	NameToken      string
 	JapaneseName   bool
-	BoxCharacters  *BoxCharacters
+	BoxChars       *BoxChars
 	DrawInfoBorder bool
 	Help           bool
 	Verbose        bool
 }
 
 var (
-	textStyleItalic    *color.Color   = color.New(color.Italic)
-	textStyleBold      *color.Color   = color.New(color.Bold)
-	resetColourANSI    string         = "\033[0m"
-	AsciiBoxCharacters *BoxCharacters = &BoxCharacters{
+	textStyleItalic *color.Color = color.New(color.Italic)
+	textStyleBold   *color.Color = color.New(color.Bold)
+	resetColourANSI string       = "\033[0m"
+	AsciiBoxChars   *BoxChars    = &BoxChars{
 		HorizontalEdge:    "-",
 		VerticalEdge:      "|",
 		TopRightCorner:    "\\",
@@ -62,7 +62,7 @@ var (
 		RightArrow:        ">",
 		CategorySeparator: "/",
 	}
-	UnicodeBoxCharacters *BoxCharacters = &BoxCharacters{
+	UnicodeBoxChars *BoxChars = &BoxChars{
 		HorizontalEdge:    "─",
 		VerticalEdge:      "│",
 		TopRightCorner:    "╮",
@@ -81,11 +81,11 @@ var (
 	}
 )
 
-func DetermineBoxCharacters(unicodeBox bool) *BoxCharacters {
+func DetermineBoxChars(unicodeBox bool) *BoxChars {
 	if unicodeBox {
-		return UnicodeBoxCharacters
+		return UnicodeBoxChars
 	} else {
-		return AsciiBoxCharacters
+		return AsciiBoxChars
 	}
 }
 
@@ -94,79 +94,80 @@ func DetermineBoxCharacters(unicodeBox bool) *BoxCharacters {
 // 1. The text received from STDIN is printed inside a speech bubble
 // 2. The cowfile data is retrieved using the matching index, decompressed (un-gzipped),
 // 3. The pokemon is printed along with the name & category information
-func Print(args Args, choice int, names []string, categories []string, cows embed.FS, drawBubble bool) {
-	printSpeechBubble(args.BoxCharacters, bufio.NewScanner(os.Stdin), args.Width, args.NoTabSpaces, args.TabSpaces, args.NoWrap, drawBubble)
+func Print(args Args, choice int, names []string, categories []string, cows embed.FS) {
+	printSpeechBubble(args.BoxChars, bufio.NewScanner(os.Stdin), args)
 	printPokemon(args, choice, names, categories, cows)
 }
 
 // Prints text from STDIN, surrounded by a speech bubble.
-func printSpeechBubble(boxCharacters *BoxCharacters, scanner *bufio.Scanner, width int, noTabSpaces bool, tabSpaces string, noWrap bool, drawBubble bool) {
-	if drawBubble {
+func printSpeechBubble(boxChars *BoxChars, scanner *bufio.Scanner, args Args) {
+	if args.DrawBubble {
 		fmt.Printf(
 			"%s%s%s\n",
-			boxCharacters.TopLeftCorner,
-			strings.Repeat(boxCharacters.HorizontalEdge, width+2),
-			boxCharacters.TopRightCorner,
+			boxChars.TopLeftCorner,
+			strings.Repeat(boxChars.HorizontalEdge, args.Width+2),
+			boxChars.TopRightCorner,
 		)
 	}
 
 	for scanner.Scan() {
 		line := scanner.Text()
 
-		if !noTabSpaces {
-			line = strings.Replace(line, "\t", tabSpaces, -1)
+		if !args.NoTabSpaces {
+			line = strings.Replace(line, "\t", args.TabSpaces, -1)
 		}
-		if noWrap {
-			printSpeechBubbleLine(boxCharacters, line, width, drawBubble)
+		if args.NoWrap {
+			printSpeechBubbleLine(boxChars, line, args)
 		} else {
-			printWrappedText(boxCharacters, line, width, tabSpaces, drawBubble)
+			printWrappedText(boxChars, line, args)
 		}
 	}
 
-	bottomBorder := strings.Repeat(boxCharacters.HorizontalEdge, 6) +
-		boxCharacters.BalloonTether +
-		strings.Repeat(boxCharacters.HorizontalEdge, width+2-7)
+	bottomBorder := strings.Repeat(boxChars.HorizontalEdge, 6) +
+		boxChars.BalloonTether +
+		strings.Repeat(boxChars.HorizontalEdge, args.Width+2-7)
 
-	if drawBubble {
-		fmt.Printf("%s%s%s\n", boxCharacters.BottomLeftCorner, bottomBorder, boxCharacters.BottomRightCorner)
+	if args.DrawBubble {
+		fmt.Printf("%s%s%s\n", boxChars.BottomLeftCorner, bottomBorder, boxChars.BottomRightCorner)
 	} else {
 		fmt.Printf(" %s \n", bottomBorder)
 	}
 	for i := 0; i < 4; i++ {
-		fmt.Printf("%s%s\n", strings.Repeat(" ", i+8), boxCharacters.BalloonString)
+		fmt.Printf("%s%s\n", strings.Repeat(" ", i+8), boxChars.BalloonString)
 	}
 }
 
 // Prints a single speech bubble line
-func printSpeechBubbleLine(boxCharacters *BoxCharacters, line string, width int, drawBubble bool) {
-	if !drawBubble {
+func printSpeechBubbleLine(boxChars *BoxChars, line string, args Args) {
+	if !args.DrawBubble {
 		fmt.Println(line)
+		return
 	}
 
 	lineLen := UnicodeStringLength(line)
-	if lineLen <= width {
+	if lineLen <= args.Width {
 		// print the line with padding, the most common case
 		fmt.Printf(
 			"%s %s%s%s %s\n",
-			boxCharacters.VerticalEdge, // left-hand side of the bubble
-			line, resetColourANSI,      // the text
-			strings.Repeat(" ", width-lineLen), // padding
-			boxCharacters.VerticalEdge,         // right-hand side of the bubble
+			boxChars.VerticalEdge, // left-hand side of the bubble
+			line, resetColourANSI, // the text
+			strings.Repeat(" ", args.Width-lineLen), // padding
+			boxChars.VerticalEdge,                   // right-hand side of the bubble
 		)
-	} else if lineLen > width {
+	} else if lineLen > args.Width {
 		// print the line without padding or right-hand side of the bubble if the line is too long
 		fmt.Printf(
 			"%s %s%s\n",
-			boxCharacters.VerticalEdge, // left-hand side of the bubble
-			line, resetColourANSI,      // the text
+			boxChars.VerticalEdge, // left-hand side of the bubble
+			line, resetColourANSI, // the text
 		)
 	}
 }
 
 // Prints line of text across multiple lines, wrapping it so that it doesn't exceed the desired width.
-func printWrappedText(boxCharacters *BoxCharacters, line string, width int, tabSpaces string, drawBubble bool) {
-	for _, wline := range strings.Split(wordwrap.WrapString(line, uint(width)), "\n") {
-		printSpeechBubbleLine(boxCharacters, wline, width, drawBubble)
+func printWrappedText(boxChars *BoxChars, line string, args Args) {
+	for _, wline := range strings.Split(wordwrap.WrapString(strings.Replace(line, "\t", args.TabSpaces, -1), uint(args.Width)), "\n") {
+		printSpeechBubbleLine(boxChars, wline, args)
 	}
 }
 
@@ -236,15 +237,15 @@ func printPokemon(args Args, index int, names []string, categoryKeys []string, G
 	if args.NoCategoryInfo {
 		infoLine = fmt.Sprintf(
 			"%s %s",
-			args.BoxCharacters.RightArrow, strings.Join(namesFmt, fmt.Sprintf(" %s ", args.BoxCharacters.Separator)),
+			args.BoxChars.RightArrow, strings.Join(namesFmt, fmt.Sprintf(" %s ", args.BoxChars.Separator)),
 		)
 	} else {
 		infoLine = fmt.Sprintf(
 			"%s %s %s %s",
-			args.BoxCharacters.RightArrow,
-			strings.Join(namesFmt, fmt.Sprintf(" %s ", args.BoxCharacters.Separator)),
-			args.BoxCharacters.Separator,
-			textStyleItalic.Sprint(strings.Join(categoryKeys, args.BoxCharacters.CategorySeparator)),
+			args.BoxChars.RightArrow,
+			strings.Join(namesFmt, fmt.Sprintf(" %s ", args.BoxChars.Separator)),
+			args.BoxChars.Separator,
+			textStyleItalic.Sprint(strings.Join(categoryKeys, args.BoxChars.CategorySeparator)),
 		)
 		for _, category := range categoryKeys {
 			width += len(category)
@@ -255,15 +256,15 @@ func printPokemon(args Args, index int, names []string, categoryKeys []string, G
 	if args.DrawInfoBorder {
 		topBorder := fmt.Sprintf(
 			"%s%s%s",
-			args.BoxCharacters.TopLeftCorner, strings.Repeat(args.BoxCharacters.HorizontalEdge, width-2), args.BoxCharacters.TopRightCorner,
+			args.BoxChars.TopLeftCorner, strings.Repeat(args.BoxChars.HorizontalEdge, width-2), args.BoxChars.TopRightCorner,
 		)
 		bottomBorder := fmt.Sprintf(
 			"%s%s%s",
-			args.BoxCharacters.BottomLeftCorner, strings.Repeat(args.BoxCharacters.HorizontalEdge, width-2), args.BoxCharacters.BottomRightCorner,
+			args.BoxChars.BottomLeftCorner, strings.Repeat(args.BoxChars.HorizontalEdge, width-2), args.BoxChars.BottomRightCorner,
 		)
 		infoLine = fmt.Sprintf(
 			"%s\n%s %s %s\n%s\n",
-			topBorder, args.BoxCharacters.VerticalEdge, infoLine, args.BoxCharacters.VerticalEdge, bottomBorder,
+			topBorder, args.BoxChars.VerticalEdge, infoLine, args.BoxChars.VerticalEdge, bottomBorder,
 		)
 	} else {
 		infoLine = fmt.Sprintf("%s\n", infoLine)
