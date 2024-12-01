@@ -2,9 +2,7 @@
 
 Print pokemon in the CLI! An adaptation of the classic "cowsay"
 
-<p align="center">
-  <kbd><img src="https://github.com/tmck-code/pokesay/assets/9894426/794ee42d-4bc2-4d0c-bce0-aafa3dca2e78" alt="demo"/></kbd>
-</p>
+![image](https://github.com/user-attachments/assets/4e1c3b0f-138d-4e6c-bf7b-d4f6c967fe96)
 
 - [pokesay](#pokesay)
   - [One-line installs](#one-line-installs)
@@ -65,6 +63,10 @@ echo 'fortune | pokesay' >> $HOME/.bashrc
 ```
 
 > _Note: The pokesay tool is intended to only be used with piped text input from STDIN, entering text by typing (or other methods) might not work as expected!_
+
+<p align="center">
+  <kbd><img src="https://github.com/tmck-code/pokesay/assets/9894426/794ee42d-4bc2-4d0c-bce0-aafa3dca2e78" alt="demo"/></kbd>
+</p>
 
 ### Full Usage
 
