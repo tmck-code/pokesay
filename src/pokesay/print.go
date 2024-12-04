@@ -106,12 +106,15 @@ func Print(args Args, choice int, names []string, categories []string, cows embe
 // Prints text from STDIN, surrounded by a speech bubble.
 func drawSpeechBubble(boxChars *BoxChars, scanner *bufio.Scanner, args Args, b *strings.Builder) {
 	if args.DrawBubble {
-		fmt.Fprintf(
-			b,
-			"%s%s%s\n",
-			boxChars.TopLeftCorner,
-			strings.Repeat(boxChars.HorizontalEdge, args.Width+2),
-			boxChars.TopRightCorner,
+		// fmt.Fprintf(
+		// 	b,
+		// 	"%s%s%s\n",
+		// 	boxChars.TopLeftCorner,
+		// 	strings.Repeat(boxChars.HorizontalEdge, args.Width+2),
+		// 	boxChars.TopRightCorner,
+		// )
+		b.WriteString(
+			boxChars.TopLeftCorner + strings.Repeat(boxChars.HorizontalEdge, args.Width+2) + boxChars.TopRightCorner + "\n",
 		)
 	}
 
@@ -133,12 +136,15 @@ func drawSpeechBubble(boxChars *BoxChars, scanner *bufio.Scanner, args Args, b *
 		strings.Repeat(boxChars.HorizontalEdge, args.Width+2-7)
 
 	if args.DrawBubble {
-		fmt.Fprintf(b, "%s%s%s\n", boxChars.BottomLeftCorner, bottomBorder, boxChars.BottomRightCorner)
+		// fmt.Fprintf(b, "%s%s%s\n", boxChars.BottomLeftCorner, bottomBorder, boxChars.BottomRightCorner)
+		b.WriteString(boxChars.BottomLeftCorner + bottomBorder + boxChars.BottomRightCorner + "\n")
 	} else {
-		fmt.Fprintf(b, " %s \n", bottomBorder)
+		// fmt.Fprintf(b, " %s \n", bottomBorder)
+		b.WriteString(" " + bottomBorder + " \n")
 	}
 	for i := 0; i < 4; i++ {
-		fmt.Fprintf(b, "%s%s\n", strings.Repeat(" ", i+8), boxChars.BalloonString)
+		// fmt.Fprintf(b, "%s%s\n", strings.Repeat(" ", i+8), boxChars.BalloonString)
+		b.WriteString(strings.Repeat(" ", i+8) + boxChars.BalloonString + "\n")
 	}
 }
 
@@ -152,22 +158,26 @@ func drawSpeechBubbleLine(boxChars *BoxChars, line string, args Args, b *strings
 	lineLen := UnicodeStringLength(line)
 	if lineLen <= args.Width {
 		// print the line with padding, the most common case
-		fmt.Fprintf(
-			b,
-			"%s %s%s%s %s\n",
-			boxChars.VerticalEdge, // left-hand side of the bubble
-			line, resetColourANSI, // the text
-			strings.Repeat(" ", args.Width-lineLen), // padding
-			boxChars.VerticalEdge,                   // right-hand side of the bubble
+		// fmt.Fprintf(
+		// 	b,
+		// 	"%s %s%s%s %s\n",
+		// 	boxChars.VerticalEdge, // left-hand side of the bubble
+		// 	line, resetColourANSI, // the text
+		// 	strings.Repeat(" ", args.Width-lineLen), // padding
+		// 	boxChars.VerticalEdge,                   // right-hand side of the bubble
+		// )
+		b.WriteString(
+			boxChars.VerticalEdge + " " + line + resetColourANSI + strings.Repeat(" ", args.Width-lineLen) + " " + boxChars.VerticalEdge + "\n",
 		)
 	} else if lineLen > args.Width {
 		// print the line without padding or right-hand side of the bubble if the line is too long
-		fmt.Fprintf(
-			b,
-			"%s %s%s\n",
-			boxChars.VerticalEdge, // left-hand side of the bubble
-			line, resetColourANSI, // the text
-		)
+		// fmt.Fprintf(
+		// 	b,
+		// 	"%s %s%s\n",
+		// 	boxChars.VerticalEdge, // left-hand side of the bubble
+		// 	line, resetColourANSI, // the text
+		// )
+		b.WriteString(boxChars.VerticalEdge + " " + line + resetColourANSI + "\n")
 	}
 }
 
@@ -261,20 +271,27 @@ func drawPokemon(args Args, index int, names []string, categoryKeys []string, GO
 	}
 
 	if args.DrawInfoBorder {
-		topBorder := fmt.Sprintf(
-			"%s%s%s",
-			args.BoxChars.TopLeftCorner, strings.Repeat(args.BoxChars.HorizontalEdge, width-2), args.BoxChars.TopRightCorner,
+		// topBorder := fmt.Sprintf(
+		// 	"%s%s%s",
+		// 	args.BoxChars.TopLeftCorner, strings.Repeat(args.BoxChars.HorizontalEdge, width-2), args.BoxChars.TopRightCorner,
+		// )
+		b.WriteString(
+			args.BoxChars.TopLeftCorner + strings.Repeat(args.BoxChars.HorizontalEdge, width-2) + args.BoxChars.TopRightCorner + "\n",
 		)
-		bottomBorder := fmt.Sprintf(
-			"%s%s%s",
-			args.BoxChars.BottomLeftCorner, strings.Repeat(args.BoxChars.HorizontalEdge, width-2), args.BoxChars.BottomRightCorner,
+		// bottomBorder := fmt.Sprintf(
+		// 	"%s%s%s",
+		// 	args.BoxChars.BottomLeftCorner, strings.Repeat(args.BoxChars.HorizontalEdge, width-2), args.BoxChars.BottomRightCorner,
+		// )
+		b.WriteString(
+			args.BoxChars.BottomLeftCorner + strings.Repeat(args.BoxChars.HorizontalEdge, width-2) + args.BoxChars.BottomRightCorner + "\n",
 		)
-		infoLine = fmt.Sprintf(
-			"%s\n%s %s %s\n%s\n",
-			topBorder, args.BoxChars.VerticalEdge, infoLine, args.BoxChars.VerticalEdge, bottomBorder,
-		)
+		// infoLine = fmt.Sprintf(
+		// 	"%s\n%s %s %s\n%s\n",
+		// 	topBorder, args.BoxChars.VerticalEdge, infoLine, args.BoxChars.VerticalEdge, bottomBorder,
+		// )
 	} else {
 		infoLine = fmt.Sprintf("%s\n", infoLine)
 	}
-	fmt.Fprintf(b, "%s%s", pokedex.Decompress(d), infoLine)
+	// fmt.Fprintf(b, "%s%s", pokedex.Decompress(d), infoLine)
+	b.WriteString(string(pokedex.Decompress(d)) + infoLine)
 }
