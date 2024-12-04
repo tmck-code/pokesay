@@ -4,7 +4,7 @@ WORKDIR /usr/local/src
 
 RUN BUILD_DEPS="make gcc"
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends "${BUILD_DEPS}" libmagickwand-dev ncurses-dev jq
+    && apt-get install -y --no-install-recommends "${BUILD_DEPS}" libmagickwand-dev ncurses-dev jq imagemagick
 
 RUN git clone --depth 1 https://github.com/denilsonsa/img2xterm \
     && (cd img2xterm && make && make install) \
@@ -31,8 +31,5 @@ RUN go run /usr/local/src/src/bin/convert/png_convert.go \
     && mv -v /tmp/cows/pokemon-gen8 /tmp/cows/gen8 \
     && mv -v /tmp/cows/pokemon-gen7x /tmp/cows/gen7x \
     && cat /tmp/original/pokesprite/data/pokemon.json | jq -c .[] > /tmp/cows/pokemon.json \
-    && rm -rf /tmp/original/pokesprite \
-    && find . ! -empty -type f -exec md5sum {} + | sort -r | uniq -w32 -dD > dup \
-    && for i in $(cut -d' ' -f1 build/cows/dup | uniq); do grep $i dup | tail -n +2 | cut -d ' ' -f3 ; done | parallel echo rm -v
-
+    && rm -rf /tmp/original/pokesprite
 ADD . .

@@ -31,8 +31,20 @@ func FindFiles(dirpath string, ext string, skip []string) []string {
 	return fpaths
 }
 
+// img2xterm converts an image to a cowfile, returning the result as a byte slice
 func img2xterm(sourceFpath string) ([]byte, error) {
 	return exec.Command("bash", "-c", fmt.Sprintf("/usr/local/bin/img2xterm %s", sourceFpath)).Output()
+}
+
+// autoCrop trims the whitespace from the edges of an image, in place
+func autoCrop(sourceFpath string) {
+	destFpath := fmt.Sprintf("/tmp/%s", filepath.Base(sourceFpath))
+	_, err := exec.Command(
+		"bash", "-c", fmt.Sprintf("/usr/bin/convert %s -trim +repage %s", sourceFpath, destFpath),
+	).Output()
+	Check(err)
+
+	os.Rename(destFpath, sourceFpath)
 }
 
 func countLineLeftPadding(line string) int {
@@ -64,23 +76,33 @@ func countCowfileLeftPadding(cowfile []byte) int {
 	return minPadding
 }
 
-func stripPadding(cowfile []byte, n int) []string {
+func stripEmptyLines(cowfile []string) []string {
+	converted := make([]string, 0)
+
+	for _, line := range cowfile {
+		if len(line) == 0 {
+			continue
+		}
+		onlySpaces := true
+		for _, ch := range line {
+			if ch != ' ' {
+				onlySpaces = false
+				break
+			}
+		}
+		if !onlySpaces {
+			converted = append(converted, line)
+		}
+	}
+	return converted
+}
+
+func padLeft(cowfile []byte, n int) []string {
 	converted := make([]string, 0)
 	lines := strings.Split(string(cowfile), "\n")
 
 	for _, line := range lines {
-		if len(line) == 0 {
-			continue
-		}
-		convertedLine := ""
-		for i, ch := range line {
-			if i >= n {
-				convertedLine += string(ch)
-			}
-		}
-		if len(convertedLine) > 0 {
-			converted = append(converted, convertedLine)
-		}
+		converted = append(converted, strings.Repeat(" ", n)+line)
 	}
 	return converted
 }
@@ -95,6 +117,8 @@ func ConvertPngToCow(sourceDirpath string, sourceFpath string, destDirpath strin
 	// Ensure that the destination dir exists
 	os.MkdirAll(destDir, 0755)
 
+	// Trim the whitespace from the edges of the images. This helps with the conversion
+	autoCrop(sourceFpath)
 	// Some conversions are failing with something about colour channels
 	// Can't be bothered resolving atm, so just skip past any failed conversions
 	converted, _ := img2xterm(sourceFpath)
@@ -110,7 +134,7 @@ func ConvertPngToCow(sourceDirpath string, sourceFpath string, destDirpath strin
 	defer ostream.Close()
 	writer := bufio.NewWriter(ostream)
 
-	final := stripPadding(converted, countCowfileLeftPadding(converted)-extraPadding)
+	final := stripEmptyLines(padLeft(converted, extraPadding))
 
 	// Join all of the lines back together, add colour reset sequence at the end
 	_, err = writer.WriteString(strings.Join(final, "\n") + COLOUR_RESET)
