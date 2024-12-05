@@ -198,9 +198,12 @@ Inspired by the [pokeshell](https://github.com/acxz/pokeshell) project, I've inc
 - **In progress**
   - [ ] optionally print ID assigned to each pokemon, support deterministic selection via the same ID
 - **Short-term**
+- [ ] requesting mew returns mewtwo also
+- [ ] add option to flip Pokemon to face right or left, remove all "right" facing cowfiles
 - **Longer-term**
   - [ ] make the process async.
     - (Currently the searching/pokemon fetching is done _before_ any printing begins. There's an opportunity to start printing the speech bubble while also fetching the pokemon to print below it)
+    - [ ] implement native lolcat/rainbow HR/colour
 - **In Beta**
   - [x] support long and short cli args (e.g. --name/-n)
 - **Completed**
