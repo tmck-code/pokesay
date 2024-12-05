@@ -200,6 +200,7 @@ Inspired by the [pokeshell](https://github.com/acxz/pokeshell) project, I've inc
 - **Short-term**
 - [ ] requesting mew returns mewtwo also
 - [ ] add option to flip Pokemon to face right or left, remove all "right" facing cowfiles
+- [ ] create "vertical" friendly display mode, place the Pokemon standing beside the text box, on the left or right
 - **Longer-term**
   - [ ] make the process async.
     - (Currently the searching/pokemon fetching is done _before_ any printing begins. There's an opportunity to start printing the speech bubble while also fetching the pokemon to print below it)
