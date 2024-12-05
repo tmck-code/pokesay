@@ -2,7 +2,8 @@
 
 Print pokemon in the CLI! An adaptation of the classic "cowsay"
 
-![image](https://github.com/user-attachments/assets/55ba9e3d-e1a0-4976-99a4-57f4c41f48b7)
+![17333819642598021244734813820110](https://github.com/user-attachments/assets/98141559-ea0e-4327-987b-ebe0c91d5886)
+
 
 - [pokesay](#pokesay)
   - [One-line installs](#one-line-installs)
