@@ -218,6 +218,37 @@ func UnicodeStringLength(s string) int {
 	return totalLen
 }
 
+type AnsiLineToken struct {
+	Colour string
+	Text   string
+}
+
+func TokeniseANSILine(line string) []AnsiLineToken {
+	tokens := make([]AnsiLineToken, 0)
+	var inAnsiCode bool
+
+	token := AnsiLineToken{}
+	for i, r := range line {
+		if i < len(line)-1 {
+			if line[i:i+2] == "\033[" {
+				inAnsiCode = true
+			}
+		}
+		if inAnsiCode {
+			token.Colour += string(r)
+			if r == 'm' {
+				inAnsiCode = false
+			}
+		} else {
+			token.Text += string(r)
+			if i == len(line)-1 {
+				tokens = append(tokens, token)
+			}
+		}
+	}
+	return tokens
+}
+
 // Prints a pokemon with its name & category information.
 func printPokemon(args Args, index int, names []string, categoryKeys []string, GOBCowData embed.FS) {
 	d, _ := GOBCowData.ReadFile(pokedex.EntryFpath("build/assets/cows", index))

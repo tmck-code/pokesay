@@ -115,6 +115,26 @@ func TestUnicodeStringLength(test *testing.T) {
 	Assert(expected, results, test)
 }
 
+func TestTokeniseAnsiLine(test *testing.T) {
+	line := "[35mAAA [41m XX [0m"
+	expected := []string{"[35m", "AAA ", "[41m", " XX ", "[0m"}
+	result := pokesay.TokeniseANSILine(line)
+	Assert(expected, result, test)
+}
+
+func TestFlipHorizontalLine(test *testing.T) {
+	// The AAA has a purple fg
+	// The XX has a red bg
+	line := "[35mAAA [41m XX [0m"
+
+	// The AAA should still have a purple fg
+	// The XX should still have a red bg
+	expected := "[41m XX [35m AAA[0m"
+	result := pokesay.ReverseString(line)
+
+	Assert(expected, result, test)
+}
+
 func TestFlipHorizontalWithoutColour(test *testing.T) {
 	msg := []string{
 		"         ▄▄          ▄▄",
