@@ -195,9 +195,9 @@ func UnicodeStringLength(s string) int {
 	for i, r := range s {
 		if i < nRunes-1 {
 			// detect the beginning of an ANSI escape code
-			// e.g. "\033[38;5;196m"
+			// e.g. "\x1b[38;5;196m"
 			//       ^^^ start    ^ end
-			if s[i:i+2] == "\033[" {
+			if s[i:i+2] == "\x1b[" {
 				ansiCode = true
 			}
 		}
@@ -218,35 +218,53 @@ func UnicodeStringLength(s string) int {
 	return totalLen
 }
 
-type AnsiLineToken struct {
+type ANSILineToken struct {
 	Colour string
 	Text   string
 }
 
-func TokeniseANSILine(line string) []AnsiLineToken {
-	tokens := make([]AnsiLineToken, 0)
+func TokeniseANSIString(line string) []ANSILineToken {
+	tokens := make([]ANSILineToken, 0)
 	var inAnsiCode bool
 
-	token := AnsiLineToken{}
+	currentColour := ""
+	currentText := ""
+
 	for i, r := range line {
-		if i < len(line)-1 {
-			if line[i:i+2] == "\033[" {
-				inAnsiCode = true
+		if r == '\x1b' {
+			if currentText != "" {
+				tokens = append(tokens, ANSILineToken{currentColour, currentText})
+				currentColour = ""
+				currentText = ""
 			}
+			if i < len(line)-1 && line[i+1] == '[' {
+				inAnsiCode = true
+				currentColour = "\x1b"
+			}
+			continue
 		}
 		if inAnsiCode {
-			token.Colour += string(r)
+			currentColour += string(r)
 			if r == 'm' {
 				inAnsiCode = false
 			}
 		} else {
-			token.Text += string(r)
-			if i == len(line)-1 {
-				tokens = append(tokens, token)
-			}
+			currentText += string(r)
 		}
 	}
+	tokens = append(tokens, ANSILineToken{currentColour, currentText})
 	return tokens
+}
+
+func ReverseANSIString(line string) string {
+	tokens := TokeniseANSIString(line)
+	reversed := ""
+
+	for i := len(tokens) - 1; i >= 0; i-- {
+		reversed += tokens[i].Colour + tokens[i].Text
+	}
+
+	return reversed
 }
 
 // Prints a pokemon with its name & category information.

@@ -115,10 +115,15 @@ func TestUnicodeStringLength(test *testing.T) {
 	Assert(expected, results, test)
 }
 
-func TestTokeniseAnsiLine(test *testing.T) {
+func TestTokeniseANSIString(test *testing.T) {
 	line := "[35mAAA [41m XX [0m"
-	expected := []string{"[35m", "AAA ", "[41m", " XX ", "[0m"}
-	result := pokesay.TokeniseANSILine(line)
+
+	expected := []pokesay.ANSILineToken{
+		pokesay.ANSILineToken{Colour: "[35m", Text: "AAA "},
+		pokesay.ANSILineToken{Colour: "[41m", Text: " XX "},
+		pokesay.ANSILineToken{Colour: "[0m", Text: ""},
+	}
+	result := pokesay.TokeniseANSIString(line)
 	Assert(expected, result, test)
 }
 
@@ -130,7 +135,7 @@ func TestFlipHorizontalLine(test *testing.T) {
 	// The AAA should still have a purple fg
 	// The XX should still have a red bg
 	expected := "[41m XX [35m AAA[0m"
-	result := pokesay.ReverseString(line)
+	result := pokesay.ReverseANSIString(line)
 
 	Assert(expected, result, test)
 }
