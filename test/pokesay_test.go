@@ -94,6 +94,7 @@ func TestChooseByNameAndCategory(test *testing.T) {
 func TestChooseByRandomIndex(test *testing.T) {
 	resultTotal, result := pokesay.ChooseByRandomIndex(GOBTotal)
 	Assert(9, resultTotal, test)
+
 	Assert(0 <= result, true, test)
 	Assert(9 >= result, true, test)
 }
@@ -116,11 +117,11 @@ func TestUnicodeStringLength(test *testing.T) {
 }
 
 func TestTokeniseANSIString(test *testing.T) {
-	line := "[35mAAA [41m XX [0m"
+	line := "[38;5;129mAAA [48;5;160m XX [0m"
 
 	expected := []pokesay.ANSILineToken{
-		pokesay.ANSILineToken{Colour: "[35m", Text: "AAA "},
-		pokesay.ANSILineToken{Colour: "[41m", Text: " XX "},
+		pokesay.ANSILineToken{Colour: "[38;5;129m", Text: "AAA "},
+		pokesay.ANSILineToken{Colour: "[48;5;160m[38;5;129m", Text: " XX "},
 		pokesay.ANSILineToken{Colour: "[0m", Text: ""},
 	}
 	result := pokesay.TokeniseANSIString(line)
@@ -130,13 +131,29 @@ func TestTokeniseANSIString(test *testing.T) {
 func TestFlipHorizontalLine(test *testing.T) {
 	// The AAA has a purple fg
 	// The XX has a red bg
-	line := "[35mAAA [41m XX [0m"
+	line := "[38;5;129mAAA [48;5;160m XY [0m"
 
 	// The AAA should still have a purple fg
 	// The XX should still have a red bg
-	expected := "[41m XX [35m AAA[0m"
+	expected := "[0m[48;5;160m\x1b[38;5;129m YX \033[0m[38;5;129m AAA"
 	result := pokesay.ReverseANSIString(line)
 
+	Assert(expected, result, test)
+}
+
+func TestTokeniseANSIStringWithNoColour(test *testing.T) {
+	msg := "         ▄▄          ▄▄"
+	expected := []pokesay.ANSILineToken{
+		pokesay.ANSILineToken{Colour: "", Text: "         ▄▄          ▄▄"},
+	}
+	result := pokesay.TokeniseANSIString(msg)
+	Assert(expected, result, test)
+}
+
+func TestReverseUnicodeString(test *testing.T) {
+	msg := "         ▄▄          ▄▄"
+	expected := "▄▄          ▄▄         "
+	result := pokesay.ReverseUnicodeString(msg)
 	Assert(expected, result, test)
 }
 
@@ -154,26 +171,66 @@ func TestFlipHorizontalWithoutColour(test *testing.T) {
 		"             ▀▀▄▀",
 	}
 	fmt.Println("msg:", msg)
-	expected := []string{""}
-	results := []string{""}
+	expected := []string{
+		"  ▄▄          ▄▄         ",
+		"▄▄ ▄▄▄▄▄▄     ▄▄▄        ",
+		"▀▄   ▄▄  ▄▄▄ ▀▄  ▄       ",
+		"  ▀▄    ▄▄  ▄▄   ▄▄▄     ",
+		"   ▄▄  ▄▀ ▄  ▄▄▄   ▄▄    ",
+		"   ▀▄ ▄▄▄   ▄▄▄   ▄▄▀    ",
+		"    ▄▄▄▄▄   ▄▄ ▄▄▄▄▄▀    ",
+		"     ▀▄▄  ▄▄▄▄           ",
+		"      ▀▄    ▄▄▄▀         ",
+		"        ▀▄▀▀             ",
+	}
+	results := pokesay.ReverseANSIStrings(msg)
+
+	for i := 0; i < len(expected); i++ {
+		Assert(expected[i], results[i], test)
+	}
+
 	Assert(expected, results, test)
 }
 
 func TestFlipHorizontal(test *testing.T) {
 	msg := []string{
-		"    [49m     [38;5;16m▄[48;5;16m[38;5;232m▄ [49m         [38;5;16m▄▄",
-		"        ▄[48;5;16m[38;5;94m▄[48;5;232m▄[48;5;16m [49m    [38;5;16m▄▄▄▄[48;5;16m[38;5;214m▄[48;5;214m[38;5;94m▄[48;5;94m [48;5;16m▄[49m[38;5;16m▄",
-		"       ▄[48;5;16m [48;5;94m [48;5;58m▄[49m▀ ▄[48;5;16m[38;5;214m▄▄[48;5;232m  [38;5;94m▄[48;5;214m▄[48;5;94m   [38;5;16m▄[49m▀",
-		"     ▄[48;5;16m[38;5;214m▄[48;5;94m▄[48;5;214m   [48;5;16m▄[38;5;58m▄[48;5;214m  [38;5;232m▄[48;5;232m[38;5;94m▄[48;5;94m    [38;5;16m▄[49m▀",
-		"    ▄[48;5;16m[38;5;214m▄[48;5;214m   [38;5;94m▄[48;5;94m[38;5;231m▄[48;5;214m[38;5;16m▄  [48;5;58m[38;5;214m▄[48;5;16m [49m[38;5;16m▀[48;5;94m▄  [48;5;16m[38;5;94m▄[49m[38;5;16m▄",
-		"    ▀[48;5;214m▄[48;5;58m[38;5;214m▄[48;5;214m   [48;5;16m▄[48;5;232m[38;5;196m▄[48;5;214m▄   [48;5;16m[38;5;214m▄[49m[38;5;16m▄[48;5;16m[38;5;94m▄[48;5;94m [38;5;16m▄[49m▀",
-		"    ▀[48;5;94m▄[48;5;232m▄[48;5;94m▄[48;5;214m[38;5;94m▄▄ [48;5;196m[38;5;214m▄[38;5;232m▄[48;5;214m   [48;5;88m[38;5;214m▄[48;5;232m▄[48;5;52m[38;5;232m▄[48;5;16m[38;5;52m▄[49m[38;5;16m▄",
-		"        [48;5;16m [48;5;94m  [48;5;232m[38;5;94m▄[48;5;214m[38;5;232m▄▄[48;5;232m[38;5;214m▄[48;5;214m  [48;5;88m▄[48;5;232m[38;5;16m▄[49m▀",
-		"         ▀[48;5;94m▄▄[48;5;214m▄    [48;5;232m▄[49m▀",
-		"             ▀▀[48;5;214m▄[49m▀[39m[39m",
+		"    \x1b[49m     \x1b[38;5;16m▄\x1b[48;5;16m\x1b[38;5;232m▄ \x1b[49m         \x1b[38;5;16m▄▄",
+		"        ▄\x1b[48;5;16m\x1b[38;5;94m▄\x1b[48;5;232m▄\x1b[48;5;16m \x1b[49m    \x1b[38;5;16m▄▄▄▄\x1b[48;5;16m\x1b[38;5;214m▄\x1b[48;5;214m\x1b[38;5;94m▄\x1b[48;5;94m \x1b[48;5;16m▄\x1b[49m\x1b[38;5;16m▄",
+		"       ▄\x1b[48;5;16m \x1b[48;5;94m \x1b[48;5;58m▄\x1b[49m▀ ▄\x1b[48;5;16m\x1b[38;5;214m▄▄\x1b[48;5;232m  \x1b[38;5;94m▄\x1b[48;5;214m▄\x1b[48;5;94m   \x1b[38;5;16m▄\x1b[49m▀",
+		"     ▄\x1b[48;5;16m\x1b[38;5;214m▄\x1b[48;5;94m▄\x1b[48;5;214m   \x1b[48;5;16m▄\x1b[38;5;58m▄\x1b[48;5;214m  \x1b[38;5;232m▄\x1b[48;5;232m\x1b[38;5;94m▄\x1b[48;5;94m    \x1b[38;5;16m▄\x1b[49m▀",
+		"    ▄\x1b[48;5;16m\x1b[38;5;214m▄\x1b[48;5;214m   \x1b[38;5;94m▄\x1b[48;5;94m\x1b[38;5;231m▄\x1b[48;5;214m\x1b[38;5;16m▄  \x1b[48;5;58m\x1b[38;5;214m▄\x1b[48;5;16m \x1b[49m\x1b[38;5;16m▀\x1b[48;5;94m▄  \x1b[48;5;16m\x1b[38;5;94m▄\x1b[49m\x1b[38;5;16m▄",
+		"    ▀\x1b[48;5;214m▄\x1b[48;5;58m\x1b[38;5;214m▄\x1b[48;5;214m   \x1b[48;5;16m▄\x1b[48;5;232m\x1b[38;5;196m▄\x1b[48;5;214m▄   \x1b[48;5;16m\x1b[38;5;214m▄\x1b[49m\x1b[38;5;16m▄\x1b[48;5;16m\x1b[38;5;94m▄\x1b[48;5;94m \x1b[38;5;16m▄\x1b[49m▀",
+		"    ▀\x1b[48;5;94m▄\x1b[48;5;232m▄\x1b[48;5;94m▄\x1b[48;5;214m\x1b[38;5;94m▄▄ \x1b[48;5;196m\x1b[38;5;214m▄\x1b[38;5;232m▄\x1b[48;5;214m   \x1b[48;5;88m\x1b[38;5;214m▄\x1b[48;5;232m▄\x1b[48;5;52m\x1b[38;5;232m▄\x1b[48;5;16m\x1b[38;5;52m▄\x1b[49m\x1b[38;5;16m▄",
+		"        \x1b[48;5;16m \x1b[48;5;94m  \x1b[48;5;232m\x1b[38;5;94m▄\x1b[48;5;214m\x1b[38;5;232m▄▄\x1b[48;5;232m\x1b[38;5;214m▄\x1b[48;5;214m  \x1b[48;5;88m▄\x1b[48;5;232m\x1b[38;5;16m▄\x1b[49m▀",
+		"         ▀\x1b[48;5;94m▄▄\x1b[48;5;214m▄    \x1b[48;5;232m▄\x1b[49m▀",
+		"             ▀▀\x1b[48;5;214m▄\x1b[49m▀\x1b[39m\x1b[39m",
 	}
 	fmt.Println("msg:", msg)
-	expected := []string{""}
-	results := []string{""}
+	results := pokesay.ReverseANSIStrings(msg)
+
+	expected := []string{
+		"  \x1b[38;5;16m▄▄\x1b[0m         \x1b[0m\x1b[48;5;16m\x1b[38;5;232m ▄\x1b[0m\x1b[38;5;16m▄\x1b[0m     \x1b[0m    ",
+		"\x1b[38;5;16m▄\x1b[0m\x1b[48;5;16m\x1b[38;5;94m▄\x1b[0m\x1b[48;5;94m\x1b[38;5;94m \x1b[0m\x1b[48;5;214m\x1b[38;5;94m▄\x1b[0m\x1b[48;5;16m\x1b[38;5;214m▄\x1b[0m\x1b[38;5;16m▄▄▄▄\x1b[0m    \x1b[0m\x1b[48;5;16m\x1b[38;5;94m \x1b[0m\x1b[48;5;232m\x1b[38;5;94m▄\x1b[0m\x1b[48;5;16m\x1b[38;5;94m▄\x1b[0m▄        ",
+		"\x1b[49m▀\x1b[0m\x1b[48;5;94m\x1b[38;5;16m▄\x1b[0m\x1b[48;5;94m\x1b[38;5;94m   \x1b[0m\x1b[48;5;214m\x1b[38;5;94m▄\x1b[0m\x1b[48;5;232m\x1b[38;5;94m▄\x1b[0m\x1b[48;5;232m\x1b[38;5;214m  \x1b[0m\x1b[48;5;16m\x1b[38;5;214m▄▄\x1b[0m▄ ▀\x1b[0m\x1b[48;5;58m▄\x1b[0m\x1b[48;5;94m \x1b[0m\x1b[48;5;16m \x1b[0m▄       ",
+		"  \x1b[49m▀\x1b[0m\x1b[48;5;94m\x1b[38;5;16m▄\x1b[0m\x1b[48;5;94m\x1b[38;5;94m    \x1b[0m\x1b[48;5;232m\x1b[38;5;94m▄\x1b[0m\x1b[48;5;214m\x1b[38;5;232m▄\x1b[0m\x1b[48;5;214m\x1b[38;5;58m  \x1b[0m\x1b[48;5;16m\x1b[38;5;58m▄\x1b[0m\x1b[48;5;16m\x1b[38;5;214m▄\x1b[0m\x1b[48;5;214m\x1b[38;5;214m   \x1b[0m\x1b[48;5;94m\x1b[38;5;214m▄\x1b[0m\x1b[48;5;16m\x1b[38;5;214m▄\x1b[0m▄     ",
+		"   \x1b[38;5;16m▄\x1b[0m\x1b[48;5;16m\x1b[38;5;94m▄\x1b[0m\x1b[48;5;94m\x1b[38;5;16m  ▄\x1b[0m\x1b[38;5;16m▀\x1b[0m\x1b[48;5;16m\x1b[38;5;214m \x1b[0m\x1b[48;5;58m\x1b[38;5;214m▄\x1b[0m\x1b[48;5;214m\x1b[38;5;16m  ▄\x1b[0m\x1b[48;5;94m\x1b[38;5;231m▄\x1b[0m\x1b[48;5;214m\x1b[38;5;94m▄\x1b[0m\x1b[48;5;214m\x1b[38;5;214m   \x1b[0m\x1b[48;5;16m\x1b[38;5;214m▄\x1b[0m▄    ",
+		"   \x1b[49m▀\x1b[0m\x1b[48;5;94m\x1b[38;5;16m▄\x1b[0m\x1b[48;5;94m\x1b[38;5;94m \x1b[0m\x1b[48;5;16m\x1b[38;5;94m▄\x1b[0m\x1b[38;5;16m▄\x1b[0m\x1b[48;5;16m\x1b[38;5;214m▄\x1b[0m\x1b[48;5;214m\x1b[38;5;196m   ▄\x1b[0m\x1b[48;5;232m\x1b[38;5;196m▄\x1b[0m\x1b[48;5;16m\x1b[38;5;214m▄\x1b[0m\x1b[48;5;214m\x1b[38;5;214m   \x1b[0m\x1b[48;5;58m\x1b[38;5;214m▄\x1b[0m\x1b[48;5;214m▄\x1b[0m▀    ",
+		"    \x1b[38;5;16m▄\x1b[0m\x1b[48;5;16m\x1b[38;5;52m▄\x1b[0m\x1b[48;5;52m\x1b[38;5;232m▄\x1b[0m\x1b[48;5;232m\x1b[38;5;214m▄\x1b[0m\x1b[48;5;88m\x1b[38;5;214m▄\x1b[0m\x1b[48;5;214m\x1b[38;5;232m   \x1b[0m\x1b[48;5;196m\x1b[38;5;232m▄\x1b[0m\x1b[48;5;196m\x1b[38;5;214m▄\x1b[0m\x1b[48;5;214m\x1b[38;5;94m ▄▄\x1b[0m\x1b[48;5;94m▄\x1b[0m\x1b[48;5;232m▄\x1b[0m\x1b[48;5;94m▄\x1b[0m▀    ",
+		"     \x1b[49m▀\x1b[0m\x1b[48;5;232m\x1b[38;5;16m▄\x1b[0m\x1b[48;5;88m\x1b[38;5;214m▄\x1b[0m\x1b[48;5;214m\x1b[38;5;214m  \x1b[0m\x1b[48;5;232m\x1b[38;5;214m▄\x1b[0m\x1b[48;5;214m\x1b[38;5;232m▄▄\x1b[0m\x1b[48;5;232m\x1b[38;5;94m▄\x1b[0m\x1b[48;5;94m  \x1b[0m\x1b[48;5;16m \x1b[0m        ",
+		"      \x1b[49m▀\x1b[0m\x1b[48;5;232m▄\x1b[0m\x1b[48;5;214m    ▄\x1b[0m\x1b[48;5;94m▄▄\x1b[0m▀         ",
+		"        \x1b[39m\x1b[0m▀\x1b[0m\x1b[48;5;214m▄\x1b[0m▀▀             ",
+	}
+	for i, line := range msg {
+		fmt.Println("msg:", i, line)
+	}
+	for i, line := range expected {
+		fmt.Println("expected:", i, line)
+	}
+	for i, line := range results {
+		fmt.Println("results:", i, line)
+	}
+	for i := 0; i < len(expected); i++ {
+		Assert(expected[i], results[i], test)
+	}
 	Assert(expected, results, test)
 }

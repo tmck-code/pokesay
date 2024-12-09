@@ -22,7 +22,7 @@ func debug() bool {
 
 // Fails a test with a formatted message showing the expected vs. result. (These are both printed in %#v form)
 func Fail(expected interface{}, result interface{}, test *testing.T) {
-	test.Fatalf("%s items don't match!\n> expected:\t%#v\n>   result:\t%#v\n", failMark, expected, result)
+	test.Fatalf("%s items don't match!\n> expected:\t%#v\x1b[0m\n>   result:\t%#v\x1b[0m\n", failMark, expected, result)
 }
 
 // Takes in an expected & result object, of any type.
@@ -33,7 +33,7 @@ func Assert(expected interface{}, result interface{}, test *testing.T) {
 	expectedString, resultString := fmt.Sprintf("%#v", expected), fmt.Sprintf("%#v", result)
 	if expectedString == resultString {
 		if debug() {
-			fmt.Printf("%s items match!\n> expected:\t%s\n>   result:\t%s\n", successMark, expected, result)
+			fmt.Printf("%s items match!\n> expected:\t%s\x1b[0m\n>   result:\t%s\x1b[0m\n", successMark, expected, result)
 		}
 		return
 	}
