@@ -271,24 +271,24 @@ func drawPokemon(args Args, index int, names []string, categoryKeys []string, GO
 	}
 
 	if args.DrawInfoBorder {
-		// topBorder := fmt.Sprintf(
-		// 	"%s%s%s",
-		// 	args.BoxChars.TopLeftCorner, strings.Repeat(args.BoxChars.HorizontalEdge, width-2), args.BoxChars.TopRightCorner,
-		// )
-		b.WriteString(
-			args.BoxChars.TopLeftCorner + strings.Repeat(args.BoxChars.HorizontalEdge, width-2) + args.BoxChars.TopRightCorner + "\n",
+		topBorder := fmt.Sprintf(
+			"%s%s%s",
+			args.BoxChars.TopLeftCorner, strings.Repeat(args.BoxChars.HorizontalEdge, width-2), args.BoxChars.TopRightCorner,
 		)
-		// bottomBorder := fmt.Sprintf(
-		// 	"%s%s%s",
-		// 	args.BoxChars.BottomLeftCorner, strings.Repeat(args.BoxChars.HorizontalEdge, width-2), args.BoxChars.BottomRightCorner,
+		// b.WriteString(
+		// 	args.BoxChars.TopLeftCorner + strings.Repeat(args.BoxChars.HorizontalEdge, width-2) + args.BoxChars.TopRightCorner + "\n",
 		// )
-		b.WriteString(
-			args.BoxChars.BottomLeftCorner + strings.Repeat(args.BoxChars.HorizontalEdge, width-2) + args.BoxChars.BottomRightCorner + "\n",
+		bottomBorder := fmt.Sprintf(
+			"%s%s%s",
+			args.BoxChars.BottomLeftCorner, strings.Repeat(args.BoxChars.HorizontalEdge, width-2), args.BoxChars.BottomRightCorner,
 		)
-		// infoLine = fmt.Sprintf(
-		// 	"%s\n%s %s %s\n%s\n",
-		// 	topBorder, args.BoxChars.VerticalEdge, infoLine, args.BoxChars.VerticalEdge, bottomBorder,
+		// b.WriteString(
+		// 	args.BoxChars.BottomLeftCorner + strings.Repeat(args.BoxChars.HorizontalEdge, width-2) + args.BoxChars.BottomRightCorner + "\n",
 		// )
+		infoLine = fmt.Sprintf(
+			"%s\n%s %s %s\n%s\n",
+			topBorder, args.BoxChars.VerticalEdge, infoLine, args.BoxChars.VerticalEdge, bottomBorder,
+		)
 	} else {
 		infoLine = fmt.Sprintf("%s\n", infoLine)
 	}
