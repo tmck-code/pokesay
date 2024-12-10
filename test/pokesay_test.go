@@ -3,6 +3,7 @@ package test
 import (
 	"embed"
 	"fmt"
+	"strings"
 	"testing"
 
 	"github.com/tmck-code/pokesay/src/pokedex"
@@ -193,17 +194,27 @@ func TestFlipHorizontalWithoutColour(test *testing.T) {
 }
 
 func TestFlipHorizontalWithColourContinuation(test *testing.T) {
-	msg := "\x1b[38;5;160m▄ \x1b[38;5;46m▄\n" +
-		"▄ \x1b[38;5;190m▄\n"
+	msg := []string{
+		"\x1b[38;5;160m▄ \x1b[38;5;46m▄",
+		"▄ \x1b[38;5;190m▄",
+	}
 
-	result := pokesay.ReverseANSIString(msg)
+	result := pokesay.ReverseANSIStrings(msg)
 
-	expected := "\x1b[38;5;46m▄ \x1b[38;5;160m▄\n" +
-		"\x1b[38;5;190m▄ \x1b[38;5;46m▄\n"
+	expected := []string{
+		"\x1b[38;5;46m▄ \x1b[38;5;160m▄",
+		"\x1b[38;5;190m▄ \x1b[38;5;46m▄",
+	}
 
-	fmt.Printf("msg:\n%s\x1b[0m\n", msg)
-	fmt.Printf("expected:\n%s\x1b[0m\n", expected)
-	fmt.Printf("result:\n%s\x1b[0m\n", result)
+	data := map[string]string{
+		"msg":      strings.Join(msg, "\n"),
+		"expected": strings.Join(expected, "\n"),
+		"result":   strings.Join(result, "\n"),
+	}
+
+	for msg, d := range data {
+		fmt.Printf("%s:\n%s\x1b[0m\n%#v\n", msg, d, d)
+	}
 
 	Assert(expected, result, test)
 }
