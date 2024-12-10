@@ -192,6 +192,22 @@ func TestFlipHorizontalWithoutColour(test *testing.T) {
 	Assert(expected, results, test)
 }
 
+func TestFlipHorizontalWithColourContinuation(test *testing.T) {
+	msg := "\x1b[38;5;160m▄ \x1b[38;5;46m▄\n" +
+		"▄ \x1b[38;5;190m▄\n"
+
+	result := pokesay.ReverseANSIString(msg)
+
+	expected := "\x1b[38;5;46m▄ \x1b[38;5;160m▄\n" +
+		"\x1b[38;5;190m▄ \x1b[38;5;46m▄\n"
+
+	fmt.Printf("msg:\n%s\x1b[0m\n", msg)
+	fmt.Printf("expected:\n%s\x1b[0m\n", expected)
+	fmt.Printf("result:\n%s\x1b[0m\n", result)
+
+	Assert(expected, result, test)
+}
+
 func TestFlipHorizontal(test *testing.T) {
 	msg := []string{
 		"    \x1b[49m     \x1b[38;5;16m▄\x1b[48;5;16m\x1b[38;5;232m▄ \x1b[49m         \x1b[38;5;16m▄▄",
