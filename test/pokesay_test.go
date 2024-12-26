@@ -240,14 +240,14 @@ func TestReverseANSIString(test *testing.T) {
 			// purple fg, red bg
 			// the 4 spaces after AAA should have a purple fg, and no bg
 			input:    "\x1b[38;5;129mAAA    \x1b[48;5;160m XX \x1b[0m",
-			expected: "\x1b[0m\x1b[48;5;160m\x1b[38;5;129m XX \x1b[38;5;129m    AAA\x1b[0m",
+			expected: "\x1b[0m\x1b[48;5;160m\x1b[38;5;129m XX \x1b[0m\x1b[38;5;129m    AAA\x1b[0m",
 		},
 		{
 			name: "Multi-line with trailing spaces",
 			// The AAA has a purple fg, the XX has a red bg
 			input: "  \x1b[38;5;129mAAA \x1b[48;5;160m XY \x1b[0m  ",
 			// The AAA should still have a purple fg, and the XX should still have a red bg
-			expected: "\x1b[0m\x1b[0m  \x1b[48;5;160m\x1b[38;5;129m YX \x1b[38;5;129m AAA  \x1b[0m",
+			expected: "\x1b[0m\x1b[0m  \x1b[48;5;160m\x1b[38;5;129m YX \x1b[0m\x1b[38;5;129m AAA  \x1b[0m",
 		},
 		{
 			name:     "Multi-line with colour continuation",
