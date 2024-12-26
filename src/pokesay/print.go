@@ -343,12 +343,25 @@ func ReverseANSIString(line string) string {
 	lines := TokeniseANSIString(line)
 	reversed := ""
 
+	maxWidth := 0
+	widths := make([]int, len(lines))
+	for idx, l := range strings.Split(line, "\n") {
+		ln := UnicodeStringLength(l)
+		if ln > maxWidth {
+			maxWidth = ln
+		}
+		widths[idx] = ln
+	}
+
+	// for i, line := range lines {
+	// 	reversed[i] = strings.Repeat(" ", maxWidth-UnicodeStringLength(line)) + ReverseANSIString(line)
+	// }
+
 	for idx, tokens := range lines {
 		needsReset := false
+		// ensure vertical alignment
+		reversed += strings.Repeat(" ", maxWidth-widths[idx])
 		for i := len(tokens) - 1; i >= 0; i-- {
-			// if idx == 0 && tokens[i].Colour == "\033[0m" {
-			// 	continue
-			// }
 			if tokens[i].Colour != "" {
 				needsReset = true
 			}
@@ -365,23 +378,6 @@ func ReverseANSIString(line string) string {
 		reversed += "\n"
 	}
 
-	return reversed
-}
-
-func ReverseANSIStrings(lines []string) []string {
-	reversed := make([]string, len(lines))
-
-	maxWidth := 0
-	for _, line := range lines {
-		l := UnicodeStringLength(line)
-		if l > maxWidth {
-			maxWidth = l
-		}
-	}
-
-	for i, line := range lines {
-		reversed[i] = strings.Repeat(" ", maxWidth-UnicodeStringLength(line)) + ReverseANSIString(line)
-	}
 	return reversed
 }
 
