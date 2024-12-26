@@ -330,7 +330,9 @@ func TokeniseANSIString(msg string) [][]ANSILineToken {
 		if text != "" {
 			tokens = append(tokens, ANSILineToken{bg + fg, text})
 		}
-		tokens = append(tokens, ANSILineToken{"\033[0m", ""})
+		if (colour != "") && len(tokens) > 0 {
+			tokens = append(tokens, ANSILineToken{"\033[0m", ""})
+		}
 		lines = append(lines, tokens)
 		tokens = nil
 	}
@@ -341,17 +343,26 @@ func ReverseANSIString(line string) string {
 	lines := TokeniseANSIString(line)
 	reversed := ""
 
-	for _, tokens := range lines {
+	for idx, tokens := range lines {
+		needsReset := false
 		for i := len(tokens) - 1; i >= 0; i-- {
-			if tokens[i].Colour != "\033[0m" && (i < len(tokens)-1 && tokens[i+1].Colour != "\033[0m") {
-				reversed += "\033[0m"
-			}
-			if tokens[i].Colour == "\033[49m" && (i < len(tokens)-1 && tokens[i+1].Colour != "\033[0m") {
-				reversed += "\033[49m"
+			// if idx == 0 && tokens[i].Colour == "\033[0m" {
+			// 	continue
+			// }
+			if tokens[i].Colour != "" {
+				needsReset = true
 			}
 			reversed += tokens[i].Colour + ReverseUnicodeString(tokens[i].Text)
 		}
-		reversed += "\033[0m\n"
+		if needsReset {
+			reversed += "\033[0m"
+		}
+		if idx < len(lines)-1 {
+			reversed += "\n"
+		}
+	}
+	if line[len(line)-1] == '\n' {
+		reversed += "\n"
 	}
 
 	return reversed

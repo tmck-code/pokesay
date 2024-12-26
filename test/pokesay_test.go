@@ -158,7 +158,7 @@ func TestFlipHorizontalLine(test *testing.T) {
 
 	// The AAA should still have a purple fg
 	// The XX should still have a red bg
-	expected := "\x1b[0m\x1b[48;5;160m\x1b[38;5;129m YX \x1b[0m\x1b[38;5;129m AAA\x1b[0m"
+	expected := "\x1b[0m\x1b[48;5;160m\x1b[38;5;129m YX \x1b[38;5;129m AAA\x1b[0m"
 	result := pokesay.ReverseANSIString(line)
 
 	Assert(expected, result, test)
@@ -166,8 +166,10 @@ func TestFlipHorizontalLine(test *testing.T) {
 
 func TestTokeniseANSIStringWithNoColour(test *testing.T) {
 	msg := "         ▄▄          ▄▄"
-	expected := []pokesay.ANSILineToken{
-		pokesay.ANSILineToken{Colour: "", Text: "         ▄▄          ▄▄"},
+	expected := [][]pokesay.ANSILineToken{
+		{
+			pokesay.ANSILineToken{Colour: "", Text: "         ▄▄          ▄▄"},
+		},
 	}
 	result := pokesay.TokeniseANSIString(msg)
 	Assert(expected, result, test)
@@ -221,17 +223,20 @@ func TestFlipHorizontalWithColourContinuation(test *testing.T) {
 		"▄ \x1b[38;5;190m▄",
 	}
 
-	result := pokesay.ReverseANSIStrings(msg)
+	result := pokesay.ReverseANSIString(strings.Join(msg, "\n"))
 
-	expected := []string{
-		"\x1b[38;5;46m▄ \x1b[38;5;160m▄",
-		"\x1b[38;5;190m▄ \x1b[38;5;46m▄",
-	}
+	expected := strings.Join(
+		[]string{
+			"\x1b[0m\x1b[38;5;46m▄\x1b[38;5;160m ▄\x1b[0m",
+			"\x1b[0m\x1b[38;5;190m▄\x1b[38;5;46m ▄\x1b[0m",
+		},
+		"\n",
+	)
 
 	data := map[string]string{
 		"msg":      strings.Join(msg, "\n"),
-		"expected": strings.Join(expected, "\n"),
-		"result":   strings.Join(result, "\n"),
+		"expected": expected,
+		"result":   result,
 	}
 
 	for msg, d := range data {
@@ -255,7 +260,7 @@ func TestFlipHorizontal(test *testing.T) {
 		"             ▀▀\x1b[48;5;214m▄\x1b[49m▀\x1b[39m\x1b[39m",
 	}
 	fmt.Println("msg:", msg)
-	results := pokesay.ReverseANSIStrings(msg)
+	results := pokesay.ReverseANSIString(strings.Join(msg, "\n"))
 
 	expected := []string{
 		"  \x1b[38;5;16m▄▄\x1b[0m         \x1b[0m\x1b[48;5;16m\x1b[38;5;232m ▄\x1b[0m\x1b[38;5;16m▄\x1b[0m     \x1b[0m    ",
@@ -275,11 +280,12 @@ func TestFlipHorizontal(test *testing.T) {
 	for i, line := range expected {
 		fmt.Println("expected:", i, line)
 	}
-	for i, line := range results {
+	splitResults := strings.Split(results, "\n")
+	for i, line := range splitResults {
 		fmt.Println("results:", i, line)
 	}
 	for i := 0; i < len(expected); i++ {
-		Assert(expected[i], results[i], test)
+		Assert(expected[i], splitResults[i], test)
 	}
 	Assert(expected, results, test)
 }
