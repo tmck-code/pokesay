@@ -123,7 +123,7 @@ func TestUnicodeStringLength(test *testing.T) {
 
 // Test ANSI tokenisation ------------------------------------------------------
 
-func TestTokeniseANSIString(test *testing.T) {
+func TestUnicodeTokenise(test *testing.T) {
 	testCases := []struct {
 		name     string
 		input    string
@@ -138,14 +138,64 @@ func TestTokeniseANSIString(test *testing.T) {
 				},
 			},
 		},
+	}
+	for _, tc := range testCases {
+		test.Run(tc.name, func(test *testing.T) {
+			result := pokesay.TokeniseANSIString(tc.input)
+			if Debug() {
+				fmt.Printf("input: 	  '%v\x1b[0m'\n", tc.input)
+				fmt.Printf("expected: '%v\x1b[0m'\n", tc.expected)
+				fmt.Printf("result:   '%v\x1b[0m'\n", result)
+			}
+			Assert(tc.expected, result, test)
+		})
+	}
+}
+
+func TestUnicodeReverse(test *testing.T) {
+	testCases := []struct {
+		name     string
+		input    string
+		expected string
+	}{
+		{
+			name:     "Reverse basic ANSI string with no colour",
+			input:    "         ▄▄          ▄▄",
+			expected: "▄▄          ▄▄         ",
+		},
+		{
+			name:     "Reverse basic ANSI string with no colour and trailing spaces",
+			input:    "         ▄▄          ▄▄      ",
+			expected: "      ▄▄          ▄▄         ",
+		},
+	}
+	for _, tc := range testCases {
+		test.Run(tc.name, func(test *testing.T) {
+			result := pokesay.ReverseUnicodeString(tc.input)
+			if Debug() {
+				fmt.Printf("input: 	  '%v\x1b[0m'\n", tc.input)
+				fmt.Printf("expected: '%v\x1b[0m'\n", tc.expected)
+				fmt.Printf("result:   '%v\x1b[0m'\n", result)
+			}
+			Assert(tc.expected, result, test)
+		})
+	}
+}
+
+func TestANSIBasic(test *testing.T) {
+	testCases := []struct {
+		name     string
+		input    string
+		expected [][]pokesay.ANSILineToken
+	}{
 		// purple fg, red bg
 		{
 			name:  "Single line with fg and bg",
-			input: "\x1b[38;5;129mAAA \x1b[48;5;160m XX \x1b[0m",
+			input: "\x1b[38;5;129mAAA\x1b[48;5;160mXX\x1b[0m",
 			expected: [][]pokesay.ANSILineToken{
 				{
-					pokesay.ANSILineToken{FGColour: "\x1b[38;5;129m", BGColour: "", Text: "AAA "},
-					pokesay.ANSILineToken{FGColour: "\x1b[48;5;160m\x1b[38;5;129m", BGColour: "", Text: " XX "},
+					pokesay.ANSILineToken{FGColour: "\x1b[38;5;129m", BGColour: "", Text: "AAA"},
+					pokesay.ANSILineToken{FGColour: "\x1b[38;5;129m", BGColour: "\x1b[48;5;160m", Text: "XX"},
 					pokesay.ANSILineToken{FGColour: "\x1b[0m", BGColour: "", Text: ""},
 				},
 			},
@@ -153,20 +203,40 @@ func TestTokeniseANSIString(test *testing.T) {
 		{
 			name: "Multi-line",
 			// line 1 : purple fg,                  line 2: red bg
-			input: "\x1b[38;5;160m▄ \x1b[38;5;46m▄\n▄ \x1b[38;5;190m▄",
+			input: "\x1b[38;5;160m▄\x1b[38;5;46m▄\n▄\x1b[38;5;190m▄",
 			expected: [][]pokesay.ANSILineToken{
 				{ // Line 1
-					pokesay.ANSILineToken{FGColour: "\x1b[38;5;160m", BGColour: "", Text: "▄ "},
+					pokesay.ANSILineToken{FGColour: "\x1b[38;5;160m", BGColour: "", Text: "▄"},
 					pokesay.ANSILineToken{FGColour: "\x1b[38;5;46m", BGColour: "", Text: "▄"},
 					pokesay.ANSILineToken{FGColour: "\x1b[0m", BGColour: "", Text: ""},
 				},
 				{ // Line 2
-					pokesay.ANSILineToken{FGColour: "\x1b[38;5;46m", BGColour: "", Text: "▄ "},
+					pokesay.ANSILineToken{FGColour: "\x1b[38;5;46m", BGColour: "", Text: "▄"},
 					pokesay.ANSILineToken{FGColour: "\x1b[38;5;190m", BGColour: "", Text: "▄"},
 					pokesay.ANSILineToken{FGColour: "\x1b[0m", BGColour: "", Text: ""},
 				},
 			},
 		},
+	}
+	for _, tc := range testCases {
+		test.Run(tc.name, func(test *testing.T) {
+			result := pokesay.TokeniseANSIString(tc.input)
+			if Debug() {
+				fmt.Printf("input: 	  '%v\x1b[0m'\n", tc.input)
+				fmt.Printf("expected: '%v\x1b[0m'\n", tc.expected)
+				fmt.Printf("result:   '%v\x1b[0m'\n", result)
+			}
+			Assert(tc.expected, result, test)
+		})
+	}
+}
+
+func TestANSIWithSpaces(test *testing.T) {
+	testCases := []struct {
+		name     string
+		input    string
+		expected [][]pokesay.ANSILineToken
+	}{
 		{
 			name: "Multi-line with trailing spaces",
 			// The AAA has a purple fg
@@ -178,7 +248,7 @@ func TestTokeniseANSIString(test *testing.T) {
 				{
 					pokesay.ANSILineToken{FGColour: "", BGColour: "", Text: "  "},
 					pokesay.ANSILineToken{FGColour: "\x1b[38;5;129m", BGColour: "", Text: "AAA "},
-					pokesay.ANSILineToken{FGColour: "\x1b[48;5;160m\x1b[38;5;129m", BGColour: "", Text: " XY "},
+					pokesay.ANSILineToken{FGColour: "\x1b[38;5;129m", BGColour: "\x1b[48;5;160m", Text: " XY "},
 					pokesay.ANSILineToken{FGColour: "\x1b[0m", BGColour: "", Text: "     "},
 					pokesay.ANSILineToken{FGColour: "\x1b[0m", BGColour: "", Text: ""},
 				},
@@ -193,7 +263,7 @@ func TestTokeniseANSIString(test *testing.T) {
 			expected: [][]pokesay.ANSILineToken{
 				{
 					pokesay.ANSILineToken{FGColour: "\x1b[38;5;129m", Text: "AAA    "},
-					pokesay.ANSILineToken{FGColour: "\x1b[48;5;160m", BGColour: "\x1b[38;5;129m", Text: " XX "},
+					pokesay.ANSILineToken{FGColour: "\x1b[38;5;129m", BGColour: "\x1b[48;5;160m", Text: " XX "},
 					pokesay.ANSILineToken{FGColour: "\x1b[0m", BGColour: "", Text: ""},
 				},
 			},
@@ -224,16 +294,6 @@ func TestReverseANSIString(test *testing.T) {
 		input    string
 		expected string
 	}{
-		{
-			name:     "Reverse basic ANSI string with no colour",
-			input:    "         ▄▄          ▄▄",
-			expected: "▄▄          ▄▄         ",
-		},
-		{
-			name:     "Reverse basic ANSI string with no colour and trailing spaces",
-			input:    "         ▄▄          ▄▄      ",
-			expected: "      ▄▄          ▄▄         ",
-		},
 		{
 			name: "Single line with ANSI colours",
 			// The AAA has a purple fg, and the XX has a red bg
