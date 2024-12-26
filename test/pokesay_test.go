@@ -118,6 +118,7 @@ func TestUnicodeStringLength(test *testing.T) {
 }
 
 func TestTokeniseANSIString(test *testing.T) {
+	// purple fg, red bg
 	line := "\x1b[38;5;129mAAA \x1b[48;5;160m XX \x1b[0m"
 
 	expected := [][]pokesay.ANSILineToken{
@@ -174,6 +175,20 @@ func TestTokeniseANSILineWithTrailingSpaces(test *testing.T) {
 	Assert(expected, result, test)
 }
 
+func TestTokeniseANSIStringWithBG(test *testing.T) {
+	// purple fg, red bg
+	// the 4 spaces after AAA should have a purple fg, and no bg
+	line := "\x1b[38;5;129mAAA    \x1b[48;5;160m XX \x1b[0m"
+
+	expected := "\x1b[0m\x1b[48;5;160m\x1b[38;5;129m XX \x1b[38;5;129m\x1b[49m    AAA\x1b[0m"
+	result := pokesay.TokeniseANSIString(line)
+
+	fmt.Printf("expected: %#v\n", expected)
+	fmt.Printf("result:   %#v\n", result)
+
+	Assert(expected, result, test)
+}
+
 func TestFlipHorizontalLine(test *testing.T) {
 	// The AAA has a purple fg
 	// The XX has a red bg
@@ -183,6 +198,20 @@ func TestFlipHorizontalLine(test *testing.T) {
 	// The XX should still have a red bg
 	expected := "\x1b[0m\x1b[48;5;160m\x1b[38;5;129m YX \x1b[38;5;129m AAA\x1b[0m"
 	result := pokesay.ReverseANSIString(line)
+
+	Assert(expected, result, test)
+}
+
+func TestReverseANSIStringWithBG(test *testing.T) {
+	// purple fg, red bg
+	// the 4 spaces after AAA should have a purple fg, and no bg
+	line := "\x1b[38;5;129mAAA    \x1b[48;5;160m XX \x1b[0m"
+
+	expected := "\x1b[0m\x1b[48;5;160m\x1b[38;5;129m XX \x1b[38;5;129m\x1b[49m    AAA\x1b[0m"
+	result := pokesay.ReverseANSIString(line)
+
+	fmt.Printf("expected: %#v\n", expected)
+	fmt.Printf("result:   %#v\n", result)
 
 	Assert(expected, result, test)
 }

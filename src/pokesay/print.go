@@ -233,70 +233,13 @@ type ANSILineToken struct {
 	Text   string
 }
 
-// func TokeniseANSIString(line string) [][]ANSILineToken {
-// 	var inAnsiCode bool
-// 	lines := make([][]ANSILineToken, 0)
-
-// 	currentColour := ""
-// 	currentForeground := ""
-// 	currentBackground := ""
-
-// 	for i, line := range strings.Split(line, "\n") {
-// 		currentText := ""
-// 		tokens := make([]ANSILineToken, 0)
-
-// 		for _, r := range line {
-// 			if r == '\x1b' {
-// 				if currentText != "" {
-// 					if currentColour == "\033[0m" || currentColour == "\033[49m" {
-// 						tokens = append(tokens, ANSILineToken{currentColour, currentText})
-// 					} else {
-// 						tokens = append(tokens, ANSILineToken{currentBackground + currentForeground, currentText})
-// 					}
-// 					currentColour = ""
-// 					currentText = ""
-// 				}
-// 				if i < len(line)-1 && line[i+1] == '[' {
-// 					inAnsiCode = true
-// 					currentColour = "\x1b"
-// 				}
-// 				continue
-// 			}
-// 			if inAnsiCode {
-// 				currentColour += string(r)
-// 				if r == 'm' {
-// 					inAnsiCode = false
-// 					if strings.Contains(currentColour, "38;5;") {
-// 						currentForeground = currentColour
-// 					} else if strings.Contains(currentColour, "48;5;") {
-// 						currentBackground = currentColour
-// 					} else {
-// 						currentForeground = currentColour
-// 						currentBackground = ""
-// 					}
-// 				}
-// 			} else {
-// 				currentText += string(r)
-// 			}
-// 		}
-// 		if len(currentText) > 0 {
-// 			tokens = append(tokens, ANSILineToken{currentBackground + currentForeground, currentText})
-// 		}
-// 		tokens = append(tokens, ANSILineToken{"\033[0m", ""})
-// 		lines = append(lines, tokens)
-// 	}
-// 	return lines
-// }
-
 func TokeniseANSIString(msg string) [][]ANSILineToken {
 	var isColour bool
 	var colour string
 	var fg string
 	var bg string
 
-	// var tokens []string
 	var tokens []ANSILineToken
-	// var lines [][]string
 	var lines [][]ANSILineToken
 	for _, line := range strings.Split(msg, "\n") {
 		var text string
@@ -353,10 +296,6 @@ func ReverseANSIString(line string) string {
 		widths[idx] = ln
 	}
 
-	// for i, line := range lines {
-	// 	reversed[i] = strings.Repeat(" ", maxWidth-UnicodeStringLength(line)) + ReverseANSIString(line)
-	// }
-
 	for idx, tokens := range lines {
 		needsReset := false
 		// ensure vertical alignment
@@ -377,7 +316,6 @@ func ReverseANSIString(line string) string {
 	if line[len(line)-1] == '\n' {
 		reversed += "\n"
 	}
-
 	return reversed
 }
 
