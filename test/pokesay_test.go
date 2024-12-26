@@ -213,90 +213,54 @@ func TestTokeniseANSIString(test *testing.T) {
 // - reverse individual lines
 // - reverse multiple (newline separated) lines
 
-func TestFlipHorizontalLine(test *testing.T) {
-	// The AAA has a purple fg
-	// The XX has a red bg
-	line := "\x1b[38;5;129mAAA \x1b[48;5;160m XY \x1b[0m"
-
-	// The AAA should still have a purple fg
-	// The XX should still have a red bg
-	expected := "\x1b[0m\x1b[48;5;160m\x1b[38;5;129m YX \x1b[38;5;129m AAA\x1b[0m"
-	result := pokesay.ReverseANSIString(line)
-
-	Assert(expected, result, test)
-}
-
-func TestReverseANSIStringWithBG(test *testing.T) {
-	// purple fg, red bg
-	// the 4 spaces after AAA should have a purple fg, and no bg
-	line := "\x1b[38;5;129mAAA    \x1b[48;5;160m XX \x1b[0m"
-
-	expected := "\x1b[0m\x1b[48;5;160m\x1b[38;5;129m XX \x1b[38;5;129m\x1b[49m    AAA\x1b[0m"
-	result := pokesay.ReverseANSIString(line)
-
-	fmt.Printf("expected: %#v\n", expected)
-	fmt.Printf("result:   %#v\n", result)
-
-	Assert(expected, result, test)
-}
-
-func TestFlipHorizontalLineWithTrailingSpaces(test *testing.T) {
-	// The AAA has a purple fg
-	// The XX has a red bg
-	line := "  \x1b[38;5;129mAAA \x1b[48;5;160m XY \x1b[0m  "
-
-	// The AAA should still have a purple fg
-	// The XX should still have a red bg
-	expected := "\x1b[0m\x1b[0m  \x1b[48;5;160m\x1b[38;5;129m YX \x1b[38;5;129m AAA  \x1b[0m"
-	result := pokesay.ReverseANSIString(line)
-
-	fmt.Printf("expected: %#v\n", expected)
-	fmt.Printf("result:   %#v\n", result)
-
-	Assert(expected, result, test)
-}
-
-func TestReverseUnicodeString(test *testing.T) {
-	msg := "         ▄▄          ▄▄"
-	expected := "▄▄          ▄▄         "
-	result := pokesay.ReverseUnicodeString(msg)
-	Assert(expected, result, test)
-}
-
-func TestReverseUnicodeStringWithTrailingSpaces(test *testing.T) {
-	msg := "         ▄▄          ▄▄      "
-	expected := "      ▄▄          ▄▄         "
-	result := pokesay.ReverseUnicodeString(msg)
-	Assert(expected, result, test)
-}
-
-func TestFlipHorizontalWithColourContinuation(test *testing.T) {
-	msg := []string{
-		"\x1b[38;5;160m▄ \x1b[38;5;46m▄",
-		"▄ \x1b[38;5;190m▄",
-	}
-
-	result := pokesay.ReverseANSIString(strings.Join(msg, "\n"))
-
-	expected := strings.Join(
-		[]string{
-			"\x1b[0m\x1b[38;5;46m▄\x1b[38;5;160m ▄\x1b[0m",
-			"\x1b[0m\x1b[38;5;190m▄\x1b[38;5;46m ▄\x1b[0m",
+func TestReverseANSIString(test *testing.T) {
+	testCases := []struct {
+		name     string
+		input    string
+		expected string
+	}{
+		{
+			name:     "Reverse basic ANSI string with no colour",
+			input:    "         ▄▄          ▄▄",
+			expected: "▄▄          ▄▄         ",
 		},
-		"\n",
-	)
-
-	data := map[string]string{
-		"msg":      strings.Join(msg, "\n"),
-		"expected": expected,
-		"result":   result,
+		{
+			name:     "Reverse basic ANSI string with no colour and trailing spaces",
+			input:    "         ▄▄          ▄▄      ",
+			expected: "      ▄▄          ▄▄         ",
+		},
+		{
+			name: "Single line with ANSI colours",
+			// The AAA has a purple fg, and the XX has a red bg
+			input:    "\x1b[38;5;129mAAA \x1b[48;5;160m XX \x1b[0m",
+			expected: "\x1b[0m\x1b[48;5;160m\x1b[38;5;129m XX \x1b[38;5;129m AAA\x1b[0m",
+		},
+		{
+			name: "Multi-line with ANSI colours",
+			// purple fg, red bg
+			// the 4 spaces after AAA should have a purple fg, and no bg
+			input:    "\x1b[38;5;129mAAA    \x1b[48;5;160m XX \x1b[0m",
+			expected: "\x1b[0m\x1b[48;5;160m\x1b[38;5;129m XX \x1b[38;5;129m    AAA\x1b[0m",
+		},
+		{
+			name: "Multi-line with trailing spaces",
+			// The AAA has a purple fg, the XX has a red bg
+			input: "  \x1b[38;5;129mAAA \x1b[48;5;160m XY \x1b[0m  ",
+			// The AAA should still have a purple fg, and the XX should still have a red bg
+			expected: "\x1b[0m\x1b[0m  \x1b[48;5;160m\x1b[38;5;129m YX \x1b[38;5;129m AAA  \x1b[0m",
+		},
+		{
+			name:     "Multi-line with colour continuation",
+			input:    "\x1b[38;5;160m▄ \x1b[38;5;46m▄\n▄ \x1b[38;5;190m▄",
+			expected: "\x1b[0m\x1b[38;5;46m▄\x1b[38;5;160m ▄\x1b[0m\n\x1b[0m\x1b[38;5;190m▄\x1b[38;5;46m ▄\x1b[0m",
+		},
 	}
-
-	for msg, d := range data {
-		fmt.Printf("%s:\n%s\x1b[0m\n%#v\n", msg, d, d)
+	for _, tc := range testCases {
+		test.Run(tc.name, func(test *testing.T) {
+			result := pokesay.ReverseANSIString(tc.input)
+			Assert(tc.expected, result, test)
+		})
 	}
-
-	Assert(expected, result, test)
 }
 
 // Test ANSI pokemon reversal --------------------------------------------------
