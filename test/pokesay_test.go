@@ -19,6 +19,8 @@ var (
 	GOBCategories embed.FS
 )
 
+// Test pokemon selection algorithms -------------------------------------------
+
 func TestChooseByName(test *testing.T) {
 	names := make(map[string][]int)
 	names["hoothoot"] = []int{4}
@@ -100,6 +102,8 @@ func TestChooseByRandomIndex(test *testing.T) {
 	Assert(9 >= result, true, test)
 }
 
+// Test unicode helpers --------------------------------------------------------
+
 func TestUnicodeStringLength(test *testing.T) {
 	msg := []string{
 		" ▄  █ ▄███▄   █    █    ████▄       ▄ ▄   ████▄ █▄▄▄▄ █     ██▄",   // 63
@@ -117,6 +121,8 @@ func TestUnicodeStringLength(test *testing.T) {
 	Assert(expected, results, test)
 }
 
+// Test ANSI tokenisation ------------------------------------------------------
+
 func TestTokeniseANSIString(test *testing.T) {
 	// purple fg, red bg
 	line := "\x1b[38;5;129mAAA \x1b[48;5;160m XX \x1b[0m"
@@ -133,6 +139,7 @@ func TestTokeniseANSIString(test *testing.T) {
 }
 
 func TestTokeniseANSIStringLines(test *testing.T) {
+	// line 1 : purple fg,                  line 2: red bg
 	msg := "\x1b[38;5;160m▄ \x1b[38;5;46m▄\n▄ \x1b[38;5;190m▄"
 
 	expected := [][]pokesay.ANSILineToken{
@@ -188,6 +195,12 @@ func TestTokeniseANSIStringWithBG(test *testing.T) {
 
 	Assert(expected, result, test)
 }
+
+// Test ANSI line reversal -----------------------------------------------------
+//
+// These are smaller "unit" tests for ANSI line reversal.
+// - reverse individual lines
+// - reverse multiple (newline separated) lines
 
 func TestFlipHorizontalLine(test *testing.T) {
 	// The AAA has a purple fg
@@ -257,6 +270,40 @@ func TestReverseUnicodeStringWithTrailingSpaces(test *testing.T) {
 	Assert(expected, result, test)
 }
 
+func TestFlipHorizontalWithColourContinuation(test *testing.T) {
+	msg := []string{
+		"\x1b[38;5;160m▄ \x1b[38;5;46m▄",
+		"▄ \x1b[38;5;190m▄",
+	}
+
+	result := pokesay.ReverseANSIString(strings.Join(msg, "\n"))
+
+	expected := strings.Join(
+		[]string{
+			"\x1b[0m\x1b[38;5;46m▄\x1b[38;5;160m ▄\x1b[0m",
+			"\x1b[0m\x1b[38;5;190m▄\x1b[38;5;46m ▄\x1b[0m",
+		},
+		"\n",
+	)
+
+	data := map[string]string{
+		"msg":      strings.Join(msg, "\n"),
+		"expected": expected,
+		"result":   result,
+	}
+
+	for msg, d := range data {
+		fmt.Printf("%s:\n%s\x1b[0m\n%#v\n", msg, d, d)
+	}
+
+	Assert(expected, result, test)
+}
+
+// Test ANSI pokemon reversal --------------------------------------------------
+//
+// These are larger "integration" tests for reversing ANSI strings.
+// - reverse pokemon sprite (with & without ANSI colours)
+
 func TestFlipHorizontalWithoutColour(test *testing.T) {
 	msg := []string{
 		"         ▄▄          ▄▄",
@@ -291,35 +338,6 @@ func TestFlipHorizontalWithoutColour(test *testing.T) {
 	}
 
 	Assert(strings.Join(expected, "\n"), results, test)
-}
-
-func TestFlipHorizontalWithColourContinuation(test *testing.T) {
-	msg := []string{
-		"\x1b[38;5;160m▄ \x1b[38;5;46m▄",
-		"▄ \x1b[38;5;190m▄",
-	}
-
-	result := pokesay.ReverseANSIString(strings.Join(msg, "\n"))
-
-	expected := strings.Join(
-		[]string{
-			"\x1b[0m\x1b[38;5;46m▄\x1b[38;5;160m ▄\x1b[0m",
-			"\x1b[0m\x1b[38;5;190m▄\x1b[38;5;46m ▄\x1b[0m",
-		},
-		"\n",
-	)
-
-	data := map[string]string{
-		"msg":      strings.Join(msg, "\n"),
-		"expected": expected,
-		"result":   result,
-	}
-
-	for msg, d := range data {
-		fmt.Printf("%s:\n%s\x1b[0m\n%#v\n", msg, d, d)
-	}
-
-	Assert(expected, result, test)
 }
 
 func TestFlipHorizontal(test *testing.T) {
