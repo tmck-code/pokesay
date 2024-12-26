@@ -258,6 +258,12 @@ func TestReverseANSIString(test *testing.T) {
 	for _, tc := range testCases {
 		test.Run(tc.name, func(test *testing.T) {
 			result := pokesay.ReverseANSIString(tc.input)
+
+			if Debug() {
+				fmt.Println("expected:", tc.expected)
+				fmt.Println("result:", result)
+			}
+
 			Assert(tc.expected, result, test)
 		})
 	}

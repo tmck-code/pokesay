@@ -13,10 +13,10 @@ var (
 	failMark    = "❌"
 )
 
-// Checks if the test is running in debug mode, i.e. has been run with the ENV var DEBUG=true.
+// Checks if the test is running in Debug mode, i.e. has been run with the ENV var DEBUG=true.
 // To do this, either first run `export DEBUG=true`, and then run the test command,
 // or do it all at once with `DEBUG=true go test -v ./test“
-func debug() bool {
+func Debug() bool {
 	return os.Getenv("DEBUG") == "true"
 }
 
@@ -32,7 +32,7 @@ func Fail(expected interface{}, result interface{}, test *testing.T) {
 func Assert(expected interface{}, result interface{}, test *testing.T) {
 	expectedString, resultString := fmt.Sprintf("%#v", expected), fmt.Sprintf("%#v", result)
 	if expectedString == resultString {
-		if debug() {
+		if Debug() {
 			fmt.Printf("\x1b[38;5;46m%s items match!\x1b[0m\n> expected:\t%s\x1b[0m\n>   result:\t%s\x1b[0m\n", successMark, expected, result)
 		}
 		return
@@ -47,7 +47,7 @@ func Assert(expected interface{}, result interface{}, test *testing.T) {
 func AssertContains[T any](slice []T, item T, test *testing.T) {
 	for _, el := range slice {
 		if reflect.DeepEqual(el, item) {
-			if debug() {
+			if Debug() {
 				fmt.Printf("%s found expected item!\n>  item:\t%v\n> slice:\t%v\n", successMark, item, slice)
 			}
 			return
