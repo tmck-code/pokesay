@@ -233,57 +233,106 @@ type ANSILineToken struct {
 	Text   string
 }
 
-func TokeniseANSIString(line string) [][]ANSILineToken {
-	var inAnsiCode bool
-	lines := make([][]ANSILineToken, 0)
+// func TokeniseANSIString(line string) [][]ANSILineToken {
+// 	var inAnsiCode bool
+// 	lines := make([][]ANSILineToken, 0)
 
-	currentColour := ""
-	currentForeground := ""
-	currentBackground := ""
+// 	currentColour := ""
+// 	currentForeground := ""
+// 	currentBackground := ""
 
-	for i, line := range strings.Split(line, "\n") {
-		currentText := ""
-		tokens := make([]ANSILineToken, 0)
+// 	for i, line := range strings.Split(line, "\n") {
+// 		currentText := ""
+// 		tokens := make([]ANSILineToken, 0)
 
-		for _, r := range line {
-			if r == '\x1b' {
-				if currentText != "" {
-					if currentColour == "\033[0m" || currentColour == "\033[49m" {
-						tokens = append(tokens, ANSILineToken{currentColour, currentText})
-					} else {
-						tokens = append(tokens, ANSILineToken{currentBackground + currentForeground, currentText})
-					}
-					currentColour = ""
-					currentText = ""
+// 		for _, r := range line {
+// 			if r == '\x1b' {
+// 				if currentText != "" {
+// 					if currentColour == "\033[0m" || currentColour == "\033[49m" {
+// 						tokens = append(tokens, ANSILineToken{currentColour, currentText})
+// 					} else {
+// 						tokens = append(tokens, ANSILineToken{currentBackground + currentForeground, currentText})
+// 					}
+// 					currentColour = ""
+// 					currentText = ""
+// 				}
+// 				if i < len(line)-1 && line[i+1] == '[' {
+// 					inAnsiCode = true
+// 					currentColour = "\x1b"
+// 				}
+// 				continue
+// 			}
+// 			if inAnsiCode {
+// 				currentColour += string(r)
+// 				if r == 'm' {
+// 					inAnsiCode = false
+// 					if strings.Contains(currentColour, "38;5;") {
+// 						currentForeground = currentColour
+// 					} else if strings.Contains(currentColour, "48;5;") {
+// 						currentBackground = currentColour
+// 					} else {
+// 						currentForeground = currentColour
+// 						currentBackground = ""
+// 					}
+// 				}
+// 			} else {
+// 				currentText += string(r)
+// 			}
+// 		}
+// 		if len(currentText) > 0 {
+// 			tokens = append(tokens, ANSILineToken{currentBackground + currentForeground, currentText})
+// 		}
+// 		tokens = append(tokens, ANSILineToken{"\033[0m", ""})
+// 		lines = append(lines, tokens)
+// 	}
+// 	return lines
+// }
+
+func TokeniseANSIString(msg string) [][]ANSILineToken {
+	var isColour bool
+	var colour string
+	var fg string
+	var bg string
+
+	// var tokens []string
+	var tokens []ANSILineToken
+	// var lines [][]string
+	var lines [][]ANSILineToken
+	for _, line := range strings.Split(msg, "\n") {
+		var text string
+
+		for _, ch := range line {
+			if ch == '\033' {
+				if text != "" {
+					tokens = append(tokens, ANSILineToken{bg + fg, text})
+					colour = ""
+					text = ""
 				}
-				if i < len(line)-1 && line[i+1] == '[' {
-					inAnsiCode = true
-					currentColour = "\x1b"
-				}
-				continue
-			}
-			if inAnsiCode {
-				currentColour += string(r)
-				if r == 'm' {
-					inAnsiCode = false
-					if strings.Contains(currentColour, "38;5;") {
-						currentForeground = currentColour
-					} else if strings.Contains(currentColour, "48;5;") {
-						currentBackground = currentColour
+				isColour = true
+				colour = string(ch)
+			} else if isColour {
+				colour += string(ch)
+				if ch == 'm' {
+					isColour = false
+					if strings.Contains(colour, "38;5;") {
+						fg = colour
+					} else if strings.Contains(colour, "48;5;") {
+						bg = colour
 					} else {
-						currentForeground = currentColour
-						currentBackground = ""
+						fg = colour
+						bg = ""
 					}
 				}
 			} else {
-				currentText += string(r)
+				text += string(ch)
 			}
 		}
-		if len(currentText) > 0 {
-			tokens = append(tokens, ANSILineToken{currentBackground + currentForeground, currentText})
+		if text != "" {
+			tokens = append(tokens, ANSILineToken{bg + fg, text})
 		}
 		tokens = append(tokens, ANSILineToken{"\033[0m", ""})
 		lines = append(lines, tokens)
+		tokens = nil
 	}
 	return lines
 }

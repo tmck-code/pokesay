@@ -118,25 +118,47 @@ func TestUnicodeStringLength(test *testing.T) {
 }
 
 func TestTokeniseANSIString(test *testing.T) {
-	line := "[38;5;129mAAA [48;5;160m XX [0m"
+	line := "\x1b[38;5;129mAAA \x1b[48;5;160m XX \x1b[0m"
 
-	expected := []pokesay.ANSILineToken{
-		pokesay.ANSILineToken{Colour: "[38;5;129m", Text: "AAA "},
-		pokesay.ANSILineToken{Colour: "[48;5;160m[38;5;129m", Text: " XX "},
-		pokesay.ANSILineToken{Colour: "[0m", Text: ""},
+	expected := [][]pokesay.ANSILineToken{
+		{
+			pokesay.ANSILineToken{Colour: "\x1b[38;5;129m", Text: "AAA "},
+			pokesay.ANSILineToken{Colour: "\x1b[48;5;160m\x1b[38;5;129m", Text: " XX "},
+			pokesay.ANSILineToken{Colour: "\x1b[0m", Text: ""},
+		},
 	}
 	result := pokesay.TokeniseANSIString(line)
 	Assert(expected, result, test)
 }
 
+func TestTokeniseANSIStringLines(test *testing.T) {
+	msg := "\x1b[38;5;160m▄ \x1b[38;5;46m▄\n▄ \x1b[38;5;190m▄"
+
+	expected := [][]pokesay.ANSILineToken{
+		{ // Line 1
+			pokesay.ANSILineToken{Colour: "\x1b[38;5;160m", Text: "▄ "},
+			pokesay.ANSILineToken{Colour: "\x1b[38;5;46m", Text: "▄"},
+			pokesay.ANSILineToken{Colour: "\x1b[0m", Text: ""},
+		},
+		{ // Line 2
+			pokesay.ANSILineToken{Colour: "\x1b[38;5;46m", Text: "▄ "},
+			pokesay.ANSILineToken{Colour: "\x1b[38;5;190m", Text: "▄"},
+			pokesay.ANSILineToken{Colour: "\x1b[0m", Text: ""},
+		},
+	}
+	result := pokesay.TokeniseANSIString(msg)
+	Assert(expected, result, test)
+
+}
+
 func TestFlipHorizontalLine(test *testing.T) {
 	// The AAA has a purple fg
 	// The XX has a red bg
-	line := "[38;5;129mAAA [48;5;160m XY [0m"
+	line := "\x1b[38;5;129mAAA \x1b[48;5;160m XY \x1b[0m"
 
 	// The AAA should still have a purple fg
 	// The XX should still have a red bg
-	expected := "[0m[48;5;160m\x1b[38;5;129m YX \033[0m[38;5;129m AAA"
+	expected := "\x1b[0m\x1b[48;5;160m\x1b[38;5;129m YX \x1b[0m\x1b[38;5;129m AAA\x1b[0m"
 	result := pokesay.ReverseANSIString(line)
 
 	Assert(expected, result, test)
