@@ -229,8 +229,9 @@ func ReverseUnicodeString(s string) string {
 }
 
 type ANSILineToken struct {
-	Colour string
-	Text   string
+	FGColour string
+	BGColour string
+	Text     string
 }
 
 func TokeniseANSIString(msg string) [][]ANSILineToken {
@@ -247,7 +248,7 @@ func TokeniseANSIString(msg string) [][]ANSILineToken {
 		for _, ch := range line {
 			if ch == '\033' {
 				if text != "" {
-					tokens = append(tokens, ANSILineToken{bg + fg, text})
+					tokens = append(tokens, ANSILineToken{fg, bg, text})
 					colour = ""
 					text = ""
 				}
@@ -271,10 +272,10 @@ func TokeniseANSIString(msg string) [][]ANSILineToken {
 			}
 		}
 		if text != "" {
-			tokens = append(tokens, ANSILineToken{bg + fg, text})
+			tokens = append(tokens, ANSILineToken{fg, bg, text})
 		}
 		if (colour != "") && len(tokens) > 0 {
-			tokens = append(tokens, ANSILineToken{"\033[0m", ""})
+			tokens = append(tokens, ANSILineToken{"\033[0m", "", ""})
 		}
 		lines = append(lines, tokens)
 		tokens = nil
@@ -297,18 +298,18 @@ func ReverseANSIString(line string) string {
 	}
 
 	for idx, tokens := range lines {
-		needsReset := false
+		// needsReset := false
 		// ensure vertical alignment
 		reversed += strings.Repeat(" ", maxWidth-widths[idx])
 		for i := len(tokens) - 1; i >= 0; i-- {
-			if tokens[i].Colour != "" {
-				needsReset = true
-			}
-			reversed += tokens[i].Colour + ReverseUnicodeString(tokens[i].Text)
+			// if tokens[i].BGColour != "" {
+			// 	needsReset = true
+			// }
+			reversed += tokens[i].FGColour + tokens[i].BGColour + ReverseUnicodeString(tokens[i].Text)
 		}
-		if needsReset {
-			reversed += "\033[0m"
-		}
+		// if needsReset {
+		// 	reversed += "\033[0m"
+		// }
 		if idx < len(lines)-1 {
 			reversed += "\n"
 		}

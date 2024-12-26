@@ -33,7 +33,7 @@ func Assert(expected interface{}, result interface{}, test *testing.T) {
 	expectedString, resultString := fmt.Sprintf("%#v", expected), fmt.Sprintf("%#v", result)
 	if expectedString == resultString {
 		if Debug() {
-			fmt.Printf("\x1b[38;5;46m%s items match!\x1b[0m\n> expected:\t%s\x1b[0m\n>   result:\t%s\x1b[0m\n", successMark, expected, result)
+			fmt.Printf("\x1b[38;5;46m%s items match!\x1b[0m\n> expected:\t%#v\x1b[0m\n>   result:\t%#v\x1b[0m\n", successMark, expected, result)
 		}
 		return
 	}

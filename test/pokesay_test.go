@@ -134,7 +134,7 @@ func TestTokeniseANSIString(test *testing.T) {
 			input: "         ▄▄          ▄▄",
 			expected: [][]pokesay.ANSILineToken{
 				{
-					pokesay.ANSILineToken{Colour: "", Text: "         ▄▄          ▄▄"},
+					pokesay.ANSILineToken{FGColour: "", BGColour: "", Text: "         ▄▄          ▄▄"},
 				},
 			},
 		},
@@ -144,9 +144,9 @@ func TestTokeniseANSIString(test *testing.T) {
 			input: "\x1b[38;5;129mAAA \x1b[48;5;160m XX \x1b[0m",
 			expected: [][]pokesay.ANSILineToken{
 				{
-					pokesay.ANSILineToken{Colour: "\x1b[38;5;129m", Text: "AAA "},
-					pokesay.ANSILineToken{Colour: "\x1b[48;5;160m\x1b[38;5;129m", Text: " XX "},
-					pokesay.ANSILineToken{Colour: "\x1b[0m", Text: ""},
+					pokesay.ANSILineToken{FGColour: "\x1b[38;5;129m", BGColour: "", Text: "AAA "},
+					pokesay.ANSILineToken{FGColour: "\x1b[48;5;160m\x1b[38;5;129m", BGColour: "", Text: " XX "},
+					pokesay.ANSILineToken{FGColour: "\x1b[0m", BGColour: "", Text: ""},
 				},
 			},
 		},
@@ -156,14 +156,14 @@ func TestTokeniseANSIString(test *testing.T) {
 			input: "\x1b[38;5;160m▄ \x1b[38;5;46m▄\n▄ \x1b[38;5;190m▄",
 			expected: [][]pokesay.ANSILineToken{
 				{ // Line 1
-					pokesay.ANSILineToken{Colour: "\x1b[38;5;160m", Text: "▄ "},
-					pokesay.ANSILineToken{Colour: "\x1b[38;5;46m", Text: "▄"},
-					pokesay.ANSILineToken{Colour: "\x1b[0m", Text: ""},
+					pokesay.ANSILineToken{FGColour: "\x1b[38;5;160m", BGColour: "", Text: "▄ "},
+					pokesay.ANSILineToken{FGColour: "\x1b[38;5;46m", BGColour: "", Text: "▄"},
+					pokesay.ANSILineToken{FGColour: "\x1b[0m", BGColour: "", Text: ""},
 				},
 				{ // Line 2
-					pokesay.ANSILineToken{Colour: "\x1b[38;5;46m", Text: "▄ "},
-					pokesay.ANSILineToken{Colour: "\x1b[38;5;190m", Text: "▄"},
-					pokesay.ANSILineToken{Colour: "\x1b[0m", Text: ""},
+					pokesay.ANSILineToken{FGColour: "\x1b[38;5;46m", BGColour: "", Text: "▄ "},
+					pokesay.ANSILineToken{FGColour: "\x1b[38;5;190m", BGColour: "", Text: "▄"},
+					pokesay.ANSILineToken{FGColour: "\x1b[0m", BGColour: "", Text: ""},
 				},
 			},
 		},
@@ -176,11 +176,11 @@ func TestTokeniseANSIString(test *testing.T) {
 			// The XX should still have a red bg
 			expected: [][]pokesay.ANSILineToken{
 				{
-					pokesay.ANSILineToken{Colour: "", Text: "  "},
-					pokesay.ANSILineToken{Colour: "\x1b[38;5;129m", Text: "AAA "},
-					pokesay.ANSILineToken{Colour: "\x1b[48;5;160m\x1b[38;5;129m", Text: " XY "},
-					pokesay.ANSILineToken{Colour: "\x1b[0m", Text: "     "},
-					pokesay.ANSILineToken{Colour: "\x1b[0m", Text: ""},
+					pokesay.ANSILineToken{FGColour: "", BGColour: "", Text: "  "},
+					pokesay.ANSILineToken{FGColour: "\x1b[38;5;129m", BGColour: "", Text: "AAA "},
+					pokesay.ANSILineToken{FGColour: "\x1b[48;5;160m\x1b[38;5;129m", BGColour: "", Text: " XY "},
+					pokesay.ANSILineToken{FGColour: "\x1b[0m", BGColour: "", Text: "     "},
+					pokesay.ANSILineToken{FGColour: "\x1b[0m", BGColour: "", Text: ""},
 				},
 			},
 		},
@@ -192,9 +192,9 @@ func TestTokeniseANSIString(test *testing.T) {
 			// expected := "\x1b[0m\x1b[48;5;160m\x1b[38;5;129m XX \x1b[38;5;129m\x1b[49m    AAA\x1b[0m"
 			expected: [][]pokesay.ANSILineToken{
 				{
-					pokesay.ANSILineToken{Colour: "\x1b[38;5;129m", Text: "AAA    "},
-					pokesay.ANSILineToken{Colour: "\x1b[48;5;160m\x1b[38;5;129m", Text: " XX "},
-					pokesay.ANSILineToken{Colour: "\x1b[0m", Text: ""},
+					pokesay.ANSILineToken{FGColour: "\x1b[38;5;129m", Text: "AAA    "},
+					pokesay.ANSILineToken{FGColour: "\x1b[48;5;160m", BGColour: "\x1b[38;5;129m", Text: " XX "},
+					pokesay.ANSILineToken{FGColour: "\x1b[0m", BGColour: "", Text: ""},
 				},
 			},
 		},
@@ -202,6 +202,11 @@ func TestTokeniseANSIString(test *testing.T) {
 	for _, tc := range testCases {
 		test.Run(tc.name, func(test *testing.T) {
 			result := pokesay.TokeniseANSIString(tc.input)
+			if Debug() {
+				fmt.Printf("input: 	  '%v\x1b[0m'\n", tc.input)
+				fmt.Printf("expected: '%v\x1b[0m'\n", tc.expected)
+				fmt.Printf("result:   '%v\x1b[0m'\n", result)
+			}
 			Assert(tc.expected, result, test)
 		})
 	}
@@ -258,12 +263,11 @@ func TestReverseANSIString(test *testing.T) {
 	for _, tc := range testCases {
 		test.Run(tc.name, func(test *testing.T) {
 			result := pokesay.ReverseANSIString(tc.input)
-
 			if Debug() {
-				fmt.Println("expected:", tc.expected)
-				fmt.Println("result:", result)
+				fmt.Printf("input: 	  '%v\x1b[0m'\n", tc.input)
+				fmt.Printf("expected: '%v\x1b[0m'\n", tc.expected)
+				fmt.Printf("result:   '%v\x1b[0m'\n", result)
 			}
-
 			Assert(tc.expected, result, test)
 		})
 	}
