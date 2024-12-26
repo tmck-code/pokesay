@@ -37,7 +37,7 @@ func parseArgs() CowBuildArgs {
 	json.Unmarshal([]byte(*skipDirs), &args.SkipDirs)
 
 	if DEBUG {
-		fmt.Println("%+v", args)
+		fmt.Printf("%+v\n", args)
 	}
 	return args
 }
