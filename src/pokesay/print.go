@@ -233,84 +233,151 @@ type ANSILineToken struct {
 	Text   string
 }
 
-func TokeniseANSIString(line string) []ANSILineToken {
-	tokens := make([]ANSILineToken, 0)
-	var inAnsiCode bool
+// func TokeniseANSIString(line string) [][]ANSILineToken {
+// 	var inAnsiCode bool
+// 	lines := make([][]ANSILineToken, 0)
 
-	currentColour := ""
-	currentForeground := ""
-	currentBackground := ""
-	currentText := ""
+// 	currentColour := ""
+// 	currentForeground := ""
+// 	currentBackground := ""
 
-	for i, r := range line {
-		if r == '\x1b' {
-			if currentText != "" {
-				if currentColour == "\033[0m" || currentColour == "\033[49m" {
-					tokens = append(tokens, ANSILineToken{currentColour, currentText})
-				} else {
-					tokens = append(tokens, ANSILineToken{currentBackground + currentForeground, currentText})
+// 	for i, line := range strings.Split(line, "\n") {
+// 		currentText := ""
+// 		tokens := make([]ANSILineToken, 0)
+
+// 		for _, r := range line {
+// 			if r == '\x1b' {
+// 				if currentText != "" {
+// 					if currentColour == "\033[0m" || currentColour == "\033[49m" {
+// 						tokens = append(tokens, ANSILineToken{currentColour, currentText})
+// 					} else {
+// 						tokens = append(tokens, ANSILineToken{currentBackground + currentForeground, currentText})
+// 					}
+// 					currentColour = ""
+// 					currentText = ""
+// 				}
+// 				if i < len(line)-1 && line[i+1] == '[' {
+// 					inAnsiCode = true
+// 					currentColour = "\x1b"
+// 				}
+// 				continue
+// 			}
+// 			if inAnsiCode {
+// 				currentColour += string(r)
+// 				if r == 'm' {
+// 					inAnsiCode = false
+// 					if strings.Contains(currentColour, "38;5;") {
+// 						currentForeground = currentColour
+// 					} else if strings.Contains(currentColour, "48;5;") {
+// 						currentBackground = currentColour
+// 					} else {
+// 						currentForeground = currentColour
+// 						currentBackground = ""
+// 					}
+// 				}
+// 			} else {
+// 				currentText += string(r)
+// 			}
+// 		}
+// 		if len(currentText) > 0 {
+// 			tokens = append(tokens, ANSILineToken{currentBackground + currentForeground, currentText})
+// 		}
+// 		tokens = append(tokens, ANSILineToken{"\033[0m", ""})
+// 		lines = append(lines, tokens)
+// 	}
+// 	return lines
+// }
+
+func TokeniseANSIString(msg string) [][]ANSILineToken {
+	var isColour bool
+	var colour string
+	var fg string
+	var bg string
+
+	// var tokens []string
+	var tokens []ANSILineToken
+	// var lines [][]string
+	var lines [][]ANSILineToken
+	for _, line := range strings.Split(msg, "\n") {
+		var text string
+
+		for _, ch := range line {
+			if ch == '\033' {
+				if text != "" {
+					tokens = append(tokens, ANSILineToken{bg + fg, text})
+					colour = ""
+					text = ""
 				}
-				currentColour = ""
-				currentText = ""
-			}
-			if i < len(line)-1 && line[i+1] == '[' {
-				inAnsiCode = true
-				currentColour = "\x1b"
-			}
-			continue
-		}
-		if inAnsiCode {
-			currentColour += string(r)
-			if r == 'm' {
-				inAnsiCode = false
-				if strings.Contains(currentColour, "38;5;") {
-					currentForeground = currentColour
-				} else if strings.Contains(currentColour, "48;5;") {
-					currentBackground = currentColour
-				} else {
-					currentForeground = currentColour
-					currentBackground = ""
+				isColour = true
+				colour = string(ch)
+			} else if isColour {
+				colour += string(ch)
+				if ch == 'm' {
+					isColour = false
+					if strings.Contains(colour, "38;5;") {
+						fg = colour
+					} else if strings.Contains(colour, "48;5;") {
+						bg = colour
+					} else {
+						fg = colour
+						bg = ""
+					}
 				}
+			} else {
+				text += string(ch)
 			}
-		} else {
-			currentText += string(r)
 		}
+		if text != "" {
+			tokens = append(tokens, ANSILineToken{bg + fg, text})
+		}
+		if (colour != "") && len(tokens) > 0 {
+			tokens = append(tokens, ANSILineToken{"\033[0m", ""})
+		}
+		lines = append(lines, tokens)
+		tokens = nil
 	}
-	tokens = append(tokens, ANSILineToken{currentColour, currentText})
-	return tokens
+	return lines
 }
 
 func ReverseANSIString(line string) string {
-	tokens := TokeniseANSIString(line)
+	lines := TokeniseANSIString(line)
 	reversed := ""
 
-	for i := len(tokens) - 1; i >= 0; i-- {
-		if tokens[i].Colour != "\033[0m" && (i < len(tokens)-1 && tokens[i+1].Colour != "\033[0m") {
+	maxWidth := 0
+	widths := make([]int, len(lines))
+	for idx, l := range strings.Split(line, "\n") {
+		ln := UnicodeStringLength(l)
+		if ln > maxWidth {
+			maxWidth = ln
+		}
+		widths[idx] = ln
+	}
+
+	// for i, line := range lines {
+	// 	reversed[i] = strings.Repeat(" ", maxWidth-UnicodeStringLength(line)) + ReverseANSIString(line)
+	// }
+
+	for idx, tokens := range lines {
+		needsReset := false
+		// ensure vertical alignment
+		reversed += strings.Repeat(" ", maxWidth-widths[idx])
+		for i := len(tokens) - 1; i >= 0; i-- {
+			if tokens[i].Colour != "" {
+				needsReset = true
+			}
+			reversed += tokens[i].Colour + ReverseUnicodeString(tokens[i].Text)
+		}
+		if needsReset {
 			reversed += "\033[0m"
 		}
-		if tokens[i].Colour == "\033[49m" && (i < len(tokens)-1 && tokens[i+1].Colour != "\033[0m") {
-			reversed += "\033[49m"
-		}
-		reversed += tokens[i].Colour + ReverseUnicodeString(tokens[i].Text)
-	}
-
-	return reversed
-}
-
-func ReverseANSIStrings(lines []string) []string {
-	reversed := make([]string, len(lines))
-
-	maxWidth := 0
-	for _, line := range lines {
-		l := UnicodeStringLength(line)
-		if l > maxWidth {
-			maxWidth = l
+		if idx < len(lines)-1 {
+			reversed += "\n"
 		}
 	}
-
-	for i, line := range lines {
-		reversed[i] = strings.Repeat(" ", maxWidth-UnicodeStringLength(line)) + ReverseANSIString(line)
+	if line[len(line)-1] == '\n' {
+		reversed += "\n"
 	}
+
 	return reversed
 }
 

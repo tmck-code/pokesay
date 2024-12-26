@@ -120,12 +120,57 @@ func TestUnicodeStringLength(test *testing.T) {
 func TestTokeniseANSIString(test *testing.T) {
 	line := "\x1b[38;5;129mAAA \x1b[48;5;160m XX \x1b[0m"
 
-	expected := []pokesay.ANSILineToken{
-		pokesay.ANSILineToken{Colour: "\x1b[38;5;129m", Text: "AAA "},
-		pokesay.ANSILineToken{Colour: "\x1b[48;5;160m\x1b[38;5;129m", Text: " XX "},
-		pokesay.ANSILineToken{Colour: "\x1b[0m", Text: ""},
+	expected := [][]pokesay.ANSILineToken{
+		{
+			pokesay.ANSILineToken{Colour: "\x1b[38;5;129m", Text: "AAA "},
+			pokesay.ANSILineToken{Colour: "\x1b[48;5;160m\x1b[38;5;129m", Text: " XX "},
+			pokesay.ANSILineToken{Colour: "\x1b[0m", Text: ""},
+		},
 	}
 	result := pokesay.TokeniseANSIString(line)
+	Assert(expected, result, test)
+}
+
+func TestTokeniseANSIStringLines(test *testing.T) {
+	msg := "\x1b[38;5;160m▄ \x1b[38;5;46m▄\n▄ \x1b[38;5;190m▄"
+
+	expected := [][]pokesay.ANSILineToken{
+		{ // Line 1
+			pokesay.ANSILineToken{Colour: "\x1b[38;5;160m", Text: "▄ "},
+			pokesay.ANSILineToken{Colour: "\x1b[38;5;46m", Text: "▄"},
+			pokesay.ANSILineToken{Colour: "\x1b[0m", Text: ""},
+		},
+		{ // Line 2
+			pokesay.ANSILineToken{Colour: "\x1b[38;5;46m", Text: "▄ "},
+			pokesay.ANSILineToken{Colour: "\x1b[38;5;190m", Text: "▄"},
+			pokesay.ANSILineToken{Colour: "\x1b[0m", Text: ""},
+		},
+	}
+	result := pokesay.TokeniseANSIString(msg)
+	Assert(expected, result, test)
+
+}
+
+func TestTokeniseANSILineWithTrailingSpaces(test *testing.T) {
+	// The AAA has a purple fg
+	// The XX has a red bg
+	line := "  \x1b[38;5;129mAAA \x1b[48;5;160m XY \x1b[0m     "
+
+	// The AAA should still have a purple fg
+	// The XX should still have a red bg
+	expected := [][]pokesay.ANSILineToken{
+		{
+			pokesay.ANSILineToken{Colour: "", Text: "  "},
+			pokesay.ANSILineToken{Colour: "\x1b[38;5;129m", Text: "AAA "},
+			pokesay.ANSILineToken{Colour: "\x1b[48;5;160m\x1b[38;5;129m", Text: " XY "},
+			pokesay.ANSILineToken{Colour: "\x1b[0m", Text: "     "},
+			pokesay.ANSILineToken{Colour: "\x1b[0m", Text: ""},
+		},
+	}
+	result := pokesay.TokeniseANSIString(line)
+	// fmt.Printf("expected: %#v\n", expected)
+	// fmt.Printf("result:   %#v\n", result)
+
 	Assert(expected, result, test)
 }
 
@@ -136,16 +181,34 @@ func TestFlipHorizontalLine(test *testing.T) {
 
 	// The AAA should still have a purple fg
 	// The XX should still have a red bg
-	expected := "\x1b[0m\x1b[48;5;160m\x1b[38;5;129m YX \033[0m\x1b[38;5;129m AAA"
+	expected := "\x1b[0m\x1b[48;5;160m\x1b[38;5;129m YX \x1b[38;5;129m AAA\x1b[0m"
 	result := pokesay.ReverseANSIString(line)
+
+	Assert(expected, result, test)
+}
+
+func TestFlipHorizontalLineWithTrailingSpaces(test *testing.T) {
+	// The AAA has a purple fg
+	// The XX has a red bg
+	line := "  \x1b[38;5;129mAAA \x1b[48;5;160m XY \x1b[0m  "
+
+	// The AAA should still have a purple fg
+	// The XX should still have a red bg
+	expected := "\x1b[0m\x1b[0m  \x1b[48;5;160m\x1b[38;5;129m YX \x1b[38;5;129m AAA  \x1b[0m"
+	result := pokesay.ReverseANSIString(line)
+
+	fmt.Printf("expected: %#v\n", expected)
+	fmt.Printf("result:   %#v\n", result)
 
 	Assert(expected, result, test)
 }
 
 func TestTokeniseANSIStringWithNoColour(test *testing.T) {
 	msg := "         ▄▄          ▄▄"
-	expected := []pokesay.ANSILineToken{
-		pokesay.ANSILineToken{Colour: "", Text: "         ▄▄          ▄▄"},
+	expected := [][]pokesay.ANSILineToken{
+		{
+			pokesay.ANSILineToken{Colour: "", Text: "         ▄▄          ▄▄"},
+		},
 	}
 	result := pokesay.TokeniseANSIString(msg)
 	Assert(expected, result, test)
@@ -154,6 +217,13 @@ func TestTokeniseANSIStringWithNoColour(test *testing.T) {
 func TestReverseUnicodeString(test *testing.T) {
 	msg := "         ▄▄          ▄▄"
 	expected := "▄▄          ▄▄         "
+	result := pokesay.ReverseUnicodeString(msg)
+	Assert(expected, result, test)
+}
+
+func TestReverseUnicodeStringWithTrailingSpaces(test *testing.T) {
+	msg := "         ▄▄          ▄▄      "
+	expected := "      ▄▄          ▄▄         "
 	result := pokesay.ReverseUnicodeString(msg)
 	Assert(expected, result, test)
 }
@@ -184,13 +254,14 @@ func TestFlipHorizontalWithoutColour(test *testing.T) {
 		"      ▀▄    ▄▄▄▀         ",
 		"        ▀▄▀▀             ",
 	}
-	results := pokesay.ReverseANSIStrings(msg)
+	results := pokesay.ReverseANSIString(strings.Join(msg, "\n"))
 
+	splitResults := strings.Split(results, "\n")
 	for i := 0; i < len(expected); i++ {
-		Assert(expected[i], results[i], test)
+		Assert(expected[i], splitResults[i], test)
 	}
 
-	Assert(expected, results, test)
+	Assert(strings.Join(expected, "\n"), results, test)
 }
 
 func TestFlipHorizontalWithColourContinuation(test *testing.T) {
@@ -199,17 +270,20 @@ func TestFlipHorizontalWithColourContinuation(test *testing.T) {
 		"▄ \x1b[38;5;190m▄",
 	}
 
-	result := pokesay.ReverseANSIStrings(msg)
+	result := pokesay.ReverseANSIString(strings.Join(msg, "\n"))
 
-	expected := []string{
-		"\x1b[38;5;46m▄ \x1b[38;5;160m▄",
-		"\x1b[38;5;190m▄ \x1b[38;5;46m▄",
-	}
+	expected := strings.Join(
+		[]string{
+			"\x1b[0m\x1b[38;5;46m▄\x1b[38;5;160m ▄\x1b[0m",
+			"\x1b[0m\x1b[38;5;190m▄\x1b[38;5;46m ▄\x1b[0m",
+		},
+		"\n",
+	)
 
 	data := map[string]string{
 		"msg":      strings.Join(msg, "\n"),
-		"expected": strings.Join(expected, "\n"),
-		"result":   strings.Join(result, "\n"),
+		"expected": expected,
+		"result":   result,
 	}
 
 	for msg, d := range data {
@@ -233,7 +307,7 @@ func TestFlipHorizontal(test *testing.T) {
 		"             ▀▀\x1b[48;5;214m▄\x1b[49m▀\x1b[39m\x1b[39m",
 	}
 	fmt.Println("msg:", msg)
-	results := pokesay.ReverseANSIStrings(msg)
+	results := pokesay.ReverseANSIString(strings.Join(msg, "\n"))
 
 	expected := []string{
 		"  \x1b[38;5;16m▄▄\x1b[0m         \x1b[0m\x1b[48;5;16m\x1b[38;5;232m ▄\x1b[0m\x1b[38;5;16m▄\x1b[0m     \x1b[0m    ",
@@ -253,11 +327,12 @@ func TestFlipHorizontal(test *testing.T) {
 	for i, line := range expected {
 		fmt.Println("expected:", i, line)
 	}
-	for i, line := range results {
+	splitResults := strings.Split(results, "\n")
+	for i, line := range splitResults {
 		fmt.Println("results:", i, line)
 	}
 	for i := 0; i < len(expected); i++ {
-		Assert(expected[i], results[i], test)
+		Assert(expected[i], splitResults[i], test)
 	}
 	Assert(expected, results, test)
 }
