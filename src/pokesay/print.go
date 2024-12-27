@@ -298,21 +298,17 @@ func ReverseANSIString(line string) string {
 	}
 
 	for idx, tokens := range lines {
-		// needsReset := false
 		// ensure vertical alignment
 		reversed += strings.Repeat(" ", maxWidth-widths[idx])
 		for i := len(tokens) - 1; i >= 0; i-- {
-			// if tokens[i].BGColour != "" {
-			// 	needsReset = true
-			// }
 			reversed += tokens[i].FGColour + tokens[i].BGColour + ReverseUnicodeString(tokens[i].Text)
 		}
-		// if needsReset {
-		// 	reversed += "\033[0m"
-		// }
 		if idx < len(lines)-1 {
 			reversed += "\n"
 		}
+	}
+	if reversed[len(reversed)-2:len(reversed)-1] != "\x1b[0m" {
+		reversed += "\033[0m"
 	}
 	if line[len(line)-1] == '\n' {
 		reversed += "\n"
