@@ -23,5 +23,5 @@ jobs:
       - name: Test build
         run: echo w | ./build/bin/pokesay-linux-amd64
       - name: Run unit tests
-        run: docker run -v ${PWD}:/usr/local/src ghcr.io/tmck-code/pokesay:latest go test -v ./test/
+        run: docker run -v ${PWD}:/usr/local/src ghcr.io/tmck-code/pokesay:latest gotestsum --format dots
 
