@@ -134,7 +134,10 @@ func TestUnicodeTokenise(test *testing.T) {
 			input: "         ▄▄          ▄▄",
 			expected: [][]pokesay.ANSILineToken{
 				{
-					pokesay.ANSILineToken{FGColour: "", BGColour: "", Text: "         ▄▄          ▄▄"},
+					pokesay.ANSILineToken{FGColour: "", BGColour: "", Text: "         ", Reset: true},
+					pokesay.ANSILineToken{FGColour: "", BGColour: "", Text: "▄▄"},
+					pokesay.ANSILineToken{FGColour: "", BGColour: "", Text: "          ", Reset: true},
+					pokesay.ANSILineToken{FGColour: "", BGColour: "", Text: "▄▄"},
 				},
 			},
 		},
@@ -182,7 +185,7 @@ func TestUnicodeReverse(test *testing.T) {
 	}
 }
 
-func TestANSIBasic(test *testing.T) {
+func TestANSITokenise(test *testing.T) {
 	testCases := []struct {
 		name     string
 		input    string
@@ -213,6 +216,18 @@ func TestANSIBasic(test *testing.T) {
 				{ // Line 2
 					pokesay.ANSILineToken{FGColour: "\x1b[38;5;46m", BGColour: "", Text: "▄"},
 					pokesay.ANSILineToken{FGColour: "\x1b[38;5;190m", BGColour: "", Text: "▄"},
+					pokesay.ANSILineToken{FGColour: "\x1b[0m", BGColour: "", Text: ""},
+				},
+			},
+		},
+		// purple fg, red bg
+		{
+			name:  "Single line with spaces",
+			input: "\x1b[38;5;129mAAA  \x1b[48;5;160m  XX  \x1b[0m",
+			expected: [][]pokesay.ANSILineToken{
+				{
+					pokesay.ANSILineToken{FGColour: "\x1b[38;5;129m", BGColour: "", Text: "AAA"},
+					pokesay.ANSILineToken{FGColour: "\x1b[38;5;129m", BGColour: "\x1b[48;5;160m", Text: "XX"},
 					pokesay.ANSILineToken{FGColour: "\x1b[0m", BGColour: "", Text: ""},
 				},
 			},
@@ -255,7 +270,21 @@ func TestANSIWithSpaces(test *testing.T) {
 			},
 		},
 		{
-			name: "Lines with colour continuation (spaces)",
+			name: "Lines with FG continuation (spaces)",
+			// purple fg, red bg
+			// the 4 spaces after AAA should have a purple fg, and no bg
+			input: "\x1b[38;5;129mAAA    \x1b[48;5;160m XX \x1b[0m",
+			// expected := "\x1b[0m\x1b[48;5;160m\x1b[38;5;129m XX \x1b[38;5;129m\x1b[49m    AAA\x1b[0m"
+			expected: [][]pokesay.ANSILineToken{
+				{
+					pokesay.ANSILineToken{FGColour: "\x1b[38;5;129m", BGColour: "", Text: "AAA    ", Reset: true},
+					pokesay.ANSILineToken{FGColour: "\x1b[38;5;129m", BGColour: "\x1b[48;5;160m", Text: " XX ", Reset: true},
+					pokesay.ANSILineToken{FGColour: "\x1b[0m", BGColour: "", Text: ""},
+				},
+			},
+		},
+		{
+			name: "Lines with BG continuation (spaces)",
 			// purple fg, red bg
 			// the 4 spaces after AAA should have a purple fg, and no bg
 			input: "\x1b[38;5;129mAAA    \x1b[48;5;160m XX \x1b[0m",

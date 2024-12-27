@@ -257,6 +257,16 @@ func TokeniseANSIString(msg string) [][]ANSILineToken {
 				}
 				isColour = true
 				colour = string(ch)
+			} else if ch == ' ' {
+				if isSpaces {
+					text += string(ch)
+				} else {
+					if text != "" {
+						tokens = append(tokens, ANSILineToken{fg, bg, text, false})
+						text = string(ch)
+					}
+					isSpaces = true
+				}
 			} else if isColour {
 				colour += string(ch)
 				if ch == 'm' {
@@ -271,8 +281,13 @@ func TokeniseANSIString(msg string) [][]ANSILineToken {
 					}
 				}
 			} else {
-				isSpaces = (ch == ' ')
-				text += string(ch)
+				if isSpaces {
+					tokens = append(tokens, ANSILineToken{fg, bg, text, true})
+					isSpaces = false
+					text = string(ch)
+				} else {
+					text += string(ch)
+				}
 			}
 		}
 		if text != "" {
@@ -286,6 +301,10 @@ func TokeniseANSIString(msg string) [][]ANSILineToken {
 	}
 	return lines
 }
+
+// func ReverseANSITokens(tokens []ANSILineToken) []ANSILineToken {
+// 	// reversed := make([]ANSILineToken, len(tokens))
+// }
 
 func ReverseANSIString(line string) string {
 	lines := TokeniseANSIString(line)
@@ -305,7 +324,7 @@ func ReverseANSIString(line string) string {
 		// ensure vertical alignment
 		reversed += strings.Repeat(" ", maxWidth-widths[idx])
 		for i := len(tokens) - 1; i >= 0; i-- {
-			if tokens[i].Reset && (tokens[i].FGColour != "\x1b[0m" && tokens[i].BGColour != "\x1b[0m") {
+			if tokens[i].Reset && (tokens[i].FGColour != "\x1b[0m" && tokens[i].BGColour != "\x1b[0m") && reversed[len(reversed)-2:len(reversed)-1] != "\x1b[0m" {
 				reversed += "\x1b[0m" + tokens[i].FGColour + tokens[i].BGColour + tokens[i].Text
 			} else {
 				reversed += tokens[i].FGColour + tokens[i].BGColour + ReverseUnicodeString(tokens[i].Text)
