@@ -150,6 +150,9 @@ func TestUnicodeTokenise(test *testing.T) {
 				fmt.Printf("expected: '%v\x1b[0m'\n", tc.expected)
 				fmt.Printf("result:   '%v\x1b[0m'\n", result)
 			}
+			for i, line := range tc.expected {
+				Assert(line, result[i], test)
+			}
 			Assert(tc.expected, result, test)
 		})
 	}
@@ -194,12 +197,11 @@ func TestANSITokenise(test *testing.T) {
 		// purple fg, red bg
 		{
 			name:  "Single line with fg and bg",
-			input: "\x1b[38;5;129mAAA\x1b[48;5;160mXX\x1b[0m",
+			input: "\x1b[38;5;129mAAA\x1b[48;5;160mXX",
 			expected: [][]pokesay.ANSILineToken{
 				{
 					pokesay.ANSILineToken{FGColour: "\x1b[38;5;129m", BGColour: "", Text: "AAA"},
 					pokesay.ANSILineToken{FGColour: "\x1b[38;5;129m", BGColour: "\x1b[48;5;160m", Text: "XX"},
-					pokesay.ANSILineToken{FGColour: "\x1b[0m", BGColour: "", Text: ""},
 				},
 			},
 		},
@@ -224,6 +226,17 @@ func TestANSITokenise(test *testing.T) {
 		{
 			name:  "Single line with spaces",
 			input: "\x1b[38;5;129mAAA  \x1b[48;5;160m  XX  \x1b[0m",
+			expected: [][]pokesay.ANSILineToken{
+				{
+					pokesay.ANSILineToken{FGColour: "\x1b[38;5;129m", BGColour: "", Text: "AAA"},
+					pokesay.ANSILineToken{FGColour: "\x1b[38;5;129m", BGColour: "\x1b[48;5;160m", Text: "XX"},
+					pokesay.ANSILineToken{FGColour: "\x1b[0m", BGColour: "", Text: ""},
+				},
+			},
+		},
+		{
+			name:  "Single line with existing ANSI reset",
+			input: "\x1b[38;5;129mAAA\x1b[48;5;160mXX\x1b[0m",
 			expected: [][]pokesay.ANSILineToken{
 				{
 					pokesay.ANSILineToken{FGColour: "\x1b[38;5;129m", BGColour: "", Text: "AAA"},

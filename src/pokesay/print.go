@@ -263,8 +263,8 @@ func TokeniseANSIString(msg string) [][]ANSILineToken {
 				} else {
 					if text != "" {
 						tokens = append(tokens, ANSILineToken{fg, bg, text, false})
-						text = string(ch)
 					}
+					text = string(ch)
 					isSpaces = true
 				}
 			} else if isColour {
@@ -292,9 +292,6 @@ func TokeniseANSIString(msg string) [][]ANSILineToken {
 		}
 		if text != "" {
 			tokens = append(tokens, ANSILineToken{fg, bg, text, isSpaces})
-		}
-		if (colour != "") && len(tokens) > 0 {
-			tokens = append(tokens, ANSILineToken{"\033[0m", "", "", false})
 		}
 		lines = append(lines, tokens)
 		tokens = nil
