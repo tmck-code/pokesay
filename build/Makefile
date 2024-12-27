@@ -42,6 +42,6 @@ test:
 		-v $(PWD)/../:/usr/local/src \
 		--rm --name pokesay-test \
 			$(DOCKER_IMAGE) \
-			go test -v ./test/
+			gotestsum --format dots
 
 .PHONY: all build/docker build/cows build/assets build/release test

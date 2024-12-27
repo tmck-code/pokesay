@@ -20,7 +20,8 @@ WORKDIR /usr/local/src/
 ADD src/ /usr/local/src/src/
 ADD go.* /usr/local/src/
 RUN go mod tidy \
-    && go get -v github.com/mitchellh/go-wordwrap
+    && go get -v github.com/mitchellh/go-wordwrap \
+    && go install gotest.tools/gotestsum@latest
 
 # Convert all of the pokesprite .pngs -> cowfiles for the terminal
 RUN go run /usr/local/src/src/bin/convert/png_convert.go \
