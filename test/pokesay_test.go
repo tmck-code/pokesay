@@ -246,10 +246,10 @@ func TestANSIWithSpaces(test *testing.T) {
 			// The XX should still have a red bg
 			expected: [][]pokesay.ANSILineToken{
 				{
-					pokesay.ANSILineToken{FGColour: "", BGColour: "", Text: "  "},
-					pokesay.ANSILineToken{FGColour: "\x1b[38;5;129m", BGColour: "", Text: "AAA "},
-					pokesay.ANSILineToken{FGColour: "\x1b[38;5;129m", BGColour: "\x1b[48;5;160m", Text: " XY "},
-					pokesay.ANSILineToken{FGColour: "\x1b[0m", BGColour: "", Text: "     "},
+					pokesay.ANSILineToken{FGColour: "", BGColour: "", Text: "  ", Reset: true},
+					pokesay.ANSILineToken{FGColour: "\x1b[38;5;129m", BGColour: "", Text: "AAA ", Reset: true},
+					pokesay.ANSILineToken{FGColour: "\x1b[38;5;129m", BGColour: "\x1b[48;5;160m", Text: " XY ", Reset: true},
+					pokesay.ANSILineToken{FGColour: "\x1b[0m", BGColour: "", Text: "     ", Reset: true},
 					pokesay.ANSILineToken{FGColour: "\x1b[0m", BGColour: "", Text: ""},
 				},
 			},
@@ -262,8 +262,8 @@ func TestANSIWithSpaces(test *testing.T) {
 			// expected := "\x1b[0m\x1b[48;5;160m\x1b[38;5;129m XX \x1b[38;5;129m\x1b[49m    AAA\x1b[0m"
 			expected: [][]pokesay.ANSILineToken{
 				{
-					pokesay.ANSILineToken{FGColour: "\x1b[38;5;129m", BGColour: "\x1b[0m", Text: "AAA    "},
-					pokesay.ANSILineToken{FGColour: "\x1b[38;5;129m", BGColour: "\x1b[48;5;160m", Text: " XX "},
+					pokesay.ANSILineToken{FGColour: "\x1b[38;5;129m", BGColour: "", Text: "AAA    ", Reset: true},
+					pokesay.ANSILineToken{FGColour: "\x1b[38;5;129m", BGColour: "\x1b[48;5;160m", Text: " XX ", Reset: true},
 					pokesay.ANSILineToken{FGColour: "\x1b[0m", BGColour: "", Text: ""},
 				},
 			},
@@ -353,16 +353,16 @@ func TestFlipHorizontalWithoutColour(test *testing.T) {
 	}
 	fmt.Println("msg:", msg)
 	expected := []string{
-		"  ▄▄          ▄▄         ",
-		"▄▄ ▄▄▄▄▄▄     ▄▄▄        ",
-		"▀▄   ▄▄  ▄▄▄ ▀▄  ▄       ",
-		"  ▀▄    ▄▄  ▄▄   ▄▄▄     ",
-		"   ▄▄  ▄▀ ▄  ▄▄▄   ▄▄    ",
-		"   ▀▄ ▄▄▄   ▄▄▄   ▄▄▀    ",
-		"    ▄▄▄▄▄   ▄▄ ▄▄▄▄▄▀    ",
-		"     ▀▄▄  ▄▄▄▄           ",
-		"      ▀▄    ▄▄▄▀         ",
-		"        ▀▄▀▀             ",
+		"  ▄▄          ▄▄         \x1b[0m",
+		"▄▄ ▄▄▄▄▄▄     ▄▄▄        \x1b[0m",
+		"▀▄   ▄▄  ▄▄▄ ▀▄  ▄       \x1b[0m",
+		"  ▀▄    ▄▄  ▄▄   ▄▄▄     \x1b[0m",
+		"   ▄▄  ▄▀ ▄  ▄▄▄   ▄▄    \x1b[0m",
+		"   ▀▄ ▄▄▄   ▄▄▄   ▄▄▀    \x1b[0m",
+		"    ▄▄▄▄▄   ▄▄ ▄▄▄▄▄▀    \x1b[0m",
+		"     ▀▄▄  ▄▄▄▄           \x1b[0m",
+		"      ▀▄    ▄▄▄▀         \x1b[0m",
+		"        ▀▄▀▀             \x1b[0m",
 	}
 	results := pokesay.ReverseANSIString(strings.Join(msg, "\n"))
 

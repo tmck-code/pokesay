@@ -232,10 +232,12 @@ type ANSILineToken struct {
 	FGColour string
 	BGColour string
 	Text     string
+	Reset    bool
 }
 
 func TokeniseANSIString(msg string) [][]ANSILineToken {
 	var isColour bool
+	isSpaces := false
 	var colour string
 	var fg string
 	var bg string
@@ -248,7 +250,8 @@ func TokeniseANSIString(msg string) [][]ANSILineToken {
 		for _, ch := range line {
 			if ch == '\033' {
 				if text != "" {
-					tokens = append(tokens, ANSILineToken{fg, bg, text})
+					shouldReset := (bg != "\x1b[0m" && fg != "\x1b[0m" && isSpaces)
+					tokens = append(tokens, ANSILineToken{fg, bg, text, shouldReset})
 					colour = ""
 					text = ""
 				}
@@ -268,14 +271,15 @@ func TokeniseANSIString(msg string) [][]ANSILineToken {
 					}
 				}
 			} else {
+				isSpaces = (ch == ' ')
 				text += string(ch)
 			}
 		}
 		if text != "" {
-			tokens = append(tokens, ANSILineToken{fg, bg, text})
+			tokens = append(tokens, ANSILineToken{fg, bg, text, isSpaces})
 		}
 		if (colour != "") && len(tokens) > 0 {
-			tokens = append(tokens, ANSILineToken{"\033[0m", "", ""})
+			tokens = append(tokens, ANSILineToken{"\033[0m", "", "", false})
 		}
 		lines = append(lines, tokens)
 		tokens = nil
@@ -301,7 +305,11 @@ func ReverseANSIString(line string) string {
 		// ensure vertical alignment
 		reversed += strings.Repeat(" ", maxWidth-widths[idx])
 		for i := len(tokens) - 1; i >= 0; i-- {
-			reversed += tokens[i].FGColour + tokens[i].BGColour + ReverseUnicodeString(tokens[i].Text)
+			if tokens[i].Reset && (tokens[i].FGColour != "\x1b[0m" && tokens[i].BGColour != "\x1b[0m") {
+				reversed += "\x1b[0m" + tokens[i].FGColour + tokens[i].BGColour + tokens[i].Text
+			} else {
+				reversed += tokens[i].FGColour + tokens[i].BGColour + ReverseUnicodeString(tokens[i].Text)
+			}
 		}
 		if idx < len(lines)-1 {
 			reversed += "\n"
