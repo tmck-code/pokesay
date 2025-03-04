@@ -249,6 +249,7 @@ func TokeniseANSIString(msg string) [][]ANSILineToken {
 
 		for _, ch := range line {
 			if ch == '\033' {
+				// this marks the START of an ANSI escape code
 				if text != "" {
 					shouldReset := (bg != "\x1b[0m" && fg != "\x1b[0m" && isSpaces)
 					tokens = append(tokens, ANSILineToken{fg, bg, text, shouldReset})
@@ -258,6 +259,7 @@ func TokeniseANSIString(msg string) [][]ANSILineToken {
 				isColour = true
 				colour = string(ch)
 			} else if ch == ' ' {
+				// this deals with whitespace
 				if isSpaces {
 					text += string(ch)
 				} else {
@@ -268,6 +270,8 @@ func TokeniseANSIString(msg string) [][]ANSILineToken {
 					isSpaces = true
 				}
 			} else if isColour {
+				// keep building the current ANSI escape code if \033 was found earlier
+				// disable the isColour bool if the end of the ANSI escape code is found
 				colour += string(ch)
 				if ch == 'm' {
 					isColour = false

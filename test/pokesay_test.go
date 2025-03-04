@@ -2,6 +2,7 @@ package test
 
 import (
 	"embed"
+	"encoding/json"
 	"fmt"
 	"strings"
 	"testing"
@@ -194,14 +195,14 @@ func TestANSITokenise(test *testing.T) {
 		input    string
 		expected [][]pokesay.ANSILineToken
 	}{
-		// purple fg, red bg
 		{
+			// purple fg, red bg
 			name:  "Single line with fg and bg",
 			input: "\x1b[38;5;129mAAA\x1b[48;5;160mXX",
 			expected: [][]pokesay.ANSILineToken{
 				{
-					pokesay.ANSILineToken{FGColour: "\x1b[38;5;129m", BGColour: "", Text: "AAA"},
-					pokesay.ANSILineToken{FGColour: "\x1b[38;5;129m", BGColour: "\x1b[48;5;160m", Text: "XX"},
+					pokesay.ANSILineToken{Text: "AAA", FGColour: "\x1b[38;5;129m", BGColour: ""},
+					pokesay.ANSILineToken{Text: "XX", FGColour: "\x1b[38;5;129m", BGColour: "\x1b[48;5;160m"},
 				},
 			},
 		},
@@ -228,9 +229,9 @@ func TestANSITokenise(test *testing.T) {
 			input: "\x1b[38;5;129mAAA  \x1b[48;5;160m  XX  \x1b[0m",
 			expected: [][]pokesay.ANSILineToken{
 				{
-					pokesay.ANSILineToken{FGColour: "\x1b[38;5;129m", BGColour: "", Text: "AAA"},
-					pokesay.ANSILineToken{FGColour: "\x1b[38;5;129m", BGColour: "\x1b[48;5;160m", Text: "XX"},
-					pokesay.ANSILineToken{FGColour: "\x1b[0m", BGColour: "", Text: ""},
+					pokesay.ANSILineToken{Text: "AAA", FGColour: "\x1b[38;5;129m", BGColour: ""},
+					pokesay.ANSILineToken{Text: "XX", FGColour: "\x1b[38;5;129m", BGColour: "\x1b[48;5;160m"},
+					pokesay.ANSILineToken{Text: "", FGColour: "\x1b[0m", BGColour: ""},
 				},
 			},
 		},
@@ -249,10 +250,16 @@ func TestANSITokenise(test *testing.T) {
 	for _, tc := range testCases {
 		test.Run(tc.name, func(test *testing.T) {
 			result := pokesay.TokeniseANSIString(tc.input)
+
+			b, err := json.MarshalIndent(result, "", "  ")
+			if err != nil {
+				fmt.Println("error:", err)
+			}
+
 			if Debug() {
 				fmt.Printf("input: 	  '%v\x1b[0m'\n", tc.input)
 				fmt.Printf("expected: '%v\x1b[0m'\n", tc.expected)
-				fmt.Printf("result:   '%v\x1b[0m'\n", result)
+				fmt.Printf("result:   '%v\x1b[0m'\n", string(b))
 			}
 			Assert(tc.expected, result, test)
 		})
@@ -340,7 +347,7 @@ func TestReverseANSIString(test *testing.T) {
 			name: "Single line with ANSI colours",
 			// The AAA has a purple fg, and the XX has a red bg
 			input:    "\x1b[38;5;129mAAA \x1b[48;5;160m XX \x1b[0m",
-			expected: "\x1b[0m\x1b[38;5;129m\x1b[48;5;160m XX \x1b[38;5;129m AAA\x1b[0m",
+			expected: "\x1b[0m\x1b[38;5;129m\x1b[48;5;160m XX \x1b[49m AAA\x1b[0m",
 		},
 		{
 			name: "Multi-line with ANSI colours",
@@ -359,7 +366,7 @@ func TestReverseANSIString(test *testing.T) {
 		{
 			name:     "Multi-line with colour continuation",
 			input:    "\x1b[38;5;160m▄ \x1b[38;5;46m▄\n▄ \x1b[38;5;190m▄",
-			expected: "\x1b[0m\x1b[38;5;46m▄\x1b[38;5;160m ▄\x1b[0m\n\x1b[0m\x1b[38;5;190m▄\x1b[38;5;46m ▄\x1b[0m",
+			expected: "\x1b[0m\x1b[38;5;46m▄\x1b[38;5;160m ▄\n\x1b[38;5;190m▄\x1b[38;5;46m ▄\x1b[0m",
 		},
 	}
 	for _, tc := range testCases {
