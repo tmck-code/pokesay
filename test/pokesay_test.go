@@ -144,7 +144,7 @@ func TestUnicodeTokenise(test *testing.T) {
 		},
 	}
 	for _, tc := range testCases {
-		test.Run(tc.name, func(test *testing.T) {
+		test.Run(tc.name, func(t *testing.T) {
 			result := pokesay.TokeniseANSIString(tc.input)
 			if Debug() {
 				fmt.Printf("input: 	  '%v\x1b[0m'\n", tc.input)
@@ -152,9 +152,9 @@ func TestUnicodeTokenise(test *testing.T) {
 				fmt.Printf("result:   '%v\x1b[0m'\n", result)
 			}
 			for i, line := range tc.expected {
-				Assert(line, result[i], test)
+				Assert(line, result[i], t)
 			}
-			Assert(tc.expected, result, test)
+			Assert(tc.expected, result, t)
 		})
 	}
 }
@@ -177,14 +177,14 @@ func TestUnicodeReverse(test *testing.T) {
 		},
 	}
 	for _, tc := range testCases {
-		test.Run(tc.name, func(test *testing.T) {
+		test.Run(tc.name, func(t *testing.T) {
 			result := pokesay.ReverseUnicodeString(tc.input)
 			if Debug() {
 				fmt.Printf("input: 	  '%v\x1b[0m'\n", tc.input)
 				fmt.Printf("expected: '%v\x1b[0m'\n", tc.expected)
 				fmt.Printf("result:   '%v\x1b[0m'\n", result)
 			}
-			Assert(tc.expected, result, test)
+			Assert(tc.expected, result, t)
 		})
 	}
 }
@@ -248,7 +248,7 @@ func TestANSITokenise(test *testing.T) {
 		},
 	}
 	for _, tc := range testCases {
-		test.Run(tc.name, func(test *testing.T) {
+		test.Run(tc.name, func(t *testing.T) {
 			result := pokesay.TokeniseANSIString(tc.input)
 
 			b, err := json.MarshalIndent(result, "", "  ")
@@ -261,7 +261,7 @@ func TestANSITokenise(test *testing.T) {
 				fmt.Printf("expected: '%v\x1b[0m'\n", tc.expected)
 				fmt.Printf("result:   '%v\x1b[0m'\n", string(b))
 			}
-			Assert(tc.expected, result, test)
+			Assert(tc.expected, result, t)
 		})
 	}
 }
@@ -319,14 +319,14 @@ func TestANSIWithSpaces(test *testing.T) {
 		},
 	}
 	for _, tc := range testCases {
-		test.Run(tc.name, func(test *testing.T) {
+		test.Run(tc.name, func(t *testing.T) {
 			result := pokesay.TokeniseANSIString(tc.input)
 			if Debug() {
 				fmt.Printf("input: 	  '%v\x1b[0m'\n", tc.input)
 				fmt.Printf("expected: '%v\x1b[0m'\n", tc.expected)
 				fmt.Printf("result:   '%v\x1b[0m'\n", result)
 			}
-			Assert(tc.expected, result, test)
+			Assert(tc.expected, result, t)
 		})
 	}
 }
@@ -370,14 +370,15 @@ func TestReverseANSIString(test *testing.T) {
 		},
 	}
 	for _, tc := range testCases {
-		test.Run(tc.name, func(test *testing.T) {
-			result := pokesay.ReverseANSIString(tc.input)
+		result := ""
+		test.Run(tc.name, func(t *testing.T) {
+			result = pokesay.ReverseANSIString(tc.input)
 			if Debug() {
 				fmt.Printf("input: 	  '%v\x1b[0m'\n", tc.input)
 				fmt.Printf("expected: '%v\x1b[0m'\n", tc.expected)
 				fmt.Printf("result:   '%v\x1b[0m'\n", result)
 			}
-			Assert(tc.expected, result, test)
+			Assert(tc.expected, result, t)
 		})
 	}
 }
