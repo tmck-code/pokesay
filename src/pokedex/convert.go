@@ -107,15 +107,7 @@ func padLeft(cowfile []byte, n int) []string {
 	return converted
 }
 
-func ConvertPngToCow(sourceDirpath string, sourceFpath string, destDirpath string, extraPadding int) {
-	destDir := filepath.Join(
-		destDirpath,
-		// strip the root "source dirpath" from the source path
-		// e.g. fpath: /a/b/c.txt sourceDir: /a/ -> b/c.txt
-		filepath.Dir(strings.ReplaceAll(sourceFpath, sourceDirpath, "")),
-	)
-	// Ensure that the destination dir exists
-	os.MkdirAll(destDir, 0755)
+func ConvertPngToCow(sourceDirpath string, sourceFpath string, destDirpath string, extraPadding int) (string, error) {
 
 	// Trim the whitespace from the edges of the images. This helps with the conversion
 	autoCrop(sourceFpath)
@@ -125,20 +117,24 @@ func ConvertPngToCow(sourceDirpath string, sourceFpath string, destDirpath strin
 
 	if len(converted) == 0 {
 		failures = append(failures, sourceFpath)
-		return
+		return "", fmt.Errorf("failed to convert %s", sourceFpath)
 	}
+	final := stripEmptyLines(padLeft(converted, extraPadding))
+	return strings.Join(final, "\n") + COLOUR_RESET, nil
+}
 
-	destFpath := filepath.Join(destDir, strings.ReplaceAll(filepath.Base(sourceFpath), ".png", ".cow"))
+func WriteToCowfile(data string, destDirpath string, destFpath string) {
+	// Ensure that the destination dir exists
+	os.MkdirAll(destDirpath, 0755)
+
 	ostream, err := os.Create(destFpath)
 	Check(err)
 	defer ostream.Close()
 	writer := bufio.NewWriter(ostream)
 
-	final := stripEmptyLines(padLeft(converted, extraPadding))
-
-	// Join all of the lines back together, add colour reset sequence at the end
-	_, err = writer.WriteString(strings.Join(final, "\n") + COLOUR_RESET)
+	_, err = writer.WriteString(data)
 	Check(err)
 
-	writer.Flush()
+	err = writer.Flush()
+	Check(err)
 }
