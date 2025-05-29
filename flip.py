@@ -33,6 +33,9 @@ def tokenise_ansi(msg: str) -> Iterator[list[tuple[str, str]]]:
                     is_colour = False
             else:
                 text += ch
+        if colour:
+            tokens.append((colour, text))
+            colour = ''
         yield tokens
         tokens = []
 
@@ -57,14 +60,19 @@ def reverse_ansi(msg: str) -> Iterator[str]:
             rev = [colour, text[::-1]]
             # print(f'{rev=}')
             rev_line += ''.join(rev)
-        yield rev_line
+        yield ' '*3 + rev_line
 
 def print_reversed_ansi(msg: str) -> None:
     for line in tokenise_ansi(msg):
         print(f'{line=}')
+    print('original:')
+    print(msg)
+
+    print('scanned:')
     for line in tokenise_ansi(msg):
         print(''.join(chain.from_iterable(line)), end='\033[0m\n')
-    print(msg)
+
+    print('reversed:')
     for rev_line in reverse_ansi(msg):
         # print(f'{rev_line=}')
         print(rev_line, end='\033[0m\n')
