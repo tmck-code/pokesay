@@ -73,19 +73,21 @@ def reverse_ansi(msg: str) -> Iterator[str]:
             rev = [colour, text[::-1]]
             # print(f'{rev=}')
             rev_line += ''.join(rev)
-        yield ' '*4 + rev_line + str(length)
+        # yield ' '*4 + rev_line + str(length)
+        yield ' '*4 + rev_line
 
 def print_reversed_ansi(msg: str) -> None:
-    # for line in tokenise_ansi(msg):
-    #     print(f'{line=}')
-    print('original:')
-    print(msg)
+    for line in tokenise_ansi(msg):
+        print(f'{line=}')
+    # print('original:')
+    # print(msg)
 
     print('scanned:')
     max_len = max_line_len(msg)
     for line in tokenise_ansi(msg):
         length = line_len(line)
-        print(''.join(chain.from_iterable(line)), end=' '*(max_len-length) + str(length) + '\n')
+        # print(''.join(chain.from_iterable(line)), end=' '*(max_len-length) + str(length) + '\n')
+        print(''.join(chain.from_iterable(line)), end='\n')
 
     print('reversed:')
     for rev_line in reverse_ansi(msg):
