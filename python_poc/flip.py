@@ -70,12 +70,12 @@ def print_reversed_ansi(msg: str) -> None:
 
     print('scanned:')
     for line in tokenise_ansi(msg):
-        print(''.join(chain.from_iterable(line)), end='\033[0m\n')
+        print(''.join(chain.from_iterable(line)), end='\n')
 
     print('reversed:')
     for rev_line in reverse_ansi(msg):
         # print(f'{rev_line=}')
-        print(rev_line, end='\033[0m\n')
+        print(rev_line, end='\n')
     print('\033[0m')
 
 
@@ -89,5 +89,6 @@ def print_reversed_ansi(msg: str) -> None:
 #
 # print_reversed_ansi('\n'.join(msg))
 
-if len(sys.argv) > 1:
-    print_reversed_ansi(open(sys.argv[1]).read())
+if __name__ == '__main__':
+    if len(sys.argv) > 1:
+        print_reversed_ansi(open(sys.argv[1]).read())
