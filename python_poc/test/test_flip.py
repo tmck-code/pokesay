@@ -21,7 +21,7 @@ class TestLineContinuation:
 
         assert result == expected
 
-    
+
     def test_tokenise_bottom(self):
         result = []
         for line in flip.tokenise_ansi(open('test/data/1_3.cow').read()):
