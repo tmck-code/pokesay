@@ -68,32 +68,48 @@ def reverse_ansi(msg: str) -> Iterator[str]:
 
     for line in tokenise_ansi(msg):
         length = line_len(line)
-        rev_line = ' ' * (max_len - length)
+        rev_line = [('', ' ' * (max_len - length))]
         for colour, text in reversed(line):
-            rev = [colour, text[::-1]]
+            rev = (colour, text[::-1])
             # print(f'{rev=}')
-            rev_line += ''.join(rev)
+            rev_line += (colour, text[::-1])
         # yield ' '*4 + rev_line + str(length)
-        yield ' '*4 + rev_line
+        if set(rev_line[-1][1]) == {' '}:
+            rev_line[-1] = (rev_line[-1][0] + '\x1b[49m', rev_line[-1][1])
+
+        yield ''.join(chain.from_iterable(rev_line))
 
 def print_reversed_ansi(msg: str) -> None:
-    for line in tokenise_ansi(msg):
-        print(f'{line=}')
+    # for line in tokenise_ansi(msg):
+    #     print(f'{line=}')
     # print('original:')
     # print(msg)
 
-    print('scanned:')
+    # print('scanned:')
     max_len = max_line_len(msg)
+    lengths = []
+    scanned = []
     for line in tokenise_ansi(msg):
         length = line_len(line)
+        lengths.append(length)
         # print(''.join(chain.from_iterable(line)), end=' '*(max_len-length) + str(length) + '\n')
-        print(''.join(chain.from_iterable(line)), end='\n')
+        # print(''.join(chain.from_iterable(line)), end='\x1b[0m\n')
+        scanned.append(''.join(chain.from_iterable(line)) + ' ' * (max_len - length))
+    print('\x1b[0m')
 
-    print('reversed:')
+    # print('reversed:')
+    rvrsed = []
     for rev_line in reverse_ansi(msg):
         # print(f'{rev_line=}')
-        print(rev_line, end='\n')
+        # print(rev_line, end='\x1b[0m\n')
+        rvrsed.append(rev_line)
     print('\033[0m')
+
+    print(msg)
+
+    for i, (o, r, s) in enumerate(zip(msg.split('\n'), rvrsed, scanned)):
+        print(f'{o+" "*(max_len-lengths[i])}\x1b[0m  |{s}\x1b[0m |  {r}')
+            # print(f'\033[31m{s} | {r}\033[0m')
 
 
 # t = list(tokenise_ansi('\n'.join(msg)))
@@ -108,4 +124,5 @@ def print_reversed_ansi(msg: str) -> None:
 
 if __name__ == '__main__':
     if len(sys.argv) > 1:
+        print(sys.argv[1])
         print_reversed_ansi(open(sys.argv[1]).read())
