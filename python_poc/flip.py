@@ -74,15 +74,10 @@ def reverse_ansi(msg: str) -> Iterator[str]:
     max_len = max_line_len(msg)
 
     for line in tokenise_ansi(msg):
-        length = line_len(line)
-        rev_line = [('', ' ' * (max_len - length))]
-        for colour, text in reversed(line):
-            rev_line.append((colour, text[::-1]))
-        if set(rev_line[-1][1]) == {' '}:
-            rev_line[-1] = (rev_line[-1][0] + '\x1b[49m', rev_line[-1][1])
-
-        # yield ' '*4 + ''.join(chain.from_iterable(rev_line))
-        yield rev_line
+        yield (
+            [('', ' ' * (max_len - line_len(line)))] +
+            list((colour, text[::-1]) for colour, text in reversed(line))
+        )
 
 def print_reversed_ansi(msg: str) -> None:
     print('original:', msg, '\x1b[0m', sep='\n')
