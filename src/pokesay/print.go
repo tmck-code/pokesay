@@ -232,80 +232,73 @@ type ANSILineToken struct {
 	FGColour string
 	BGColour string
 	Text     string
-	Reset    bool
+	// Reset    bool
 }
 
 func TokeniseANSIString(msg string) [][]ANSILineToken {
-	var isColour bool
-	isSpaces := false
-	var colour string
-	var fg string
-	var bg string
+	isColour := false
+	isReset := false
+	fg := ""
+	bg := ""
+	lines := make([][]ANSILineToken, 0)
 
-	var tokens []ANSILineToken
-	var lines [][]ANSILineToken
 	for _, line := range strings.Split(msg, "\n") {
-		var text string
+		tokens := make([]ANSILineToken, 0)
+		text := ""
+		colour := ""
 
 		for _, ch := range line {
+            // start of colour sequence detected!
 			if ch == '\033' {
-				// this marks the START of an ANSI escape code
-				if text != "" {
-					shouldReset := (bg != "\x1b[0m" && fg != "\x1b[0m" && isSpaces)
-					tokens = append(tokens, ANSILineToken{fg, bg, text, shouldReset})
-					colour = ""
-					text = ""
-				}
 				isColour = true
-				colour = string(ch)
-			} else if ch == ' ' {
-				// this deals with whitespace
-				if isSpaces {
-					text += string(ch)
-				} else {
-					if text != "" {
-						tokens = append(tokens, ANSILineToken{fg, bg, text, false})
+                // if there is text in the current token buffer,
+				if text != "" {
+					fmt.Printf("> fg=%#v bg=%#v text=%#v \x1b[0m\n", fg, bg, text)
+					if (isReset) {
+						tokens = append(tokens, ANSILineToken{"\x1b[0m", "", text})
+						isReset = false
+					} else {
+						tokens = append(tokens, ANSILineToken{fg, bg, text})
 					}
-					text = string(ch)
-					isSpaces = true
+					colour = string(ch)
+					text = ""
+				} else {
+					colour = string(ch)
 				}
 			} else if isColour {
 				// keep building the current ANSI escape code if \033 was found earlier
 				// disable the isColour bool if the end of the ANSI escape code is found
 				colour += string(ch)
+				fmt.Printf("c: %#v \x1b[0m\n", colour)
 				if ch == 'm' {
 					isColour = false
-					if strings.Contains(colour, "38;5;") {
+					if strings.Contains(colour, "[38") || strings.Contains(colour, "[39") {
 						fg = colour
-					} else if strings.Contains(colour, "48;5;") {
+					} else if strings.Contains(colour, "[48") || strings.Contains(colour, "[49") {
 						bg = colour
-					} else {
-						fg = colour
-						bg = ""
+					} else if strings.Contains(colour, "[0m") {
+						isReset = true
+						colour = ""
 					}
 				}
 			} else {
-				if isSpaces {
-					tokens = append(tokens, ANSILineToken{fg, bg, text, true})
-					isSpaces = false
-					text = string(ch)
-				} else {
-					text += string(ch)
-				}
+				text += string(ch)
 			}
 		}
-		if text != "" {
-			tokens = append(tokens, ANSILineToken{fg, bg, text, isSpaces})
+		if colour != "" || text != "" {
+			fmt.Printf("! fg=%#v bg=%#v text=%#v \x1b[0m\n", fg, bg, text)
+			if (isReset) {
+				tokens = append(tokens, ANSILineToken{"\x1b[0m", "", text})
+				isReset = false
+			} else {
+				tokens = append(tokens, ANSILineToken{fg, bg, text})
+			}
 		}
 		lines = append(lines, tokens)
-		tokens = nil
+		tokens = make([]ANSILineToken, 0)
 	}
 	return lines
 }
-
-// func ReverseANSITokens(tokens []ANSILineToken) []ANSILineToken {
-// 	// reversed := make([]ANSILineToken, len(tokens))
-// }
 
 func ReverseANSIString(line string) string {
 	lines := TokeniseANSIString(line)
@@ -325,11 +318,11 @@ func ReverseANSIString(line string) string {
 		// ensure vertical alignment
 		reversed += strings.Repeat(" ", maxWidth-widths[idx])
 		for i := len(tokens) - 1; i >= 0; i-- {
-			if tokens[i].Reset && (tokens[i].FGColour != "\x1b[0m" && tokens[i].BGColour != "\x1b[0m") && reversed[len(reversed)-2:len(reversed)-1] != "\x1b[0m" {
-				reversed += "\x1b[0m" + tokens[i].FGColour + tokens[i].BGColour + tokens[i].Text
-			} else {
-				reversed += tokens[i].FGColour + tokens[i].BGColour + ReverseUnicodeString(tokens[i].Text)
-			}
+			// if tokens[i].Reset && (tokens[i].FGColour != "\x1b[0m" && tokens[i].BGColour != "\x1b[0m") && reversed[len(reversed)-2:len(reversed)-1] != "\x1b[0m" {
+			// 	reversed += "\x1b[0m" + tokens[i].FGColour + tokens[i].BGColour + tokens[i].Text
+			// } else {
+			reversed += tokens[i].FGColour + tokens[i].BGColour + ReverseUnicodeString(tokens[i].Text)
+			// }
 		}
 		if idx < len(lines)-1 {
 			reversed += "\n"

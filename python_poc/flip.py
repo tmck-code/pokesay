@@ -9,9 +9,10 @@ DEBUG = os.environ.get('DEBUG', '0') == '1'
 
 def tokenise_ansi(msg: str) -> Iterator[list[tuple[str, str]]]:
     colour, colour_fg, colour_bg = '', deque([], 1), deque([], 1)
-    is_colour, is_reeet = False, False
+    is_colour = False
     for i, line in enumerate(msg.split('\n')):
         colour, text, tokens = '', '', []
+
         for ch in line:
             # start of colour sequence detected!
             if ch == '\033':
@@ -80,7 +81,7 @@ def reverse_ansi(msg: str) -> Iterator[str]:
         )
 
 def print_reversed_ansi(msg: str) -> None:
-    print('original:', msg, '\x1b[0m', sep='\n')
+    # print('original:', msg, '\x1b[0m', sep='\n')
 
     print('scanned:')
     for line in tokenise_ansi(msg):
