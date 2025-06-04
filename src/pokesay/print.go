@@ -300,6 +300,18 @@ func TokeniseANSIString(msg string) [][]ANSILineToken {
 	return lines
 }
 
+func BuildANSIString(lines [][]ANSILineToken) string {
+	s := ""
+
+	for _, tokens := range lines {
+		for _, token := range tokens {
+			s += token.FGColour + token.BGColour + token.Text
+		}
+		s += "\x1b[0m\n"
+	}
+	return s
+}
+
 func ReverseANSIString(line string) string {
 	lines := TokeniseANSIString(line)
 	reversed := ""

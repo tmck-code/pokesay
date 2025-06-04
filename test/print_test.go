@@ -229,7 +229,7 @@ func TestANSITokenise(test *testing.T) {
 			if Debug() {
 				fmt.Printf("input: 	  '%v\x1b[0m'\n", tc.input)
 				fmt.Printf("expected: '%v\x1b[0m'\n", tc.expected)
-				fmt.Printf("result:   '%v\x1b[0m'\n", result)
+				fmt.Printf("result:   '%v\x1b[0m'\n", pokesay.BuildANSIString(result))
 			}
 			for i, line := range tc.expected {
 				if Debug() {
