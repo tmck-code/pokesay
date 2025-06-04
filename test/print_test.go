@@ -159,7 +159,7 @@ func TestANSITokenise(test *testing.T) {
 		},
 		{
 			name: "Top of Egg",
-			input: "    \x1b[49m   \x1b[38;5;16m▄▄\x1b[48;5;16m\x1b[38;5;142m▄▄▄\x1b[49m\x1b[38;5;16m▄▄" +
+			input: "    \x1b[49m   \x1b[38;5;16m▄▄\x1b[48;5;16m\x1b[38;5;142m▄▄▄\x1b[49m\x1b[38;5;16m▄▄\n" +
 				"     ▄\x1b[48;5;16m\x1b[38;5;58m▄\x1b[48;5;58m\x1b[38;5;70m▄\x1b[48;5;70m \x1b[48;5;227m    \x1b[48;5;237m\x1b[38;5;227m▄\x1b[48;5;16m\x1b[38;5;237m▄\x1b[49m\x1b[38;5;16m▄",
 			expected: [][]pokesay.ANSILineToken{
 				{
@@ -168,7 +168,10 @@ func TestANSITokenise(test *testing.T) {
 
 					pokesay.ANSILineToken{FGColour: "\u001b[38;5;16m", BGColour: "\x1b[49m", Text: "▄▄"},
 					pokesay.ANSILineToken{FGColour: "\u001b[38;5;142m", BGColour: "\u001b[48;5;16m", Text: "▄▄▄"},
-					pokesay.ANSILineToken{FGColour: "\u001b[38;5;16m", BGColour: "\x1b[49m", Text: "▄▄     ▄"},
+					pokesay.ANSILineToken{FGColour: "\u001b[38;5;16m", BGColour: "\x1b[49m", Text: "▄▄"},
+				},
+				{
+					pokesay.ANSILineToken{FGColour: "\x1b[38;5;16m", BGColour: "\x1b[49m", Text: "     ▄"},
 					pokesay.ANSILineToken{FGColour: "\u001b[38;5;58m", BGColour: "\u001b[48;5;16m", Text: "▄"},
 					pokesay.ANSILineToken{FGColour: "\u001b[38;5;70m", BGColour: "\u001b[48;5;58m", Text: "▄"},
 					pokesay.ANSILineToken{FGColour: "\u001b[38;5;70m", BGColour: "\u001b[48;5;70m", Text: " "},
@@ -226,11 +229,9 @@ func TestANSITokenise(test *testing.T) {
 		test.Run(tc.name, func(t *testing.T) {
 			result := pokesay.TokeniseANSIString(tc.input)
 
-			if Debug() {
-				fmt.Printf("input: 	  '%v\x1b[0m'\n", tc.input)
-				fmt.Printf("expected: '%v\x1b[0m'\n", tc.expected)
-				fmt.Printf("result:   '%v\x1b[0m'\n", pokesay.BuildANSIString(result))
-			}
+			fmt.Printf("input: 	  '\n%s\x1b[0m'\n", tc.input)
+			fmt.Printf("expected:   '\n%s\n", pokesay.BuildANSIString(tc.expected))
+			fmt.Printf("result:   '\n%s\n", pokesay.BuildANSIString(result))
 			for i, line := range tc.expected {
 				if Debug() {
 					fmt.Printf("expected: %+v\x1b[0m\n", line)
