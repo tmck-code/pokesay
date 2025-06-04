@@ -253,7 +253,7 @@ func TokeniseANSIString(msg string) [][]ANSILineToken {
 				isColour = true
                 // if there is text in the current token buffer,
 				if text != "" {
-					fmt.Printf("> fg=%#v bg=%#v text=%#v \x1b[0m\n", fg, bg, text)
+					// fmt.Printf("> fg=%#v bg=%#v text=%#v \x1b[0m\n", fg, bg, text)
 					if (isReset) {
 						tokens = append(tokens, ANSILineToken{"\x1b[0m", "", text})
 						isReset = false
@@ -269,7 +269,7 @@ func TokeniseANSIString(msg string) [][]ANSILineToken {
 				// keep building the current ANSI escape code if \033 was found earlier
 				// disable the isColour bool if the end of the ANSI escape code is found
 				colour += string(ch)
-				fmt.Printf("c: %#v \x1b[0m\n", colour)
+				// fmt.Printf("c: %#v \x1b[0m\n", colour)
 				if ch == 'm' {
 					isColour = false
 					if strings.Contains(colour, "[38") || strings.Contains(colour, "[39") {
@@ -286,7 +286,7 @@ func TokeniseANSIString(msg string) [][]ANSILineToken {
 			}
 		}
 		if colour != "" || text != "" {
-			fmt.Printf("! fg=%#v bg=%#v text=%#v \x1b[0m\n", fg, bg, text)
+			// fmt.Printf("! fg=%#v bg=%#v text=%#v \x1b[0m\n", fg, bg, text)
 			if (isReset) {
 				tokens = append(tokens, ANSILineToken{"\x1b[0m", "", text})
 				isReset = false
