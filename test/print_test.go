@@ -116,8 +116,8 @@ func TestANSITokenise(test *testing.T) {
 			input: "\x1b[38;5;129mAAA    \x1b[48;5;160m XX \x1b[0m",
 			expected: [][]pokesay.ANSILineToken{
 				{
-					pokesay.ANSILineToken{Text: "AAA    ", FGColour: "\x1b[38;5;129m", BGColour: "",               },
-					pokesay.ANSILineToken{Text: " XX ", FGColour: "\x1b[38;5;129m", BGColour: "\x1b[48;5;160m", },
+					pokesay.ANSILineToken{Text: "AAA    ", FGColour: "\x1b[38;5;129m", BGColour: ""},
+					pokesay.ANSILineToken{Text: " XX ", FGColour: "\x1b[38;5;129m", BGColour: "\x1b[48;5;160m"},
 				},
 			},
 		},
@@ -152,8 +152,8 @@ func TestANSITokenise(test *testing.T) {
 			input: "\x1b[38;5;129mAAA\x1b[48;5;160mXX\x1b[0m",
 			expected: [][]pokesay.ANSILineToken{
 				{
-					pokesay.ANSILineToken{Text: "AAA", FGColour: "\x1b[38;5;129m", BGColour: "",},
-					pokesay.ANSILineToken{Text: "XX", FGColour: "\x1b[38;5;129m", BGColour: "\x1b[48;5;160m",},
+					pokesay.ANSILineToken{Text: "AAA", FGColour: "\x1b[38;5;129m", BGColour: ""},
+					pokesay.ANSILineToken{Text: "XX", FGColour: "\x1b[38;5;129m", BGColour: "\x1b[48;5;160m"},
 				},
 			},
 		},
@@ -163,19 +163,19 @@ func TestANSITokenise(test *testing.T) {
 				"     ▄\x1b[48;5;16m\x1b[38;5;58m▄\x1b[48;5;58m\x1b[38;5;70m▄\x1b[48;5;70m \x1b[48;5;227m    \x1b[48;5;237m\x1b[38;5;227m▄\x1b[48;5;16m\x1b[38;5;237m▄\x1b[49m\x1b[38;5;16m▄",
 			expected: [][]pokesay.ANSILineToken{
 				{
-					pokesay.ANSILineToken{FGColour: "\x1b[38;5;129m",       BGColour: "",                   Text: "AAA"},
-					pokesay.ANSILineToken{ FGColour: "", 				    BGColour: "", 					Text: "    ", 	},
-					pokesay.ANSILineToken{ FGColour: "\u001b[38;5;16m", 	BGColour: "", 					Text: "▄▄", 	},
-					pokesay.ANSILineToken{ FGColour: "\u001b[38;5;142m",    BGColour: "\u001b[48;5;16m", 	Text: "▄▄▄", 	},
-					pokesay.ANSILineToken{ FGColour: "\u001b[38;5;16m", 	BGColour: "", 					Text: "▄▄", 	},
-					pokesay.ANSILineToken{ FGColour: "\u001b[38;5;16m", 	BGColour: "", 					Text: "     ", 	},
-					pokesay.ANSILineToken{ FGColour: "\u001b[38;5;16m", 	BGColour: "", 					Text: "▄", 		},
-					pokesay.ANSILineToken{ FGColour: "\u001b[38;5;58m", 	BGColour: "\u001b[48;5;16m", 	Text: "▄", 		},
-					pokesay.ANSILineToken{ FGColour: "\u001b[38;5;70m", 	BGColour: "\u001b[48;5;58m", 	Text: "▄", 		},
-					pokesay.ANSILineToken{ FGColour: "\u001b[38;5;70m", 	BGColour: "\u001b[48;5;70m", 	Text: " ", 		},
-					pokesay.ANSILineToken{ FGColour: "\u001b[38;5;70m", 	BGColour: "\u001b[48;5;227m", 	Text: "    ", 	},
-					pokesay.ANSILineToken{ FGColour: "\u001b[38;5;227m",    BGColour: "\u001b[48;5;237m", 	Text: "▄", 		},
-					pokesay.ANSILineToken{ FGColour: "\u001b[38;5;237m",    BGColour: "\u001b[48;5;16m", 	Text: "▄", 		},
+					pokesay.ANSILineToken{FGColour: "", BGColour: "", Text: "    "},
+					pokesay.ANSILineToken{FGColour: "", BGColour: "\x1b[49m", Text: "   "},
+
+					pokesay.ANSILineToken{FGColour: "\u001b[38;5;16m", BGColour: "\x1b[49m", Text: "▄▄"},
+					pokesay.ANSILineToken{FGColour: "\u001b[38;5;142m", BGColour: "\u001b[48;5;16m", Text: "▄▄▄"},
+					pokesay.ANSILineToken{FGColour: "\u001b[38;5;16m", BGColour: "\x1b[49m", Text: "▄▄     ▄"},
+					pokesay.ANSILineToken{FGColour: "\u001b[38;5;58m", BGColour: "\u001b[48;5;16m", Text: "▄"},
+					pokesay.ANSILineToken{FGColour: "\u001b[38;5;70m", BGColour: "\u001b[48;5;58m", Text: "▄"},
+					pokesay.ANSILineToken{FGColour: "\u001b[38;5;70m", BGColour: "\u001b[48;5;70m", Text: " "},
+					pokesay.ANSILineToken{FGColour: "\u001b[38;5;70m", BGColour: "\u001b[48;5;227m", Text: "    "},
+					pokesay.ANSILineToken{FGColour: "\u001b[38;5;227m", BGColour: "\u001b[48;5;237m", Text: "▄"},
+					pokesay.ANSILineToken{FGColour: "\u001b[38;5;237m", BGColour: "\u001b[48;5;16m", Text: "▄"},
+					pokesay.ANSILineToken{FGColour: "\u001b[38;5;16m", BGColour: "\u001b[49m", Text: "▄"},
 				},
 			},
 		},
@@ -192,7 +192,6 @@ func TestANSITokenise(test *testing.T) {
 					pokesay.ANSILineToken{FGColour: "\x1b[38;5;129m", BGColour: "", Text: "AAA "},
 					pokesay.ANSILineToken{FGColour: "\x1b[38;5;129m", BGColour: "\x1b[48;5;160m", Text: " XY "},
 					pokesay.ANSILineToken{FGColour: "\x1b[0m", BGColour: "", Text: "     "},
-					pokesay.ANSILineToken{FGColour: "\x1b[0m", BGColour: "", Text: ""},
 				},
 			},
 		},
@@ -206,7 +205,6 @@ func TestANSITokenise(test *testing.T) {
 				{
 					pokesay.ANSILineToken{FGColour: "\x1b[38;5;129m", BGColour: "", Text: "AAA    "},
 					pokesay.ANSILineToken{FGColour: "\x1b[38;5;129m", BGColour: "\x1b[48;5;160m", Text: " XX "},
-					pokesay.ANSILineToken{FGColour: "\x1b[0m", BGColour: "", Text: ""},
 				},
 			},
 		},
@@ -220,7 +218,6 @@ func TestANSITokenise(test *testing.T) {
 				{
 					pokesay.ANSILineToken{FGColour: "\x1b[38;5;129m", BGColour: "", Text: "AAA    "},
 					pokesay.ANSILineToken{FGColour: "\x1b[38;5;129m", BGColour: "\x1b[48;5;160m", Text: " XX "},
-					pokesay.ANSILineToken{FGColour: "\x1b[0m", BGColour: "", Text: ""},
 				},
 			},
 		},
@@ -229,7 +226,6 @@ func TestANSITokenise(test *testing.T) {
 		test.Run(tc.name, func(t *testing.T) {
 			result := pokesay.TokeniseANSIString(tc.input)
 
-			
 			if Debug() {
 				fmt.Printf("input: 	  '%v\x1b[0m'\n", tc.input)
 				fmt.Printf("expected: '%v\x1b[0m'\n", tc.expected)
@@ -249,6 +245,12 @@ func TestANSITokenise(test *testing.T) {
 						fmt.Println("error:", err)
 					}
 					fmt.Printf("expected: %+v\x1b[0m\n", string(eb))
+					for j, token := range result[i] {
+						Assert(line[j], token, t)
+						if (j + 1) < len(line) {
+							break
+						}
+					}
 					Assert(line, result[i], t)
 				}
 			}
