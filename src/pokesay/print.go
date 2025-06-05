@@ -248,13 +248,13 @@ func TokeniseANSIString(msg string) [][]ANSILineToken {
 		colour := ""
 
 		for _, ch := range line {
-            // start of colour sequence detected!
+			// start of colour sequence detected!
 			if ch == '\033' {
 				isColour = true
-                // if there is text in the current token buffer,
+				// if there is text in the current token buffer,
 				if text != "" {
 					// fmt.Printf("> fg=%#v bg=%#v text=%#v \x1b[0m\n", fg, bg, text)
-					if (isReset) {
+					if isReset {
 						tokens = append(tokens, ANSILineToken{"\x1b[0m", "", text})
 						isReset = false
 					} else {
@@ -287,7 +287,7 @@ func TokeniseANSIString(msg string) [][]ANSILineToken {
 		}
 		if colour != "" || text != "" {
 			// fmt.Printf("! fg=%#v bg=%#v text=%#v \x1b[0m\n", fg, bg, text)
-			if (isReset) {
+			if isReset {
 				tokens = append(tokens, ANSILineToken{"\x1b[0m", "", text})
 				isReset = false
 			} else {
@@ -312,9 +312,9 @@ func BuildANSIString(lines [][]ANSILineToken) string {
 	return s
 }
 
-func ReverseANSIString(line string) string {
+func ReverseANSIString(line string) [][]ANSILineToken {
 	lines := TokeniseANSIString(line)
-	reversed := ""
+	linesRev := make([][]ANSILineToken, len(lines))
 
 	maxWidth := 0
 	widths := make([]int, len(lines))
@@ -327,26 +327,19 @@ func ReverseANSIString(line string) string {
 	}
 
 	for idx, tokens := range lines {
+		revTokens := make([]ANSILineToken, len(tokens)+1)
 		// ensure vertical alignment
-		reversed += strings.Repeat(" ", maxWidth-widths[idx])
+		revTokens[0] = ANSILineToken{FGColour: "", BGColour: "", Text: strings.Repeat(" ", maxWidth-widths[idx])}
 		for i := len(tokens) - 1; i >= 0; i-- {
-			// if tokens[i].Reset && (tokens[i].FGColour != "\x1b[0m" && tokens[i].BGColour != "\x1b[0m") && reversed[len(reversed)-2:len(reversed)-1] != "\x1b[0m" {
-			// 	reversed += "\x1b[0m" + tokens[i].FGColour + tokens[i].BGColour + tokens[i].Text
-			// } else {
-			reversed += tokens[i].FGColour + tokens[i].BGColour + ReverseUnicodeString(tokens[i].Text)
-			// }
+			revTokens[i+1] = ANSILineToken{
+				FGColour: tokens[i].FGColour,
+				BGColour: tokens[i].BGColour,
+				Text:     ReverseUnicodeString(tokens[i].Text),
+			}
 		}
-		if idx < len(lines)-1 {
-			reversed += "\n"
-		}
+		linesRev[idx] = revTokens
 	}
-	if reversed[len(reversed)-2:len(reversed)-1] != "\x1b[0m" {
-		reversed += "\033[0m"
-	}
-	if line[len(line)-1] == '\n' {
-		reversed += "\n"
-	}
-	return reversed
+	return linesRev
 }
 
 // Prints a pokemon with its name & category information.
