@@ -312,30 +312,34 @@ func BuildANSIString(lines [][]ANSILineToken) string {
 	return s
 }
 
-func ReverseANSIString(line string) [][]ANSILineToken {
-	lines := TokeniseANSIString(line)
+func ReverseANSIString(lines [][]ANSILineToken) [][]ANSILineToken {
 	linesRev := make([][]ANSILineToken, len(lines))
 
 	maxWidth := 0
 	widths := make([]int, len(lines))
-	for idx, l := range strings.Split(line, "\n") {
-		ln := UnicodeStringLength(l)
-		if ln > maxWidth {
-			maxWidth = ln
+	for idx, l := range lines {
+		lineWidth := 0
+		for _, token := range l {
+			lineWidth += UnicodeStringLength(token.Text)
 		}
-		widths[idx] = ln
+		if lineWidth > maxWidth {
+			maxWidth = lineWidth
+		}
+		widths[idx] = lineWidth
 	}
 
 	for idx, tokens := range lines {
-		revTokens := make([]ANSILineToken, len(tokens)+1)
+		revTokens := make([]ANSILineToken, 1)
 		// ensure vertical alignment
 		revTokens[0] = ANSILineToken{FGColour: "", BGColour: "", Text: strings.Repeat(" ", maxWidth-widths[idx])}
 		for i := len(tokens) - 1; i >= 0; i-- {
-			revTokens[i+1] = ANSILineToken{
+			fmt.Println(tokens[i], "\x1b[0m")
+			fmt.Println(ReverseUnicodeString(tokens[i].Text))
+			revTokens = append(revTokens, ANSILineToken{
 				FGColour: tokens[i].FGColour,
 				BGColour: tokens[i].BGColour,
 				Text:     ReverseUnicodeString(tokens[i].Text),
-			}
+			})
 		}
 		linesRev[idx] = revTokens
 	}
