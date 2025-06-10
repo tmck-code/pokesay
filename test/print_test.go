@@ -270,38 +270,72 @@ func TestReverseANSIString(test *testing.T) {
 	testCases := []struct {
 		name     string
 		input    string
-		expected string
+		expected [][]pokesay.ANSILineToken
 	}{
-		// {
-		// 	name: "Single line with ANSI colours",
-		// 	// The AAA has a purple fg, and the XX has a red bg
-		// 	input:    "\x1b[38;5;129mAAA \x1b[48;5;160m XX \x1b[0m",
-		// 	expected: "\x1b[0m\x1b[38;5;129m\x1b[48;5;160m XX \x1b[49m AAA\x1b[0m",
-		// },
+		{
+			name: "Single line with ANSI colours",
+			// The AAA has a purple fg, and the XX has a red bg
+			input: "\x1b[38;5;129mAAA \x1b[48;5;160m XX \x1b[0m",
+			// expected: "\x1b[0m\x1b[38;5;129m\x1b[48;5;160m XX \x1b[49m AAA\x1b[0m",
+			expected: [][]pokesay.ANSILineToken{
+				{
+					{"", "", ""},
+					{"\x1b[38;5;129m", "\x1b[48;5;160m", " XX "},
+					{"\x1b[38;5;129m", "", " AAA"},
+				},
+			},
+		},
 		{
 			name: "Multi-line with ANSI colours",
 			// purple fg, red bg
 			// the 4 spaces after AAA should have a purple fg, and no bg
-			input:    "\x1b[38;5;129mAAA    \x1b[48;5;160m XX \x1b[0m",
-			expected: "\x1b[0m\x1b[38;5;129m\x1b[48;5;160m XX \x1b[0m\x1b[38;5;129m    AAA\x1b[0m",
+			input: "\x1b[38;5;129mAAA    \x1b[48;5;160m XX \x1b[0m",
+			// expected: "\x1b[0m\x1b[38;5;129m\x1b[48;5;160m XX \x1b[0m\x1b[38;5;129m    AAA\x1b[0m",
+			expected: [][]pokesay.ANSILineToken{
+				{
+					{"", "", ""},
+					{"\x1b[38;5;129m", "\x1b[48;5;160m", " XX "},
+					{"\x1b[38;5;129m", "", "    AAA"},
+				},
+			},
 		},
 		{
 			name: "Multi-line with trailing spaces",
 			// The AAA has a purple fg, the XX has a red bg
 			input: "  \x1b[38;5;129mAAA \x1b[48;5;160m XY \x1b[0m  ",
 			// The AAA should still have a purple fg, and the XX should still have a red bg
-			expected: "\x1b[0m\x1b[0m  \x1b[38;5;129m\x1b[48;5;160m YX \x1b[0m\x1b[38;5;129m AAA  \x1b[0m",
+			expected: [][]pokesay.ANSILineToken{
+				{
+					pokesay.ANSILineToken{FGColour: "", BGColour: "", Text: ""},
+					pokesay.ANSILineToken{FGColour: "\x1b[0m", BGColour: "", Text: "  "},
+					pokesay.ANSILineToken{FGColour: "\x1b[38;5;129m", BGColour: "\x1b[48;5;160m", Text: " YX "},
+					pokesay.ANSILineToken{FGColour: "\x1b[38;5;129m", BGColour: "", Text: " AAA"},
+					pokesay.ANSILineToken{FGColour: "", BGColour: "", Text: "  "},
+				},
+			},
 		},
 		{
-			name:     "Multi-line with colour continuation",
-			input:    "\x1b[38;5;160m▄ \x1b[38;5;46m▄\n▄ \x1b[38;5;190m▄",
-			expected: "\x1b[0m\x1b[38;5;46m▄\x1b[38;5;160m ▄\n\x1b[38;5;190m▄\x1b[38;5;46m ▄\x1b[0m",
+			name:  "Multi-line with colour continuation",
+			input: "\x1b[38;5;160m▄ \x1b[38;5;46m▄\n▄ \x1b[38;5;190m▄",
+			// expected: "\x1b[0m\x1b[38;5;46m▄\x1b[38;5;160m ▄\n\x1b[38;5;190m▄\x1b[38;5;46m ▄\x1b[0m",
+			expected: [][]pokesay.ANSILineToken{
+				{
+					pokesay.ANSILineToken{FGColour: "", BGColour: "", Text: ""},
+					pokesay.ANSILineToken{FGColour: "\x1b[38;5;46m", BGColour: "", Text: "▄"},
+					pokesay.ANSILineToken{FGColour: "\x1b[38;5;160m", BGColour: "", Text: " ▄"},
+				},
+				{
+					pokesay.ANSILineToken{FGColour: "", BGColour: "", Text: ""},
+					pokesay.ANSILineToken{FGColour: "\x1b[38;5;190m", BGColour: "", Text: "▄"},
+					pokesay.ANSILineToken{FGColour: "\x1b[38;5;46m", BGColour: "", Text: " ▄"},
+				},
+			},
 		},
 		{
-			// Test ANSI pokemon reversal --------------------------------------------------
-			//
-			// These are larger "integration" tests for reversing ANSI strings.
-			// - reverse pokemon sprite (with & without ANSI colours)
+			// 	// Test ANSI pokemon reversal --------------------------------------------------
+			// 	//
+			// 	// These are larger "integration" tests for reversing ANSI strings.
+			// 	// - reverse pokemon sprite (with & without ANSI colours)
 			name: "flip pikachu without colour",
 			input: strings.Join(
 				[]string{
@@ -318,21 +352,18 @@ func TestReverseANSIString(test *testing.T) {
 				},
 				"\n",
 			),
-			expected: strings.Join(
-				[]string{
-					"  ▄▄          ▄▄         \x1b[0m",
-					"▄▄ ▄▄▄▄▄▄     ▄▄▄        \x1b[0m",
-					"▀▄   ▄▄  ▄▄▄ ▀▄  ▄       \x1b[0m",
-					"  ▀▄    ▄▄  ▄▄   ▄▄▄     \x1b[0m",
-					"   ▄▄  ▄▀ ▄  ▄▄▄   ▄▄    \x1b[0m",
-					"   ▀▄ ▄▄▄   ▄▄▄   ▄▄▀    \x1b[0m",
-					"    ▄▄▄▄▄   ▄▄ ▄▄▄▄▄▀    \x1b[0m",
-					"     ▀▄▄  ▄▄▄▄           \x1b[0m",
-					"      ▀▄    ▄▄▄▀         \x1b[0m",
-					"        ▀▄▀▀             \x1b[0m",
-				},
-				"\n",
-			),
+			expected: [][]pokesay.ANSILineToken{
+				{{"", "", "  "}, {"", "", "▄▄          ▄▄         "}},
+				{{"", "", ""}, {"", "", "▄▄ ▄▄▄▄▄▄     ▄▄▄        "}},
+				{{"", "", ""}, {"", "", "▀▄   ▄▄  ▄▄▄ ▀▄  ▄       "}},
+				{{"", "", "  "}, {"", "", "▀▄    ▄▄  ▄▄   ▄▄▄     "}},
+				{{"", "", "   "}, {"", "", "▄▄  ▄▀ ▄  ▄▄▄   ▄▄    "}},
+				{{"", "", "   "}, {"", "", "▀▄ ▄▄▄   ▄▄▄   ▄▄▀    "}},
+				{{"", "", "    "}, {"", "", "▄▄▄▄▄   ▄▄ ▄▄▄▄▄▀    "}},
+				{{"", "", "     "}, {"", "", "▀▄▄  ▄▄▄▄           "}},
+				{{"", "", "      "}, {"", "", "▀▄    ▄▄▄▀         "}},
+				{{"", "", "        "}, {"", "", "▀▄▀▀             "}},
+			},
 		},
 		{
 			name: "flip pikachu with colour",
@@ -351,21 +382,33 @@ func TestReverseANSIString(test *testing.T) {
 				},
 				"\n",
 			),
-			expected: strings.Join(
-				[]string{
-					"  \x1b[38;5;16m▄▄\x1b[0m         \x1b[0m\x1b[48;5;16m\x1b[38;5;232m ▄\x1b[0m\x1b[38;5;16m▄\x1b[0m     \x1b[0m    ",
-					"\x1b[38;5;16m▄\x1b[0m\x1b[48;5;16m\x1b[38;5;94m▄\x1b[0m\x1b[48;5;94m\x1b[38;5;94m \x1b[0m\x1b[48;5;214m\x1b[38;5;94m▄\x1b[0m\x1b[48;5;16m\x1b[38;5;214m▄\x1b[0m\x1b[38;5;16m▄▄▄▄\x1b[0m    \x1b[0m\x1b[48;5;16m\x1b[38;5;94m \x1b[0m\x1b[48;5;232m\x1b[38;5;94m▄\x1b[0m\x1b[48;5;16m\x1b[38;5;94m▄\x1b[0m▄        ",
-					"\x1b[49m▀\x1b[0m\x1b[48;5;94m\x1b[38;5;16m▄\x1b[0m\x1b[48;5;94m\x1b[38;5;94m   \x1b[0m\x1b[48;5;214m\x1b[38;5;94m▄\x1b[0m\x1b[48;5;232m\x1b[38;5;94m▄\x1b[0m\x1b[48;5;232m\x1b[38;5;214m  \x1b[0m\x1b[48;5;16m\x1b[38;5;214m▄▄\x1b[0m▄ ▀\x1b[0m\x1b[48;5;58m▄\x1b[0m\x1b[48;5;94m \x1b[0m\x1b[48;5;16m \x1b[0m▄       ",
-					"  \x1b[49m▀\x1b[0m\x1b[48;5;94m\x1b[38;5;16m▄\x1b[0m\x1b[48;5;94m\x1b[38;5;94m    \x1b[0m\x1b[48;5;232m\x1b[38;5;94m▄\x1b[0m\x1b[48;5;214m\x1b[38;5;232m▄\x1b[0m\x1b[48;5;214m\x1b[38;5;58m  \x1b[0m\x1b[48;5;16m\x1b[38;5;58m▄\x1b[0m\x1b[48;5;16m\x1b[38;5;214m▄\x1b[0m\x1b[48;5;214m\x1b[38;5;214m   \x1b[0m\x1b[48;5;94m\x1b[38;5;214m▄\x1b[0m\x1b[48;5;16m\x1b[38;5;214m▄\x1b[0m▄     ",
-					"   \x1b[38;5;16m▄\x1b[0m\x1b[48;5;16m\x1b[38;5;94m▄\x1b[0m\x1b[48;5;94m\x1b[38;5;16m  ▄\x1b[0m\x1b[38;5;16m▀\x1b[0m\x1b[48;5;16m\x1b[38;5;214m \x1b[0m\x1b[48;5;58m\x1b[38;5;214m▄\x1b[0m\x1b[48;5;214m\x1b[38;5;16m  ▄\x1b[0m\x1b[48;5;94m\x1b[38;5;231m▄\x1b[0m\x1b[48;5;214m\x1b[38;5;94m▄\x1b[0m\x1b[48;5;214m\x1b[38;5;214m   \x1b[0m\x1b[48;5;16m\x1b[38;5;214m▄\x1b[0m▄    ",
-					"   \x1b[49m▀\x1b[0m\x1b[48;5;94m\x1b[38;5;16m▄\x1b[0m\x1b[48;5;94m\x1b[38;5;94m \x1b[0m\x1b[48;5;16m\x1b[38;5;94m▄\x1b[0m\x1b[38;5;16m▄\x1b[0m\x1b[48;5;16m\x1b[38;5;214m▄\x1b[0m\x1b[48;5;214m\x1b[38;5;196m   ▄\x1b[0m\x1b[48;5;232m\x1b[38;5;196m▄\x1b[0m\x1b[48;5;16m\x1b[38;5;214m▄\x1b[0m\x1b[48;5;214m\x1b[38;5;214m   \x1b[0m\x1b[48;5;58m\x1b[38;5;214m▄\x1b[0m\x1b[48;5;214m▄\x1b[0m▀    ",
-					"    \x1b[38;5;16m▄\x1b[0m\x1b[48;5;16m\x1b[38;5;52m▄\x1b[0m\x1b[48;5;52m\x1b[38;5;232m▄\x1b[0m\x1b[48;5;232m\x1b[38;5;214m▄\x1b[0m\x1b[48;5;88m\x1b[38;5;214m▄\x1b[0m\x1b[48;5;214m\x1b[38;5;232m   \x1b[0m\x1b[48;5;196m\x1b[38;5;232m▄\x1b[0m\x1b[48;5;196m\x1b[38;5;214m▄\x1b[0m\x1b[48;5;214m\x1b[38;5;94m ▄▄\x1b[0m\x1b[48;5;94m▄\x1b[0m\x1b[48;5;232m▄\x1b[0m\x1b[48;5;94m▄\x1b[0m▀    ",
-					"     \x1b[49m▀\x1b[0m\x1b[48;5;232m\x1b[38;5;16m▄\x1b[0m\x1b[48;5;88m\x1b[38;5;214m▄\x1b[0m\x1b[48;5;214m\x1b[38;5;214m  \x1b[0m\x1b[48;5;232m\x1b[38;5;214m▄\x1b[0m\x1b[48;5;214m\x1b[38;5;232m▄▄\x1b[0m\x1b[48;5;232m\x1b[38;5;94m▄\x1b[0m\x1b[48;5;94m  \x1b[0m\x1b[48;5;16m \x1b[0m        ",
-					"      \x1b[49m▀\x1b[0m\x1b[48;5;232m▄\x1b[0m\x1b[48;5;214m    ▄\x1b[0m\x1b[48;5;94m▄▄\x1b[0m▀         ",
-					"        \x1b[39m\x1b[0m▀\x1b[0m\x1b[48;5;214m▄\x1b[0m▀▀             ",
-				},
-				"\n",
-			),
+			// expected: strings.Join(
+			// 	[]string{
+			// 		"  \x1b[38;5;16m▄▄\x1b[0m         \x1b[0m\x1b[48;5;16m\x1b[38;5;232m ▄\x1b[0m\x1b[38;5;16m▄\x1b[0m     \x1b[0m    ",
+			// 		"\x1b[38;5;16m▄\x1b[0m\x1b[48;5;16m\x1b[38;5;94m▄\x1b[0m\x1b[48;5;94m\x1b[38;5;94m \x1b[0m\x1b[48;5;214m\x1b[38;5;94m▄\x1b[0m\x1b[48;5;16m\x1b[38;5;214m▄\x1b[0m\x1b[38;5;16m▄▄▄▄\x1b[0m    \x1b[0m\x1b[48;5;16m\x1b[38;5;94m \x1b[0m\x1b[48;5;232m\x1b[38;5;94m▄\x1b[0m\x1b[48;5;16m\x1b[38;5;94m▄\x1b[0m▄        ",
+			// 		"\x1b[49m▀\x1b[0m\x1b[48;5;94m\x1b[38;5;16m▄\x1b[0m\x1b[48;5;94m\x1b[38;5;94m   \x1b[0m\x1b[48;5;214m\x1b[38;5;94m▄\x1b[0m\x1b[48;5;232m\x1b[38;5;94m▄\x1b[0m\x1b[48;5;232m\x1b[38;5;214m  \x1b[0m\x1b[48;5;16m\x1b[38;5;214m▄▄\x1b[0m▄ ▀\x1b[0m\x1b[48;5;58m▄\x1b[0m\x1b[48;5;94m \x1b[0m\x1b[48;5;16m \x1b[0m▄       ",
+			// 		"  \x1b[49m▀\x1b[0m\x1b[48;5;94m\x1b[38;5;16m▄\x1b[0m\x1b[48;5;94m\x1b[38;5;94m    \x1b[0m\x1b[48;5;232m\x1b[38;5;94m▄\x1b[0m\x1b[48;5;214m\x1b[38;5;232m▄\x1b[0m\x1b[48;5;214m\x1b[38;5;58m  \x1b[0m\x1b[48;5;16m\x1b[38;5;58m▄\x1b[0m\x1b[48;5;16m\x1b[38;5;214m▄\x1b[0m\x1b[48;5;214m\x1b[38;5;214m   \x1b[0m\x1b[48;5;94m\x1b[38;5;214m▄\x1b[0m\x1b[48;5;16m\x1b[38;5;214m▄\x1b[0m▄     ",
+			// 		"   \x1b[38;5;16m▄\x1b[0m\x1b[48;5;16m\x1b[38;5;94m▄\x1b[0m\x1b[48;5;94m\x1b[38;5;16m  ▄\x1b[0m\x1b[38;5;16m▀\x1b[0m\x1b[48;5;16m\x1b[38;5;214m \x1b[0m\x1b[48;5;58m\x1b[38;5;214m▄\x1b[0m\x1b[48;5;214m\x1b[38;5;16m  ▄\x1b[0m\x1b[48;5;94m\x1b[38;5;231m▄\x1b[0m\x1b[48;5;214m\x1b[38;5;94m▄\x1b[0m\x1b[48;5;214m\x1b[38;5;214m   \x1b[0m\x1b[48;5;16m\x1b[38;5;214m▄\x1b[0m▄    ",
+			// 		"   \x1b[49m▀\x1b[0m\x1b[48;5;94m\x1b[38;5;16m▄\x1b[0m\x1b[48;5;94m\x1b[38;5;94m \x1b[0m\x1b[48;5;16m\x1b[38;5;94m▄\x1b[0m\x1b[38;5;16m▄\x1b[0m\x1b[48;5;16m\x1b[38;5;214m▄\x1b[0m\x1b[48;5;214m\x1b[38;5;196m   ▄\x1b[0m\x1b[48;5;232m\x1b[38;5;196m▄\x1b[0m\x1b[48;5;16m\x1b[38;5;214m▄\x1b[0m\x1b[48;5;214m\x1b[38;5;214m   \x1b[0m\x1b[48;5;58m\x1b[38;5;214m▄\x1b[0m\x1b[48;5;214m▄\x1b[0m▀    ",
+			// 		"    \x1b[38;5;16m▄\x1b[0m\x1b[48;5;16m\x1b[38;5;52m▄\x1b[0m\x1b[48;5;52m\x1b[38;5;232m▄\x1b[0m\x1b[48;5;232m\x1b[38;5;214m▄\x1b[0m\x1b[48;5;88m\x1b[38;5;214m▄\x1b[0m\x1b[48;5;214m\x1b[38;5;232m   \x1b[0m\x1b[48;5;196m\x1b[38;5;232m▄\x1b[0m\x1b[48;5;196m\x1b[38;5;214m▄\x1b[0m\x1b[48;5;214m\x1b[38;5;94m ▄▄\x1b[0m\x1b[48;5;94m▄\x1b[0m\x1b[48;5;232m▄\x1b[0m\x1b[48;5;94m▄\x1b[0m▀    ",
+			// 		"     \x1b[49m▀\x1b[0m\x1b[48;5;232m\x1b[38;5;16m▄\x1b[0m\x1b[48;5;88m\x1b[38;5;214m▄\x1b[0m\x1b[48;5;214m\x1b[38;5;214m  \x1b[0m\x1b[48;5;232m\x1b[38;5;214m▄\x1b[0m\x1b[48;5;214m\x1b[38;5;232m▄▄\x1b[0m\x1b[48;5;232m\x1b[38;5;94m▄\x1b[0m\x1b[48;5;94m  \x1b[0m\x1b[48;5;16m \x1b[0m        ",
+			// 		"      \x1b[49m▀\x1b[0m\x1b[48;5;232m▄\x1b[0m\x1b[48;5;214m    ▄\x1b[0m\x1b[48;5;94m▄▄\x1b[0m▀         ",
+			// 		"        \x1b[39m\x1b[0m▀\x1b[0m\x1b[48;5;214m▄\x1b[0m▀▀             ",
+			// 	},
+			// 	"\n",
+			// ),
+			expected: [][]pokesay.ANSILineToken{
+				{{"", "", "  "}, {"\x1b[38;5;16m", "\x1b[49m", "▄▄"}, {"\x1b[38;5;232m", "\x1b[49m", "         "}, {"\x1b[38;5;232m", "\x1b[48;5;16m", " ▄"}, {"\x1b[38;5;16m", "\x1b[49m", "▄"}, {"", "\x1b[49m", "     "}, {"", "", "    "}},
+				{{"", "", ""}, {"\x1b[38;5;16m", "\x1b[49m", "▄"}, {"\x1b[38;5;94m", "\x1b[48;5;16m", "▄"}, {"\x1b[38;5;94m", "\x1b[48;5;94m", " "}, {"\x1b[38;5;94m", "\x1b[48;5;214m", "▄"}, {"\x1b[38;5;214m", "\x1b[48;5;16m", "▄"}, {"\x1b[38;5;16m", "\x1b[49m", "▄▄▄▄"}, {"\x1b[38;5;94m", "\x1b[49m", "    "}, {"\x1b[38;5;94m", "\x1b[48;5;16m", " "}, {"\x1b[38;5;94m", "\x1b[48;5;232m", "▄"}, {"\x1b[38;5;94m", "\x1b[48;5;16m", "▄"}, {"\x1b[38;5;16m", "\x1b[49m", "▄        "}},
+				{{"", "", ""}, {"\x1b[38;5;16m", "\x1b[49m", "▀"}, {"\x1b[38;5;16m", "\x1b[48;5;94m", "▄"}, {"\x1b[38;5;94m", "\x1b[48;5;94m", "   "}, {"\x1b[38;5;94m", "\x1b[48;5;214m", "▄"}, {"\x1b[38;5;94m", "\x1b[48;5;232m", "▄"}, {"\x1b[38;5;214m", "\x1b[48;5;232m", "  "}, {"\x1b[38;5;214m", "\x1b[48;5;16m", "▄▄"}, {"\x1b[38;5;16m", "\x1b[49m", "▄ ▀"}, {"\x1b[38;5;16m", "\x1b[48;5;58m", "▄"}, {"\x1b[38;5;16m", "\x1b[48;5;94m", " "}, {"\x1b[38;5;16m", "\x1b[48;5;16m", " "}, {"\x1b[38;5;16m", "\x1b[49m", "▄       "}},
+				{{"", "", "  "}, {"\x1b[38;5;16m", "\x1b[49m", "▀"}, {"\x1b[38;5;16m", "\x1b[48;5;94m", "▄"}, {"\x1b[38;5;94m", "\x1b[48;5;94m", "    "}, {"\x1b[38;5;94m", "\x1b[48;5;232m", "▄"}, {"\x1b[38;5;232m", "\x1b[48;5;214m", "▄"}, {"\x1b[38;5;58m", "\x1b[48;5;214m", "  "}, {"\x1b[38;5;58m", "\x1b[48;5;16m", "▄"}, {"\x1b[38;5;214m", "\x1b[48;5;16m", "▄"}, {"\x1b[38;5;214m", "\x1b[48;5;214m", "   "}, {"\x1b[38;5;214m", "\x1b[48;5;94m", "▄"}, {"\x1b[38;5;214m", "\x1b[48;5;16m", "▄"}, {"\x1b[38;5;16m", "\x1b[49m", "▄     "}},
+				{{"", "", "   "}, {"\x1b[38;5;16m", "\x1b[49m", "▄"}, {"\x1b[38;5;94m", "\x1b[48;5;16m", "▄"}, {"\x1b[38;5;16m", "\x1b[48;5;94m", "  ▄"}, {"\x1b[38;5;16m", "\x1b[49m", "▀"}, {"\x1b[38;5;214m", "\x1b[48;5;16m", " "}, {"\x1b[38;5;214m", "\x1b[48;5;58m", "▄"}, {"\x1b[38;5;16m", "\x1b[48;5;214m", "  ▄"}, {"\x1b[38;5;231m", "\x1b[48;5;94m", "▄"}, {"\x1b[38;5;94m", "\x1b[48;5;214m", "▄"}, {"\x1b[38;5;214m", "\x1b[48;5;214m", "   "}, {"\x1b[38;5;214m", "\x1b[48;5;16m", "▄"}, {"\x1b[38;5;16m", "\x1b[49m", "▄    "}},
+				{{"", "", "   "}, {"\x1b[38;5;16m", "\x1b[49m", "▀"}, {"\x1b[38;5;16m", "\x1b[48;5;94m", "▄"}, {"\x1b[38;5;94m", "\x1b[48;5;94m", " "}, {"\x1b[38;5;94m", "\x1b[48;5;16m", "▄"}, {"\x1b[38;5;16m", "\x1b[49m", "▄"}, {"\x1b[38;5;214m", "\x1b[48;5;16m", "▄"}, {"\x1b[38;5;196m", "\x1b[48;5;214m", "   ▄"}, {"\x1b[38;5;196m", "\x1b[48;5;232m", "▄"}, {"\x1b[38;5;214m", "\x1b[48;5;16m", "▄"}, {"\x1b[38;5;214m", "\x1b[48;5;214m", "   "}, {"\x1b[38;5;214m", "\x1b[48;5;58m", "▄"}, {"\x1b[38;5;16m", "\x1b[48;5;214m", "▄"}, {"\x1b[38;5;16m", "\x1b[49m", "▀    "}},
+				{{"", "", "    "}, {"\x1b[38;5;16m", "\x1b[49m", "▄"}, {"\x1b[38;5;52m", "\x1b[48;5;16m", "▄"}, {"\x1b[38;5;232m", "\x1b[48;5;52m", "▄"}, {"\x1b[38;5;214m", "\x1b[48;5;232m", "▄"}, {"\x1b[38;5;214m", "\x1b[48;5;88m", "▄"}, {"\x1b[38;5;232m", "\x1b[48;5;214m", "   "}, {"\x1b[38;5;232m", "\x1b[48;5;196m", "▄"}, {"\x1b[38;5;214m", "\x1b[48;5;196m", "▄"}, {"\x1b[38;5;94m", "\x1b[48;5;214m", " ▄▄"}, {"\x1b[38;5;16m", "\x1b[48;5;94m", "▄"}, {"\x1b[38;5;16m", "\x1b[48;5;232m", "▄"}, {"\x1b[38;5;16m", "\x1b[48;5;94m", "▄"}, {"\x1b[38;5;16m", "\x1b[49m", "▀    "}},
+				{{"", "", "     "}, {"\x1b[38;5;16m", "\x1b[49m", "▀"}, {"\x1b[38;5;16m", "\x1b[48;5;232m", "▄"}, {"\x1b[38;5;214m", "\x1b[48;5;88m", "▄"}, {"\x1b[38;5;214m", "\x1b[48;5;214m", "  "}, {"\x1b[38;5;214m", "\x1b[48;5;232m", "▄"}, {"\x1b[38;5;232m", "\x1b[48;5;214m", "▄▄"}, {"\x1b[38;5;94m", "\x1b[48;5;232m", "▄"}, {"\x1b[38;5;16m", "\x1b[48;5;94m", "  "}, {"\x1b[38;5;16m", "\x1b[48;5;16m", " "}, {"\x1b[38;5;16m", "\x1b[49m", "        "}},
+				{{"", "", "      "}, {"\x1b[38;5;16m", "\x1b[49m", "▀"}, {"\x1b[38;5;16m", "\x1b[48;5;232m", "▄"}, {"\x1b[38;5;16m", "\x1b[48;5;214m", "    ▄"}, {"\x1b[38;5;16m", "\x1b[48;5;94m", "▄▄"}, {"\x1b[38;5;16m", "\x1b[49m", "▀         "}},
+				{{"", "", "        "}, {"\x1b[39m", "\x1b[49m", ""}, {"\x1b[38;5;16m", "\x1b[49m", "▀"}, {"\x1b[38;5;16m", "\x1b[48;5;214m", "▄"}, {"\x1b[38;5;16m", "\x1b[49m", "▀▀             "}},
+			},
 		},
 		{
 			name: "flip egg with colour",
@@ -381,35 +424,60 @@ func TestReverseANSIString(test *testing.T) {
 				},
 				"\n",
 			),
-			expected: strings.Join(
-				[]string{
-					"        \x1b[49m\x1b[38;5;16m\x1b[49m▄▄\x1b[48;5;16m\x1b[38;5;142m\x1b[48;5;16m▄▄▄\x1b[38;5;16m\x1b[49m▄▄\x1b[49m    \x1b[49m \x1b[0m",
-					"      \x1b[49m\x1b[38;5;16m\x1b[49m▄\x1b[48;5;16m\x1b[38;5;237m\x1b[48;5;16m▄\x1b[48;5;237m\x1b[38;5;227m\x1b[48;5;237m▄\x1b[48;5;58m\x1b[38;5;70m\x1b[48;5;227m    \x1b[48;5;58m\x1b[38;5;70m\x1b[48;5;70m \x1b[48;5;58m\x1b[38;5;70m\x1b[48;5;58m▄\x1b[48;5;16m\x1b[38;5;58m\x1b[48;5;16m▄\x1b[49m\x1b[38;5;16m\x1b[49m▄\x1b[49m \x1b[0m",
-					"     \x1b[49m\x1b[38;5;16m\x1b[49m▄\x1b[48;5;16m\x1b[38;5;237m\x1b[48;5;16m▄\x1b[38;5;70m\x1b[48;5;142m \x1b[38;5;70m\x1b[48;5;227m▄▄\x1b[48;5;70m\x1b[38;5;227m\x1b[48;5;227m    \x1b[48;5;70m\x1b[38;5;227m\x1b[48;5;70m▄▄\x1b[48;5;16m\x1b[38;5;237m\x1b[48;5;16m▄\x1b[49m\x1b[38;5;16m\x1b[49m▄\x1b[49m \x1b[0m",
-					"     \x1b[38;5;58m\x1b[49m\x1b[38;5;58m\x1b[48;5;16m \x1b[38;5;58m\x1b[48;5;142m \x1b[38;5;58m\x1b[48;5;58m \x1b[38;5;58m\x1b[48;5;70m▄\x1b[48;5;70m\x1b[38;5;227m\x1b[48;5;70m▄\x1b[49m\x1b[38;5;16m\x1b[48;5;227m       \x1b[49m\x1b[38;5;16m\x1b[48;5;16m \x1b[49m\x1b[38;5;16m\x1b[49m \x1b[49m \x1b[0m",
-					"     \x1b[38;5;237m\x1b[49m\x1b[38;5;237m\x1b[48;5;16m \x1b[38;5;237m\x1b[48;5;142m▄\x1b[38;5;58m\x1b[48;5;142m ▄▄\x1b[38;5;58m\x1b[48;5;227m▄\x1b[48;5;227m\x1b[38;5;142m\x1b[48;5;227m▄▄\x1b[48;5;227m\x1b[38;5;142m\x1b[48;5;70m  \x1b[48;5;227m\x1b[38;5;142m\x1b[48;5;227m▄\x1b[48;5;142m\x1b[38;5;237m\x1b[48;5;142m▄\x1b[38;5;58m\x1b[48;5;16m \x1b[38;5;58m\x1b[49m \x1b[49m \x1b[0m",
-					"      \x1b[38;5;234m\x1b[49m\x1b[38;5;234m\x1b[48;5;16m \x1b[38;5;234m\x1b[48;5;58m▄\x1b[38;5;237m\x1b[48;5;58m    \x1b[38;5;237m\x1b[48;5;142m   ▄\x1b[38;5;237m\x1b[48;5;16m \x1b[38;5;237m\x1b[49m \x1b[49m \x1b[0m",
-					"       \x1b[39m\x1b[39m\x1b[49m\x1b[38;5;16m\x1b[49m▀▀\x1b[38;5;16m\x1b[48;5;58m▄▄\x1b[38;5;16m\x1b[48;5;142m▄▄▄\x1b[38;5;16m\x1b[49m▀▀\x1b[38;5;234m\x1b[49m \x1b[49m \x1b[0m",
-					"     \x1b[49m                 \x1b[0m",
-				},
-				"\n",
-			),
+			// expected: strings.Join(
+			// 	[]string{
+			// 		"        \x1b[49m\x1b[38;5;16m\x1b[49m▄▄\x1b[48;5;16m\x1b[38;5;142m\x1b[48;5;16m▄▄▄\x1b[38;5;16m\x1b[49m▄▄\x1b[49m    \x1b[49m \x1b[0m",
+			// 		"      \x1b[49m\x1b[38;5;16m\x1b[49m▄\x1b[48;5;16m\x1b[38;5;237m\x1b[48;5;16m▄\x1b[48;5;237m\x1b[38;5;227m\x1b[48;5;237m▄\x1b[48;5;58m\x1b[38;5;70m\x1b[48;5;227m    \x1b[48;5;58m\x1b[38;5;70m\x1b[48;5;70m \x1b[48;5;58m\x1b[38;5;70m\x1b[48;5;58m▄\x1b[48;5;16m\x1b[38;5;58m\x1b[48;5;16m▄\x1b[49m\x1b[38;5;16m\x1b[49m▄\x1b[49m \x1b[0m",
+			// 		"     \x1b[49m\x1b[38;5;16m\x1b[49m▄\x1b[48;5;16m\x1b[38;5;237m\x1b[48;5;16m▄\x1b[38;5;70m\x1b[48;5;142m \x1b[38;5;70m\x1b[48;5;227m▄▄\x1b[48;5;70m\x1b[38;5;227m\x1b[48;5;227m    \x1b[48;5;70m\x1b[38;5;227m\x1b[48;5;70m▄▄\x1b[48;5;16m\x1b[38;5;237m\x1b[48;5;16m▄\x1b[49m\x1b[38;5;16m\x1b[49m▄\x1b[49m \x1b[0m",
+			// 		"     \x1b[38;5;58m\x1b[49m\x1b[38;5;58m\x1b[48;5;16m \x1b[38;5;58m\x1b[48;5;142m \x1b[38;5;58m\x1b[48;5;58m \x1b[38;5;58m\x1b[48;5;70m▄\x1b[48;5;70m\x1b[38;5;227m\x1b[48;5;70m▄\x1b[49m\x1b[38;5;16m\x1b[48;5;227m       \x1b[49m\x1b[38;5;16m\x1b[48;5;16m \x1b[49m\x1b[38;5;16m\x1b[49m \x1b[49m \x1b[0m",
+			// 		"     \x1b[38;5;237m\x1b[49m\x1b[38;5;237m\x1b[48;5;16m \x1b[38;5;237m\x1b[48;5;142m▄\x1b[38;5;58m\x1b[48;5;142m ▄▄\x1b[38;5;58m\x1b[48;5;227m▄\x1b[48;5;227m\x1b[38;5;142m\x1b[48;5;227m▄▄\x1b[48;5;227m\x1b[38;5;142m\x1b[48;5;70m  \x1b[48;5;227m\x1b[38;5;142m\x1b[48;5;227m▄\x1b[48;5;142m\x1b[38;5;237m\x1b[48;5;142m▄\x1b[38;5;58m\x1b[48;5;16m \x1b[38;5;58m\x1b[49m \x1b[49m \x1b[0m",
+			// 		"      \x1b[38;5;234m\x1b[49m\x1b[38;5;234m\x1b[48;5;16m \x1b[38;5;234m\x1b[48;5;58m▄\x1b[38;5;237m\x1b[48;5;58m    \x1b[38;5;237m\x1b[48;5;142m   ▄\x1b[38;5;237m\x1b[48;5;16m \x1b[38;5;237m\x1b[49m \x1b[49m \x1b[0m",
+			// 		"       \x1b[39m\x1b[39m\x1b[49m\x1b[38;5;16m\x1b[49m▀▀\x1b[38;5;16m\x1b[48;5;58m▄▄\x1b[38;5;16m\x1b[48;5;142m▄▄▄\x1b[38;5;16m\x1b[49m▀▀\x1b[38;5;234m\x1b[49m \x1b[49m \x1b[0m",
+			// 		"     \x1b[49m                 \x1b[0m",
+			// 	},
+			// 	"\n",
+			// ),
+			expected: [][]pokesay.ANSILineToken{
+				{{"", "", "   "}, {"\x1b[38;5;16m", "\x1b[49m", "▄▄"}, {"\x1b[38;5;142m", "\x1b[48;5;16m", "▄▄▄"}, {"\x1b[38;5;16m", "\x1b[49m", "▄▄"}, {"", "\x1b[49m", "   "}, {"", "", "     "}},
+				{{"", "", " "}, {"\x1b[38;5;16m", "\x1b[49m", "▄"}, {"\x1b[38;5;237m", "\x1b[48;5;16m", "▄"}, {"\x1b[38;5;227m", "\x1b[48;5;237m", "▄"}, {"\x1b[38;5;70m", "\x1b[48;5;227m", "    "}, {"\x1b[38;5;70m", "\x1b[48;5;70m", " "}, {"\x1b[38;5;70m", "\x1b[48;5;58m", "▄"}, {"\x1b[38;5;58m", "\x1b[48;5;16m", "▄"}, {"\x1b[38;5;16m", "\x1b[49m", "▄      "}},
+				{{"", "", ""}, {"\x1b[38;5;16m", "\x1b[49m", "▄"}, {"\x1b[38;5;237m", "\x1b[48;5;16m", "▄"}, {"\x1b[38;5;70m", "\x1b[48;5;142m", " "}, {"\x1b[38;5;70m", "\x1b[48;5;227m", "▄▄"}, {"\x1b[38;5;227m", "\x1b[48;5;227m", "    "}, {"\x1b[38;5;227m", "\x1b[48;5;70m", "▄▄"}, {"\x1b[38;5;237m", "\x1b[48;5;16m", "▄"}, {"\x1b[38;5;16m", "\x1b[49m", "▄     "}},
+				{{"", "", ""}, {"\x1b[38;5;58m", "\x1b[49m", ""}, {"\x1b[38;5;58m", "\x1b[48;5;16m", " "}, {"\x1b[38;5;58m", "\x1b[48;5;142m", " "}, {"\x1b[38;5;58m", "\x1b[48;5;58m", " "}, {"\x1b[38;5;58m", "\x1b[48;5;70m", "▄"}, {"\x1b[38;5;227m", "\x1b[48;5;70m", "▄"}, {"\x1b[38;5;16m", "\x1b[48;5;227m", "       "}, {"\x1b[38;5;16m", "\x1b[48;5;16m", " "}, {"\x1b[38;5;16m", "\x1b[49m", "     "}},
+				{{"", "", ""}, {"\x1b[38;5;237m", "\x1b[49m", ""}, {"\x1b[38;5;237m", "\x1b[48;5;16m", " "}, {"\x1b[38;5;237m", "\x1b[48;5;142m", "▄"}, {"\x1b[38;5;58m", "\x1b[48;5;142m", " ▄▄"}, {"\x1b[38;5;58m", "\x1b[48;5;227m", "▄"}, {"\x1b[38;5;142m", "\x1b[48;5;227m", "▄▄"}, {"\x1b[38;5;142m", "\x1b[48;5;70m", "  "}, {"\x1b[38;5;142m", "\x1b[48;5;227m", "▄"}, {"\x1b[38;5;237m", "\x1b[48;5;142m", "▄"}, {"\x1b[38;5;58m", "\x1b[48;5;16m", " "}, {"\x1b[38;5;58m", "\x1b[49m", "     "}},
+				{{"", "", " "}, {"\x1b[38;5;234m", "\x1b[49m", ""}, {"\x1b[38;5;234m", "\x1b[48;5;16m", " "}, {"\x1b[38;5;234m", "\x1b[48;5;58m", "▄"}, {"\x1b[38;5;237m", "\x1b[48;5;58m", "    "}, {"\x1b[38;5;237m", "\x1b[48;5;142m", "   ▄"}, {"\x1b[38;5;237m", "\x1b[48;5;16m", " "}, {"\x1b[38;5;237m", "\x1b[49m", "      "}},
+				{{"", "", "  "}, {"\x1b[39m", "\x1b[49m", ""}, {"\x1b[38;5;16m", "\x1b[49m", "▀▀"}, {"\x1b[38;5;16m", "\x1b[48;5;58m", "▄▄"}, {"\x1b[38;5;16m", "\x1b[48;5;142m", "▄▄▄"}, {"\x1b[38;5;16m", "\x1b[49m", "▀▀"}, {"\x1b[38;5;234m", "\x1b[49m", "       "}},
+			},
 		},
 	}
 	for _, tc := range testCases {
-		result := ""
 		test.Run(tc.name, func(t *testing.T) {
-			defer func() {
-				if r := recover(); r != nil {
-					// We successfully recovered from panic
-					t.Log("Test passed, panic was caught!")
+			result := pokesay.ReverseANSIString(pokesay.TokeniseANSIString(tc.input))
+
+			fmt.Printf("input: 	  '\n%s\x1b[0m'\n", tc.input)
+			fmt.Printf("expected:   '\n%s\n", pokesay.BuildANSIString(tc.expected))
+			fmt.Printf("result:   '\n%s\n", pokesay.BuildANSIString(result))
+			for i, line := range tc.expected {
+				if Debug() {
+					fmt.Printf("expected: %+v\x1b[0m\n", line)
+					fmt.Printf("  result: %+v\x1b[0m\n", result[i])
+
+					eb, err := json.MarshalIndent(line, "", "  ")
+					if err != nil {
+						fmt.Println("error:", err)
+					}
+					fmt.Printf("expected: %+v\x1b[0m\n", string(eb))
+					rb, err := json.MarshalIndent(result[i], "", "  ")
+					if err != nil {
+						fmt.Println("error:", err)
+					}
+					fmt.Printf("  result: %+v\x1b[0m\n", string(rb))
+					for j, token := range result[i] {
+						Assert(line[j], token, t)
+						if (j + 1) < len(line) {
+							break
+						}
+					}
+					Assert(line, result[i], t)
 				}
-			}()
-			result = pokesay.ReverseANSIString(tc.input)
-			if Debug() {
-				fmt.Printf("input: 	  '%v\x1b[0m'\n", tc.input)
-				fmt.Printf("expected: '%v\x1b[0m'\n", tc.expected)
-				fmt.Printf("result:   '%v\x1b[0m'\n", result)
 			}
 			Assert(tc.expected, result, t)
 		})
