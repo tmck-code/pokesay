@@ -61,6 +61,7 @@ func parseFlags() pokesay.Args {
 
 	// other option
 	unicodeBorders := getopt.BoolLong("unicode-borders", 'u', "use unicode characters to draw the border around the speech box (and info box if --info-border is enabled)")
+	flipPokemon := getopt.BoolLong("flip", 'f', "flip the pokemon horizontally (face right instead of left)")
 
 	getopt.Parse()
 	var args pokesay.Args
@@ -90,6 +91,7 @@ func parseFlags() pokesay.Args {
 			JapaneseName:   *japaneseName,
 			BoxChars:       pokesay.DetermineBoxChars(*unicodeBorders),
 			DrawInfoBorder: *drawInfoBorder,
+			FlipPokemon:    *flipPokemon,
 			Help:           *help,
 			Verbose:        *verbose,
 		}

@@ -41,6 +41,7 @@ type Args struct {
 	JapaneseName   bool
 	BoxChars       *BoxChars
 	DrawInfoBorder bool
+	FlipPokemon    bool
 	Help           bool
 	Verbose        bool
 }
@@ -346,7 +347,7 @@ func ReverseANSIString(lines [][]ANSILineToken) [][]ANSILineToken {
 			revTokens = append(revTokens, ANSILineToken{
 				FG: tokens[i].FG,
 				BG: tokens[i].BG,
-				T:     ReverseUnicodeString(tokens[i].T),
+				T:  ReverseUnicodeString(tokens[i].T),
 			})
 		}
 		linesRev[idx] = revTokens
@@ -405,5 +406,13 @@ func printPokemon(args Args, index int, names []string, categoryKeys []string, G
 	} else {
 		infoLine = fmt.Sprintf("%s\n", infoLine)
 	}
-	fmt.Printf("%s%s", pokedex.Decompress(d), infoLine)
+	if args.FlipPokemon {
+		fmt.Printf(
+			"%s%s",
+			BuildANSIString(ReverseANSIString(TokeniseANSIString(string(pokedex.Decompress(d))))),
+			infoLine,
+		)
+	} else {
+		fmt.Printf("%s%s", pokedex.Decompress(d), infoLine)
+	}
 }
