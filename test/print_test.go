@@ -38,8 +38,8 @@ func TestUnicodeTokenise(test *testing.T) {
 			name:  "Single line with no colour",
 			input: "         ▄▄          ▄▄",
 			expected: [][]pokesay.ANSILineToken{
-				[]pokesay.ANSILineToken{
-					pokesay.ANSILineToken{FG:"", BG:"", T:"         ▄▄          ▄▄"},
+				{
+					{FG:"", BG:"", T:"         ▄▄          ▄▄"},
 				},
 			},
 		},
