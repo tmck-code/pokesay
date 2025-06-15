@@ -296,7 +296,7 @@ func TokeniseANSIString(msg string) [][]ANSILineToken {
 			} else {
 				// if we are setting a bg colour, but the last token didn't have one
 				// then add a background clear to the previous bg
-				if bg != "" && !strings.Contains(bg, "[49m") && tokens[len(tokens)-1].BG == "" {
+				if bg != "" && len(tokens) > 0 && !strings.Contains(bg, "[49m") && tokens[len(tokens)-1].BG == "" {
 					prevToken := tokens[len(tokens)-1]
 					tokens[len(tokens)-1] = ANSILineToken{prevToken.FG, "\x1b[49m", prevToken.T}
 				}
