@@ -9,6 +9,14 @@ import (
 	"github.com/tmck-code/pokesay/src/pokesay"
 )
 
+func AddBorder(s string) string {
+	newS := ""
+	for _, line := range strings.Split(s, "\n") {
+		newS += line + "|\n"
+	}
+	return newS
+}
+
 func TestUnicodeStringLength(test *testing.T) {
 	msg := []string{
 		" ▄  █ ▄███▄   █    █    ████▄       ▄ ▄   ████▄ █▄▄▄▄ █     ██▄",   // 63
@@ -226,9 +234,10 @@ func TestANSITokenise(test *testing.T) {
 		test.Run(tc.name, func(t *testing.T) {
 			result := pokesay.TokeniseANSIString(tc.input)
 
-			fmt.Printf("input: 	  '\n%s\x1b[0m'\n", tc.input)
-			fmt.Printf("expected:   '\n%s\n", pokesay.BuildANSIString(tc.expected))
-			fmt.Printf("result:   '\n%s\n", pokesay.BuildANSIString(result))
+			fmt.Printf("input: 	  '\n%s\x1b[0m'\n", AddBorder(tc.input))
+			fmt.Printf("expected:   '\n%s\x1b[0m'\n", AddBorder(pokesay.BuildANSIString(tc.expected)))
+			fmt.Printf("result:   '\n%s\n", AddBorder(pokesay.BuildANSIString(result)))
+
 			for i, line := range tc.expected {
 				if Debug() {
 					fmt.Printf("expected: %+v\x1b[0m\n", line)
@@ -421,9 +430,9 @@ func TestReverseANSIString(test *testing.T) {
 		test.Run(tc.name, func(t *testing.T) {
 			result := pokesay.ReverseANSIString(pokesay.TokeniseANSIString(tc.input))
 
-			fmt.Printf("input: 	  '\n%s\x1b[0m'\n", tc.input)
-			fmt.Printf("expected:   '\n%s\n", pokesay.BuildANSIString(tc.expected))
-			fmt.Printf("result:   '\n%s\n", pokesay.BuildANSIString(result))
+			fmt.Printf("input: 	  '\n%s\x1b[0m'\n", AddBorder(tc.input))
+			fmt.Printf("expected:   '\n%s\n", AddBorder(pokesay.BuildANSIString(tc.expected)))
+			fmt.Printf("result:   '\n%s\n", AddBorder(pokesay.BuildANSIString(result)))
 			for i, line := range tc.expected {
 				if Debug() {
 					fmt.Printf("expected: %+v\x1b[0m\n", line)
