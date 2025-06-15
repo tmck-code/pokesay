@@ -39,7 +39,7 @@ func TestUnicodeTokenise(test *testing.T) {
 			input: "         ▄▄          ▄▄",
 			expected: [][]pokesay.ANSILineToken{
 				{
-					{FG:"", BG:"", T:"         ▄▄          ▄▄"},
+					{FG: "", BG: "", T: "         ▄▄          ▄▄"},
 				},
 			},
 		},
