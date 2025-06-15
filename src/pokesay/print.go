@@ -342,8 +342,6 @@ func ReverseANSIString(lines [][]ANSILineToken) [][]ANSILineToken {
 		// ensure vertical alignment
 		revTokens[0] = ANSILineToken{FG: "", BG: "", T: strings.Repeat(" ", maxWidth-widths[idx])}
 		for i := len(tokens) - 1; i >= 0; i-- {
-			fmt.Println(tokens[i], "\x1b[0m")
-			fmt.Println(ReverseUnicodeString(tokens[i].T))
 			revTokens = append(revTokens, ANSILineToken{
 				FG: tokens[i].FG,
 				BG: tokens[i].BG,
