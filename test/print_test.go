@@ -39,10 +39,10 @@ func TestUnicodeTokenise(test *testing.T) {
 			input: "         ▄▄          ▄▄",
 			expected: [][]pokesay.ANSILineToken{
 				{
-					pokesay.ANSILineToken{FGColour: "", BGColour: "", Text: "         "},
-					pokesay.ANSILineToken{FGColour: "", BGColour: "", Text: "▄▄"},
-					pokesay.ANSILineToken{FGColour: "", BGColour: "", Text: "          "},
-					pokesay.ANSILineToken{FGColour: "", BGColour: "", Text: "▄▄"},
+					pokesay.ANSILineToken{FG: "", BG: "", T: "         "},
+					pokesay.ANSILineToken{FG: "", BG: "", T: "▄▄"},
+					pokesay.ANSILineToken{FG: "", BG: "", T: "          "},
+					pokesay.ANSILineToken{FG: "", BG: "", T: "▄▄"},
 				},
 			},
 		},
@@ -105,8 +105,8 @@ func TestANSITokenise(test *testing.T) {
 			input: "\x1b[38;5;129mAAA\x1b[48;5;160mXX",
 			expected: [][]pokesay.ANSILineToken{
 				{
-					pokesay.ANSILineToken{Text: "AAA", FGColour: "\x1b[38;5;129m", BGColour: ""},
-					pokesay.ANSILineToken{Text: "XX", FGColour: "\x1b[38;5;129m", BGColour: "\x1b[48;5;160m"},
+					pokesay.ANSILineToken{T: "AAA", FG: "\x1b[38;5;129m", BG: "\x1b[49m"},
+					pokesay.ANSILineToken{T: "XX", FG: "\x1b[38;5;129m", BG: "\x1b[48;5;160m"},
 				},
 			},
 		},
@@ -116,8 +116,8 @@ func TestANSITokenise(test *testing.T) {
 			input: "\x1b[38;5;129mAAA    \x1b[48;5;160m XX \x1b[0m",
 			expected: [][]pokesay.ANSILineToken{
 				{
-					pokesay.ANSILineToken{Text: "AAA    ", FGColour: "\x1b[38;5;129m", BGColour: ""},
-					pokesay.ANSILineToken{Text: " XX ", FGColour: "\x1b[38;5;129m", BGColour: "\x1b[48;5;160m"},
+					pokesay.ANSILineToken{T: "AAA    ", FG: "\x1b[38;5;129m", BG: "\x1b[49m"},
+					pokesay.ANSILineToken{T: " XX ", FG: "\x1b[38;5;129m", BG: "\x1b[48;5;160m"},
 				},
 			},
 		},
@@ -127,12 +127,12 @@ func TestANSITokenise(test *testing.T) {
 			input: "\x1b[38;5;160m▄\x1b[38;5;46m▄\n▄\x1b[38;5;190m▄",
 			expected: [][]pokesay.ANSILineToken{
 				{ // Line 1
-					pokesay.ANSILineToken{FGColour: "\x1b[38;5;160m", BGColour: "", Text: "▄"},
-					pokesay.ANSILineToken{FGColour: "\x1b[38;5;46m", BGColour: "", Text: "▄"},
+					pokesay.ANSILineToken{FG: "\x1b[38;5;160m", BG: "", T: "▄"},
+					pokesay.ANSILineToken{FG: "\x1b[38;5;46m", BG: "", T: "▄"},
 				},
 				{ // Line 2
-					pokesay.ANSILineToken{FGColour: "\x1b[38;5;46m", BGColour: "", Text: "▄"},
-					pokesay.ANSILineToken{FGColour: "\x1b[38;5;190m", BGColour: "", Text: "▄"},
+					pokesay.ANSILineToken{FG: "\x1b[38;5;46m", BG: "", T: "▄"},
+					pokesay.ANSILineToken{FG: "\x1b[38;5;190m", BG: "", T: "▄"},
 				},
 			},
 		},
@@ -142,8 +142,8 @@ func TestANSITokenise(test *testing.T) {
 			input: "\x1b[38;5;129mAAA  \x1b[48;5;160m  XX  \x1b[0m",
 			expected: [][]pokesay.ANSILineToken{
 				{
-					pokesay.ANSILineToken{Text: "AAA  ", FGColour: "\x1b[38;5;129m", BGColour: ""},
-					pokesay.ANSILineToken{Text: "  XX  ", FGColour: "\x1b[38;5;129m", BGColour: "\x1b[48;5;160m"},
+					pokesay.ANSILineToken{T: "AAA  ", FG: "\x1b[38;5;129m", BG: "\x1b[49m"},
+					pokesay.ANSILineToken{T: "  XX  ", FG: "\x1b[38;5;129m", BG: "\x1b[48;5;160m"},
 				},
 			},
 		},
@@ -152,8 +152,8 @@ func TestANSITokenise(test *testing.T) {
 			input: "\x1b[38;5;129mAAA\x1b[48;5;160mXX\x1b[0m",
 			expected: [][]pokesay.ANSILineToken{
 				{
-					pokesay.ANSILineToken{Text: "AAA", FGColour: "\x1b[38;5;129m", BGColour: ""},
-					pokesay.ANSILineToken{Text: "XX", FGColour: "\x1b[38;5;129m", BGColour: "\x1b[48;5;160m"},
+					pokesay.ANSILineToken{T: "AAA", FG: "\x1b[38;5;129m", BG: "\x1b[49m"},
+					pokesay.ANSILineToken{T: "XX", FG: "\x1b[38;5;129m", BG: "\x1b[48;5;160m"},
 				},
 			},
 		},
@@ -163,22 +163,22 @@ func TestANSITokenise(test *testing.T) {
 				"     ▄\x1b[48;5;16m\x1b[38;5;58m▄\x1b[48;5;58m\x1b[38;5;70m▄\x1b[48;5;70m \x1b[48;5;227m    \x1b[48;5;237m\x1b[38;5;227m▄\x1b[48;5;16m\x1b[38;5;237m▄\x1b[49m\x1b[38;5;16m▄",
 			expected: [][]pokesay.ANSILineToken{
 				{
-					pokesay.ANSILineToken{FGColour: "", BGColour: "", Text: "    "},
-					pokesay.ANSILineToken{FGColour: "", BGColour: "\x1b[49m", Text: "   "},
+					pokesay.ANSILineToken{FG: "", BG: "", T: "    "},
+					pokesay.ANSILineToken{FG: "", BG: "\x1b[49m", T: "   "},
 
-					pokesay.ANSILineToken{FGColour: "\u001b[38;5;16m", BGColour: "\x1b[49m", Text: "▄▄"},
-					pokesay.ANSILineToken{FGColour: "\u001b[38;5;142m", BGColour: "\u001b[48;5;16m", Text: "▄▄▄"},
-					pokesay.ANSILineToken{FGColour: "\u001b[38;5;16m", BGColour: "\x1b[49m", Text: "▄▄"},
+					pokesay.ANSILineToken{FG: "\u001b[38;5;16m", BG: "\x1b[49m", T: "▄▄"},
+					pokesay.ANSILineToken{FG: "\u001b[38;5;142m", BG: "\u001b[48;5;16m", T: "▄▄▄"},
+					pokesay.ANSILineToken{FG: "\u001b[38;5;16m", BG: "\x1b[49m", T: "▄▄"},
 				},
 				{
-					pokesay.ANSILineToken{FGColour: "\x1b[38;5;16m", BGColour: "\x1b[49m", Text: "     ▄"},
-					pokesay.ANSILineToken{FGColour: "\u001b[38;5;58m", BGColour: "\u001b[48;5;16m", Text: "▄"},
-					pokesay.ANSILineToken{FGColour: "\u001b[38;5;70m", BGColour: "\u001b[48;5;58m", Text: "▄"},
-					pokesay.ANSILineToken{FGColour: "\u001b[38;5;70m", BGColour: "\u001b[48;5;70m", Text: " "},
-					pokesay.ANSILineToken{FGColour: "\u001b[38;5;70m", BGColour: "\u001b[48;5;227m", Text: "    "},
-					pokesay.ANSILineToken{FGColour: "\u001b[38;5;227m", BGColour: "\u001b[48;5;237m", Text: "▄"},
-					pokesay.ANSILineToken{FGColour: "\u001b[38;5;237m", BGColour: "\u001b[48;5;16m", Text: "▄"},
-					pokesay.ANSILineToken{FGColour: "\u001b[38;5;16m", BGColour: "\u001b[49m", Text: "▄"},
+					pokesay.ANSILineToken{FG: "\x1b[38;5;16m", BG: "\x1b[49m", T: "     ▄"},
+					pokesay.ANSILineToken{FG: "\u001b[38;5;58m", BG: "\u001b[48;5;16m", T: "▄"},
+					pokesay.ANSILineToken{FG: "\u001b[38;5;70m", BG: "\u001b[48;5;58m", T: "▄"},
+					pokesay.ANSILineToken{FG: "\u001b[38;5;70m", BG: "\u001b[48;5;70m", T: " "},
+					pokesay.ANSILineToken{FG: "\u001b[38;5;70m", BG: "\u001b[48;5;227m", T: "    "},
+					pokesay.ANSILineToken{FG: "\u001b[38;5;227m", BG: "\u001b[48;5;237m", T: "▄"},
+					pokesay.ANSILineToken{FG: "\u001b[38;5;237m", BG: "\u001b[48;5;16m", T: "▄"},
+					pokesay.ANSILineToken{FG: "\u001b[38;5;16m", BG: "\u001b[49m", T: "▄"},
 				},
 			},
 		},
@@ -191,10 +191,10 @@ func TestANSITokenise(test *testing.T) {
 			// The XX should still have a red bg
 			expected: [][]pokesay.ANSILineToken{
 				{
-					pokesay.ANSILineToken{FGColour: "", BGColour: "", Text: "  "},
-					pokesay.ANSILineToken{FGColour: "\x1b[38;5;129m", BGColour: "", Text: "AAA "},
-					pokesay.ANSILineToken{FGColour: "\x1b[38;5;129m", BGColour: "\x1b[48;5;160m", Text: " XY "},
-					pokesay.ANSILineToken{FGColour: "\x1b[0m", BGColour: "", Text: "     "},
+					pokesay.ANSILineToken{FG: "", BG: "", T: "  "},
+					pokesay.ANSILineToken{FG: "\x1b[38;5;129m", BG: "\x1b[49m", T: "AAA "},
+					pokesay.ANSILineToken{FG: "\x1b[38;5;129m", BG: "\x1b[48;5;160m", T: " XY "},
+					pokesay.ANSILineToken{FG: "\x1b[0m", BG: "", T: "     "},
 				},
 			},
 		},
@@ -206,8 +206,8 @@ func TestANSITokenise(test *testing.T) {
 			// expected := "\x1b[0m\x1b[48;5;160m\x1b[38;5;129m XX \x1b[38;5;129m\x1b[49m    AAA\x1b[0m"
 			expected: [][]pokesay.ANSILineToken{
 				{
-					pokesay.ANSILineToken{FGColour: "\x1b[38;5;129m", BGColour: "", Text: "AAA    "},
-					pokesay.ANSILineToken{FGColour: "\x1b[38;5;129m", BGColour: "\x1b[48;5;160m", Text: " XX "},
+					pokesay.ANSILineToken{FG: "\x1b[38;5;129m", BG: "\x1b[49m", T: "AAA    "},
+					pokesay.ANSILineToken{FG: "\x1b[38;5;129m", BG: "\x1b[48;5;160m", T: " XX "},
 				},
 			},
 		},
@@ -219,8 +219,8 @@ func TestANSITokenise(test *testing.T) {
 			// expected := "\x1b[0m\x1b[48;5;160m\x1b[38;5;129m XX \x1b[38;5;129m\x1b[49m    AAA\x1b[0m"
 			expected: [][]pokesay.ANSILineToken{
 				{
-					pokesay.ANSILineToken{FGColour: "\x1b[38;5;129m", BGColour: "", Text: "AAA    "},
-					pokesay.ANSILineToken{FGColour: "\x1b[38;5;129m", BGColour: "\x1b[48;5;160m", Text: " XX "},
+					pokesay.ANSILineToken{FG: "\x1b[38;5;129m", BG: "\x1b[49m", T: "AAA    "},
+					pokesay.ANSILineToken{FG: "\x1b[38;5;129m", BG: "\x1b[48;5;160m", T: " XX "},
 				},
 			},
 		},
@@ -281,7 +281,7 @@ func TestReverseANSIString(test *testing.T) {
 				{
 					{"", "", ""},
 					{"\x1b[38;5;129m", "\x1b[48;5;160m", " XX "},
-					{"\x1b[38;5;129m", "", " AAA"},
+					{"\x1b[38;5;129m", "\x1b[49m", " AAA"},
 				},
 			},
 		},
@@ -293,9 +293,9 @@ func TestReverseANSIString(test *testing.T) {
 			// expected: "\x1b[0m\x1b[38;5;129m\x1b[48;5;160m XX \x1b[0m\x1b[38;5;129m    AAA\x1b[0m",
 			expected: [][]pokesay.ANSILineToken{
 				{
-					{"", "", ""},
-					{"\x1b[38;5;129m", "\x1b[48;5;160m", " XX "},
-					{"\x1b[38;5;129m", "", "    AAA"},
+					{FG: "", BG: "", T: ""},
+					{FG: "\x1b[38;5;129m", BG: "\x1b[48;5;160m", T: " XX "},
+					{FG: "\x1b[38;5;129m", BG: "\x1b[49m", T: "    AAA"},
 				},
 			},
 		},
@@ -306,11 +306,11 @@ func TestReverseANSIString(test *testing.T) {
 			// The AAA should still have a purple fg, and the XX should still have a red bg
 			expected: [][]pokesay.ANSILineToken{
 				{
-					pokesay.ANSILineToken{FGColour: "", BGColour: "", Text: ""},
-					pokesay.ANSILineToken{FGColour: "\x1b[0m", BGColour: "", Text: "  "},
-					pokesay.ANSILineToken{FGColour: "\x1b[38;5;129m", BGColour: "\x1b[48;5;160m", Text: " YX "},
-					pokesay.ANSILineToken{FGColour: "\x1b[38;5;129m", BGColour: "", Text: " AAA"},
-					pokesay.ANSILineToken{FGColour: "", BGColour: "", Text: "  "},
+					pokesay.ANSILineToken{FG: "", BG: "", T: ""},
+					pokesay.ANSILineToken{FG: "\x1b[0m", BG: "", T: "  "},
+					pokesay.ANSILineToken{FG: "\x1b[38;5;129m", BG: "\x1b[48;5;160m", T: " YX "},
+					pokesay.ANSILineToken{FG: "\x1b[38;5;129m", BG: "\x1b[49m", T: " AAA"},
+					pokesay.ANSILineToken{FG: "", BG: "", T: "  "},
 				},
 			},
 		},
@@ -320,14 +320,14 @@ func TestReverseANSIString(test *testing.T) {
 			// expected: "\x1b[0m\x1b[38;5;46m▄\x1b[38;5;160m ▄\n\x1b[38;5;190m▄\x1b[38;5;46m ▄\x1b[0m",
 			expected: [][]pokesay.ANSILineToken{
 				{
-					pokesay.ANSILineToken{FGColour: "", BGColour: "", Text: ""},
-					pokesay.ANSILineToken{FGColour: "\x1b[38;5;46m", BGColour: "", Text: "▄"},
-					pokesay.ANSILineToken{FGColour: "\x1b[38;5;160m", BGColour: "", Text: " ▄"},
+					pokesay.ANSILineToken{FG: "", BG: "", T: ""},
+					pokesay.ANSILineToken{FG: "\x1b[38;5;46m", BG: "", T: "▄"},
+					pokesay.ANSILineToken{FG: "\x1b[38;5;160m", BG: "", T: " ▄"},
 				},
 				{
-					pokesay.ANSILineToken{FGColour: "", BGColour: "", Text: ""},
-					pokesay.ANSILineToken{FGColour: "\x1b[38;5;190m", BGColour: "", Text: "▄"},
-					pokesay.ANSILineToken{FGColour: "\x1b[38;5;46m", BGColour: "", Text: " ▄"},
+					pokesay.ANSILineToken{FG: "", BG: "", T: ""},
+					pokesay.ANSILineToken{FG: "\x1b[38;5;190m", BG: "", T: "▄"},
+					pokesay.ANSILineToken{FG: "\x1b[38;5;46m", BG: "", T: " ▄"},
 				},
 			},
 		},
@@ -382,21 +382,6 @@ func TestReverseANSIString(test *testing.T) {
 				},
 				"\n",
 			),
-			// expected: strings.Join(
-			// 	[]string{
-			// 		"  \x1b[38;5;16m▄▄\x1b[0m         \x1b[0m\x1b[48;5;16m\x1b[38;5;232m ▄\x1b[0m\x1b[38;5;16m▄\x1b[0m     \x1b[0m    ",
-			// 		"\x1b[38;5;16m▄\x1b[0m\x1b[48;5;16m\x1b[38;5;94m▄\x1b[0m\x1b[48;5;94m\x1b[38;5;94m \x1b[0m\x1b[48;5;214m\x1b[38;5;94m▄\x1b[0m\x1b[48;5;16m\x1b[38;5;214m▄\x1b[0m\x1b[38;5;16m▄▄▄▄\x1b[0m    \x1b[0m\x1b[48;5;16m\x1b[38;5;94m \x1b[0m\x1b[48;5;232m\x1b[38;5;94m▄\x1b[0m\x1b[48;5;16m\x1b[38;5;94m▄\x1b[0m▄        ",
-			// 		"\x1b[49m▀\x1b[0m\x1b[48;5;94m\x1b[38;5;16m▄\x1b[0m\x1b[48;5;94m\x1b[38;5;94m   \x1b[0m\x1b[48;5;214m\x1b[38;5;94m▄\x1b[0m\x1b[48;5;232m\x1b[38;5;94m▄\x1b[0m\x1b[48;5;232m\x1b[38;5;214m  \x1b[0m\x1b[48;5;16m\x1b[38;5;214m▄▄\x1b[0m▄ ▀\x1b[0m\x1b[48;5;58m▄\x1b[0m\x1b[48;5;94m \x1b[0m\x1b[48;5;16m \x1b[0m▄       ",
-			// 		"  \x1b[49m▀\x1b[0m\x1b[48;5;94m\x1b[38;5;16m▄\x1b[0m\x1b[48;5;94m\x1b[38;5;94m    \x1b[0m\x1b[48;5;232m\x1b[38;5;94m▄\x1b[0m\x1b[48;5;214m\x1b[38;5;232m▄\x1b[0m\x1b[48;5;214m\x1b[38;5;58m  \x1b[0m\x1b[48;5;16m\x1b[38;5;58m▄\x1b[0m\x1b[48;5;16m\x1b[38;5;214m▄\x1b[0m\x1b[48;5;214m\x1b[38;5;214m   \x1b[0m\x1b[48;5;94m\x1b[38;5;214m▄\x1b[0m\x1b[48;5;16m\x1b[38;5;214m▄\x1b[0m▄     ",
-			// 		"   \x1b[38;5;16m▄\x1b[0m\x1b[48;5;16m\x1b[38;5;94m▄\x1b[0m\x1b[48;5;94m\x1b[38;5;16m  ▄\x1b[0m\x1b[38;5;16m▀\x1b[0m\x1b[48;5;16m\x1b[38;5;214m \x1b[0m\x1b[48;5;58m\x1b[38;5;214m▄\x1b[0m\x1b[48;5;214m\x1b[38;5;16m  ▄\x1b[0m\x1b[48;5;94m\x1b[38;5;231m▄\x1b[0m\x1b[48;5;214m\x1b[38;5;94m▄\x1b[0m\x1b[48;5;214m\x1b[38;5;214m   \x1b[0m\x1b[48;5;16m\x1b[38;5;214m▄\x1b[0m▄    ",
-			// 		"   \x1b[49m▀\x1b[0m\x1b[48;5;94m\x1b[38;5;16m▄\x1b[0m\x1b[48;5;94m\x1b[38;5;94m \x1b[0m\x1b[48;5;16m\x1b[38;5;94m▄\x1b[0m\x1b[38;5;16m▄\x1b[0m\x1b[48;5;16m\x1b[38;5;214m▄\x1b[0m\x1b[48;5;214m\x1b[38;5;196m   ▄\x1b[0m\x1b[48;5;232m\x1b[38;5;196m▄\x1b[0m\x1b[48;5;16m\x1b[38;5;214m▄\x1b[0m\x1b[48;5;214m\x1b[38;5;214m   \x1b[0m\x1b[48;5;58m\x1b[38;5;214m▄\x1b[0m\x1b[48;5;214m▄\x1b[0m▀    ",
-			// 		"    \x1b[38;5;16m▄\x1b[0m\x1b[48;5;16m\x1b[38;5;52m▄\x1b[0m\x1b[48;5;52m\x1b[38;5;232m▄\x1b[0m\x1b[48;5;232m\x1b[38;5;214m▄\x1b[0m\x1b[48;5;88m\x1b[38;5;214m▄\x1b[0m\x1b[48;5;214m\x1b[38;5;232m   \x1b[0m\x1b[48;5;196m\x1b[38;5;232m▄\x1b[0m\x1b[48;5;196m\x1b[38;5;214m▄\x1b[0m\x1b[48;5;214m\x1b[38;5;94m ▄▄\x1b[0m\x1b[48;5;94m▄\x1b[0m\x1b[48;5;232m▄\x1b[0m\x1b[48;5;94m▄\x1b[0m▀    ",
-			// 		"     \x1b[49m▀\x1b[0m\x1b[48;5;232m\x1b[38;5;16m▄\x1b[0m\x1b[48;5;88m\x1b[38;5;214m▄\x1b[0m\x1b[48;5;214m\x1b[38;5;214m  \x1b[0m\x1b[48;5;232m\x1b[38;5;214m▄\x1b[0m\x1b[48;5;214m\x1b[38;5;232m▄▄\x1b[0m\x1b[48;5;232m\x1b[38;5;94m▄\x1b[0m\x1b[48;5;94m  \x1b[0m\x1b[48;5;16m \x1b[0m        ",
-			// 		"      \x1b[49m▀\x1b[0m\x1b[48;5;232m▄\x1b[0m\x1b[48;5;214m    ▄\x1b[0m\x1b[48;5;94m▄▄\x1b[0m▀         ",
-			// 		"        \x1b[39m\x1b[0m▀\x1b[0m\x1b[48;5;214m▄\x1b[0m▀▀             ",
-			// 	},
-			// 	"\n",
-			// ),
 			expected: [][]pokesay.ANSILineToken{
 				{{"", "", "  "}, {"\x1b[38;5;16m", "\x1b[49m", "▄▄"}, {"\x1b[38;5;232m", "\x1b[49m", "         "}, {"\x1b[38;5;232m", "\x1b[48;5;16m", " ▄"}, {"\x1b[38;5;16m", "\x1b[49m", "▄"}, {"", "\x1b[49m", "     "}, {"", "", "    "}},
 				{{"", "", ""}, {"\x1b[38;5;16m", "\x1b[49m", "▄"}, {"\x1b[38;5;94m", "\x1b[48;5;16m", "▄"}, {"\x1b[38;5;94m", "\x1b[48;5;94m", " "}, {"\x1b[38;5;94m", "\x1b[48;5;214m", "▄"}, {"\x1b[38;5;214m", "\x1b[48;5;16m", "▄"}, {"\x1b[38;5;16m", "\x1b[49m", "▄▄▄▄"}, {"\x1b[38;5;94m", "\x1b[49m", "    "}, {"\x1b[38;5;94m", "\x1b[48;5;16m", " "}, {"\x1b[38;5;94m", "\x1b[48;5;232m", "▄"}, {"\x1b[38;5;94m", "\x1b[48;5;16m", "▄"}, {"\x1b[38;5;16m", "\x1b[49m", "▄        "}},
@@ -424,19 +409,6 @@ func TestReverseANSIString(test *testing.T) {
 				},
 				"\n",
 			),
-			// expected: strings.Join(
-			// 	[]string{
-			// 		"        \x1b[49m\x1b[38;5;16m\x1b[49m▄▄\x1b[48;5;16m\x1b[38;5;142m\x1b[48;5;16m▄▄▄\x1b[38;5;16m\x1b[49m▄▄\x1b[49m    \x1b[49m \x1b[0m",
-			// 		"      \x1b[49m\x1b[38;5;16m\x1b[49m▄\x1b[48;5;16m\x1b[38;5;237m\x1b[48;5;16m▄\x1b[48;5;237m\x1b[38;5;227m\x1b[48;5;237m▄\x1b[48;5;58m\x1b[38;5;70m\x1b[48;5;227m    \x1b[48;5;58m\x1b[38;5;70m\x1b[48;5;70m \x1b[48;5;58m\x1b[38;5;70m\x1b[48;5;58m▄\x1b[48;5;16m\x1b[38;5;58m\x1b[48;5;16m▄\x1b[49m\x1b[38;5;16m\x1b[49m▄\x1b[49m \x1b[0m",
-			// 		"     \x1b[49m\x1b[38;5;16m\x1b[49m▄\x1b[48;5;16m\x1b[38;5;237m\x1b[48;5;16m▄\x1b[38;5;70m\x1b[48;5;142m \x1b[38;5;70m\x1b[48;5;227m▄▄\x1b[48;5;70m\x1b[38;5;227m\x1b[48;5;227m    \x1b[48;5;70m\x1b[38;5;227m\x1b[48;5;70m▄▄\x1b[48;5;16m\x1b[38;5;237m\x1b[48;5;16m▄\x1b[49m\x1b[38;5;16m\x1b[49m▄\x1b[49m \x1b[0m",
-			// 		"     \x1b[38;5;58m\x1b[49m\x1b[38;5;58m\x1b[48;5;16m \x1b[38;5;58m\x1b[48;5;142m \x1b[38;5;58m\x1b[48;5;58m \x1b[38;5;58m\x1b[48;5;70m▄\x1b[48;5;70m\x1b[38;5;227m\x1b[48;5;70m▄\x1b[49m\x1b[38;5;16m\x1b[48;5;227m       \x1b[49m\x1b[38;5;16m\x1b[48;5;16m \x1b[49m\x1b[38;5;16m\x1b[49m \x1b[49m \x1b[0m",
-			// 		"     \x1b[38;5;237m\x1b[49m\x1b[38;5;237m\x1b[48;5;16m \x1b[38;5;237m\x1b[48;5;142m▄\x1b[38;5;58m\x1b[48;5;142m ▄▄\x1b[38;5;58m\x1b[48;5;227m▄\x1b[48;5;227m\x1b[38;5;142m\x1b[48;5;227m▄▄\x1b[48;5;227m\x1b[38;5;142m\x1b[48;5;70m  \x1b[48;5;227m\x1b[38;5;142m\x1b[48;5;227m▄\x1b[48;5;142m\x1b[38;5;237m\x1b[48;5;142m▄\x1b[38;5;58m\x1b[48;5;16m \x1b[38;5;58m\x1b[49m \x1b[49m \x1b[0m",
-			// 		"      \x1b[38;5;234m\x1b[49m\x1b[38;5;234m\x1b[48;5;16m \x1b[38;5;234m\x1b[48;5;58m▄\x1b[38;5;237m\x1b[48;5;58m    \x1b[38;5;237m\x1b[48;5;142m   ▄\x1b[38;5;237m\x1b[48;5;16m \x1b[38;5;237m\x1b[49m \x1b[49m \x1b[0m",
-			// 		"       \x1b[39m\x1b[39m\x1b[49m\x1b[38;5;16m\x1b[49m▀▀\x1b[38;5;16m\x1b[48;5;58m▄▄\x1b[38;5;16m\x1b[48;5;142m▄▄▄\x1b[38;5;16m\x1b[49m▀▀\x1b[38;5;234m\x1b[49m \x1b[49m \x1b[0m",
-			// 		"     \x1b[49m                 \x1b[0m",
-			// 	},
-			// 	"\n",
-			// ),
 			expected: [][]pokesay.ANSILineToken{
 				{{"", "", "   "}, {"\x1b[38;5;16m", "\x1b[49m", "▄▄"}, {"\x1b[38;5;142m", "\x1b[48;5;16m", "▄▄▄"}, {"\x1b[38;5;16m", "\x1b[49m", "▄▄"}, {"", "\x1b[49m", "   "}, {"", "", "     "}},
 				{{"", "", " "}, {"\x1b[38;5;16m", "\x1b[49m", "▄"}, {"\x1b[38;5;237m", "\x1b[48;5;16m", "▄"}, {"\x1b[38;5;227m", "\x1b[48;5;237m", "▄"}, {"\x1b[38;5;70m", "\x1b[48;5;227m", "    "}, {"\x1b[38;5;70m", "\x1b[48;5;70m", " "}, {"\x1b[38;5;70m", "\x1b[48;5;58m", "▄"}, {"\x1b[38;5;58m", "\x1b[48;5;16m", "▄"}, {"\x1b[38;5;16m", "\x1b[49m", "▄      "}},

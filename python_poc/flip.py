@@ -22,6 +22,10 @@ def tokenise_ansi(msg: str) -> Iterator[list[tuple[str, str]]]:
                     # save it,
                     if DEBUG:
                         print(f'> {text=}, {colour_fg=}, {colour_bg=}, {colour=}, {is_colour=}')
+                    if colour_bg: # if we are setting a bg colour
+                        if tokens[-1] and '[48' not in tokens[-1][0]: # but the last token didn't have one
+                            # then add a background clear to the previous bg
+                            tokens[-1] = (tokens[-1][0] + '\x1b[49m', tokens[-1][1])
                     tokens.append((''.join([*colour_fg, *colour_bg]), text))
                     colour = ch # then start a new colour token (unknown if bg/fg)
                     text = ''   # & clear the text buffer
