@@ -235,8 +235,8 @@ func TestANSITokenise(test *testing.T) {
 			result := pokesay.TokeniseANSIString(tc.input)
 
 			fmt.Printf("input: 	  '\n%s\x1b[0m'\n", AddBorder(tc.input))
-			fmt.Printf("expected:   '\n%s\x1b[0m'\n", AddBorder(pokesay.BuildANSIString(tc.expected)))
-			fmt.Printf("result:   '\n%s\n", AddBorder(pokesay.BuildANSIString(result)))
+			fmt.Printf("expected:   '\n%s\x1b[0m'\n", AddBorder(pokesay.BuildANSIString(tc.expected, 4)))
+			fmt.Printf("result:   '\n%s\n", AddBorder(pokesay.BuildANSIString(result, 4)))
 
 			for i, line := range tc.expected {
 				if Debug() {
@@ -431,8 +431,8 @@ func TestReverseANSIString(test *testing.T) {
 			result := pokesay.ReverseANSIString(pokesay.TokeniseANSIString(tc.input))
 
 			fmt.Printf("input: 	  '\n%s\x1b[0m'\n", AddBorder(tc.input))
-			fmt.Printf("expected:   '\n%s\n", AddBorder(pokesay.BuildANSIString(tc.expected)))
-			fmt.Printf("result:   '\n%s\n", AddBorder(pokesay.BuildANSIString(result)))
+			fmt.Printf("expected:   '\n%s\n", AddBorder(pokesay.BuildANSIString(tc.expected, 4)))
+			fmt.Printf("result:   '\n%s\n", AddBorder(pokesay.BuildANSIString(result, 4)))
 			for i, line := range tc.expected {
 				if Debug() {
 					fmt.Printf("expected: %+v\x1b[0m\n", line)

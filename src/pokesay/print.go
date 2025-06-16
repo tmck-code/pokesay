@@ -309,10 +309,11 @@ func TokeniseANSIString(msg string) [][]ANSILineToken {
 	return lines
 }
 
-func BuildANSIString(lines [][]ANSILineToken) string {
+func BuildANSIString(lines [][]ANSILineToken, padding int) string {
 	s := ""
 
 	for _, tokens := range lines {
+		s += strings.Repeat(" ", padding) // add padding to the left
 		for _, token := range tokens {
 			s += token.FG + token.BG + token.T
 		}
@@ -407,7 +408,7 @@ func printPokemon(args Args, index int, names []string, categoryKeys []string, G
 	if args.FlipPokemon {
 		fmt.Printf(
 			"%s%s",
-			BuildANSIString(ReverseANSIString(TokeniseANSIString(string(pokedex.Decompress(d))))),
+			BuildANSIString(ReverseANSIString(TokeniseANSIString(string(pokedex.Decompress(d)))), 4),
 			infoLine,
 		)
 	} else {
