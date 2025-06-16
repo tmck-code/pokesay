@@ -321,20 +321,10 @@ func BuildANSIString(lines [][]ANSILineToken) string {
 	return s
 }
 
-func allSameStrings(a []int) bool {
-	for i := 1; i < len(a); i++ {
-		if a[i] != a[0] {
-			return false
-		}
-	}
-	return true
-}
 func ReverseANSIString(lines [][]ANSILineToken) [][]ANSILineToken {
 	linesRev := make([][]ANSILineToken, len(lines))
 
 	maxWidth := 0
-	paddings := make([]int, 0)
-	padding := 0
 	widths := make([]int, len(lines))
 	for idx, l := range lines {
 		lineWidth := 0
@@ -345,43 +335,17 @@ func ReverseANSIString(lines [][]ANSILineToken) [][]ANSILineToken {
 			maxWidth = lineWidth
 		}
 		widths[idx] = lineWidth
-
-		paddingLen := 0
-		if strings.HasPrefix(l[0].T, " ") {
-			paddingLen = strings.Count(l[0].T, " ")
-		}
-		paddings = append(paddings, paddingLen)
-		if allSameStrings(paddings) {
-			padding = 0
-		} else {
-			padding = paddings[0]
-			for _, p := range paddings {
-				if p < padding {
-					padding = p
-				}
-			}
-		}
-
 	}
 
 	for idx, tokens := range lines {
-		revTokens := make([]ANSILineToken, 0)
+		revTokens := make([]ANSILineToken, 1)
 		// ensure vertical alignment
-		// revTokens[0] = ANSILineToken{FG: "", BG: "", T: strings.Repeat(" ", maxWidth-widths[idx])}
+		revTokens[0] = ANSILineToken{FG: "", BG: "", T: strings.Repeat(" ", maxWidth-widths[idx])}
 		for i := len(tokens) - 1; i >= 0; i-- {
-			t := ReverseUnicodeString(tokens[i].T)
-			if i == len(tokens)-1 && padding > 0 {
-				t = strings.Repeat(" ", padding+maxWidth-widths[idx]) + t
-			}
-
-			if tokens[i].FG == "" && tokens[i].BG == "" && tokens[i].T == "" {
-				// if the token is empty, skip it
-				continue
-			}
 			revTokens = append(revTokens, ANSILineToken{
 				FG: tokens[i].FG,
 				BG: tokens[i].BG,
-				T:  t,
+				T:  ReverseUnicodeString(tokens[i].T),
 			})
 		}
 		linesRev[idx] = revTokens
