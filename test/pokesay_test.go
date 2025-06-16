@@ -17,6 +17,8 @@ var (
 	GOBCategories embed.FS
 )
 
+// Test pokemon selection algorithms -------------------------------------------
+
 func TestChooseByName(test *testing.T) {
 	names := make(map[string][]int)
 	names["hoothoot"] = []int{4}
@@ -93,23 +95,7 @@ func TestChooseByNameAndCategory(test *testing.T) {
 func TestChooseByRandomIndex(test *testing.T) {
 	resultTotal, result := pokesay.ChooseByRandomIndex(GOBTotal)
 	Assert(9, resultTotal, test)
+
 	Assert(0 <= result, true, test)
 	Assert(9 >= result, true, test)
-}
-
-func TestUnicodeStringLength(test *testing.T) {
-	msg := []string{
-		" ▄  █ ▄███▄   █    █    ████▄       ▄ ▄   ████▄ █▄▄▄▄ █     ██▄",   // 63
-		"█   █ █▀   ▀  █    █    █   █      █   █  █   █ █  ▄▀ █     █  █",  // 64
-		"██▀▀█ ██▄▄    █    █    █   █     █ ▄   █ █   █ █▀▀▌  █     █   █", // 65
-		"█   █ █▄   ▄▀ ███▄ ███▄ ▀████     █  █  █ ▀████ █  █  ███▄  █  █",  // 64
-		"   █  ▀███▀       ▀    ▀           █ █ █          █       ▀ ███▀",  // 64
-		"  ▀                                 ▀ ▀          ▀",                // 50
-	}
-	expected := []int{63, 64, 65, 64, 64, 50}
-	results := make([]int, len(msg))
-	for i, line := range msg {
-		results[i] = pokesay.UnicodeStringLength(line)
-	}
-	Assert(expected, results, test)
 }
