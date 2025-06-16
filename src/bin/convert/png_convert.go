@@ -73,7 +73,7 @@ func main() {
 				break
 			}
 		}
-		if found {
+		if found && args.Debug {
 			fmt.Println("Skipping duplicate data for", f)
 			nDuplicates++
 			pbar.Add(1)
