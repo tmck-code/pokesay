@@ -3,6 +3,7 @@ package pokesay
 import (
 	"bufio"
 	"embed"
+	"encoding/json"
 	"fmt"
 	"os"
 	"strings"
@@ -96,18 +97,66 @@ func DetermineBoxChars(unicodeBox bool) *BoxChars {
 // 2. The cowfile data is retrieved using the matching index, decompressed (un-gzipped),
 // 3. The pokemon is printed along with the name & category information
 func Print(args Args, choice int, names []string, categories []string, cows embed.FS) {
-	printSpeechBubble(args.BoxChars, bufio.NewScanner(os.Stdin), args)
-	printPokemon(args, choice, names, categories, cows)
+	speechBubble := drawSpeechBubble(args.BoxChars, bufio.NewScanner(os.Stdin), args)
+	pokemon := drawPokemon(args, choice, names, categories, cows)
+
+	fmt.Printf("%#v\n", speechBubble)
+	fmt.Printf("%#v\n", pokemon)
+
+	sb, err := json.MarshalIndent(speechBubble, "", "  ")
+	if err != nil {
+		fmt.Println("error:", err)
+	}
+	fmt.Printf("  result: %+v\x1b[0m\n", string(sb))
+
+	pb, err := json.MarshalIndent(pokemon, "", "  ")
+	if err != nil {
+		fmt.Println("error:", err)
+	}
+	fmt.Printf("  result: %+v\x1b[0m\n", string(pb))
+
+
+
+	pokemonWidth := 0
+	for _, line := range pokemon {
+		pokemonWidth = max(pokemonWidth, UnicodeStringLength(line))
+	}
+
+	if len(speechBubble) > len(pokemon) {
+		for range(len(speechBubble) - len(pokemon)) {
+			pokemon = append(
+				[]string{strings.Repeat(" ", pokemonWidth)},
+				pokemon...,
+			)
+		}
+	}
+
+	if len(pokemon) > len(speechBubble) {
+		for range(len(pokemon) - len(speechBubble)) {
+			speechBubble = append(
+				[]string{strings.Repeat(" ", args.Width)},
+				speechBubble...,
+			)
+		}
+	}
+
+	for i := 0; i <= len(pokemon)-1; i++ {
+		fmt.Printf("%s%s\n", pokemon[len(pokemon)-i-1], speechBubble[i])
+	}
 }
 
 // Prints text from STDIN, surrounded by a speech bubble.
-func printSpeechBubble(boxChars *BoxChars, scanner *bufio.Scanner, args Args) {
+func drawSpeechBubble(boxChars *BoxChars, scanner *bufio.Scanner, args Args) []string {
+	lines := make([]string, 0)
 	if args.DrawBubble {
-		fmt.Printf(
-			"%s%s%s\n",
-			boxChars.TopLeftCorner,
-			strings.Repeat(boxChars.HorizontalEdge, args.Width+2),
-			boxChars.TopRightCorner,
+		lines = append(
+			lines,
+			fmt.Sprintf(
+				"%s%s%s",
+				boxChars.TopLeftCorner,
+				strings.Repeat(boxChars.HorizontalEdge, args.Width+2),
+				boxChars.TopRightCorner,
+			),
 		)
 	}
 
@@ -118,9 +167,15 @@ func printSpeechBubble(boxChars *BoxChars, scanner *bufio.Scanner, args Args) {
 			line = strings.Replace(line, "\t", args.TabSpaces, -1)
 		}
 		if args.NoWrap {
-			printSpeechBubbleLine(boxChars, line, args)
+			lines = append(
+				lines,
+				drawSpeechBubbleLine(boxChars, line, args),
+			)
 		} else {
-			printWrappedText(boxChars, line, args)
+			lines = append(
+				lines,
+				printWrappedText(boxChars, line, args)...,
+			)
 		}
 	}
 
@@ -129,27 +184,36 @@ func printSpeechBubble(boxChars *BoxChars, scanner *bufio.Scanner, args Args) {
 		strings.Repeat(boxChars.HorizontalEdge, args.Width+2-7)
 
 	if args.DrawBubble {
-		fmt.Printf("%s%s%s\n", boxChars.BottomLeftCorner, bottomBorder, boxChars.BottomRightCorner)
+		lines = append(
+			lines,
+			fmt.Sprintf("%s%s%s", boxChars.BottomLeftCorner, bottomBorder, boxChars.BottomRightCorner),
+		)
 	} else {
-		fmt.Printf(" %s \n", bottomBorder)
+		lines = append(
+			lines,
+			fmt.Sprintf(" %s ", bottomBorder),
+		)
 	}
 	for i := 0; i < 4; i++ {
-		fmt.Printf("%s%s\n", strings.Repeat(" ", i+8), boxChars.BalloonString)
+		lines = append(
+			lines,
+			fmt.Sprintf("%s%s", strings.Repeat(" ", i+8), boxChars.BalloonString),
+		)
 	}
+	return lines
 }
 
 // Prints a single speech bubble line
-func printSpeechBubbleLine(boxChars *BoxChars, line string, args Args) {
+func drawSpeechBubbleLine(boxChars *BoxChars, line string, args Args) string {
 	if !args.DrawBubble {
-		fmt.Println(line)
-		return
+		return line
 	}
 
 	lineLen := UnicodeStringLength(line)
 	if lineLen <= args.Width {
 		// print the line with padding, the most common case
-		fmt.Printf(
-			"%s %s%s%s %s\n",
+		return fmt.Sprintf(
+			"%s %s%s%s %s",
 			boxChars.VerticalEdge, // left-hand side of the bubble
 			line, resetColourANSI, // the text
 			strings.Repeat(" ", args.Width-lineLen), // padding
@@ -157,19 +221,25 @@ func printSpeechBubbleLine(boxChars *BoxChars, line string, args Args) {
 		)
 	} else if lineLen > args.Width {
 		// print the line without padding or right-hand side of the bubble if the line is too long
-		fmt.Printf(
-			"%s %s%s\n",
+		return fmt.Sprintf(
+			"%s %s%s",
 			boxChars.VerticalEdge, // left-hand side of the bubble
 			line, resetColourANSI, // the text
 		)
 	}
+	return ""
 }
 
 // Prints line of text across multiple lines, wrapping it so that it doesn't exceed the desired width.
-func printWrappedText(boxChars *BoxChars, line string, args Args) {
+func printWrappedText(boxChars *BoxChars, line string, args Args) []string {
+	wrappedLines := make([]string, 0)
 	for _, wline := range strings.Split(wordwrap.WrapString(strings.Replace(line, "\t", args.TabSpaces, -1), uint(args.Width)), "\n") {
-		printSpeechBubbleLine(boxChars, wline, args)
+		wrappedLines = append(
+			wrappedLines,
+			drawSpeechBubbleLine(boxChars, wline, args),
+		)
 	}
+	return wrappedLines
 }
 
 func nameLength(names []string) int {
@@ -355,8 +425,9 @@ func ReverseANSIString(lines [][]ANSILineToken) [][]ANSILineToken {
 }
 
 // Prints a pokemon with its name & category information.
-func printPokemon(args Args, index int, names []string, categoryKeys []string, GOBCowData embed.FS) {
+func drawPokemon(args Args, index int, names []string, categoryKeys []string, GOBCowData embed.FS) []string {
 	d, _ := GOBCowData.ReadFile(pokedex.EntryFpath("build/assets/cows", index))
+	p := make([]string, 0)
 
 	width := nameLength(names)
 	namesFmt := make([]string, 0)
@@ -406,12 +477,23 @@ func printPokemon(args Args, index int, names []string, categoryKeys []string, G
 		infoLine = fmt.Sprintf("%s\n", infoLine)
 	}
 	if args.FlipPokemon {
-		fmt.Printf(
-			"%s%s",
-			BuildANSIString(ReverseANSIString(TokeniseANSIString(string(pokedex.Decompress(d)))), 4),
-			infoLine,
+		p = append(
+			p,
+			strings.Split(
+				BuildANSIString(ReverseANSIString(TokeniseANSIString(string(pokedex.Decompress(d)))), 4),
+				"\n",
+			)...,
 		)
+		p = append(p, strings.Split(infoLine, "\n")...)
 	} else {
-		fmt.Printf("%s%s", pokedex.Decompress(d), infoLine)
+		p = append(
+			p,
+			strings.Split(
+				string(pokedex.Decompress(d)),
+				"\n",
+			)...,
+		)
+		p = append(p, strings.Split(infoLine, "\n")...)
 	}
+	return p
 }
