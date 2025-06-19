@@ -97,9 +97,6 @@ func DetermineBoxChars(unicodeBox bool) *BoxChars {
 //     one is padded with spaces to match the height of the taller one.
 //   - In above-and-below mode, the same thing is done to the width
 func ConcatLines(pokemon []string, speechBubble []string, args Args) []string {
-	fmt.Printf("%#v\n", speechBubble)
-	fmt.Printf("%#v\n", pokemon)
-
 	totalLen := max(len(pokemon), len(speechBubble))
 	pokemonWidth := 0
 	for _, line := range pokemon {
@@ -112,7 +109,7 @@ func ConcatLines(pokemon []string, speechBubble []string, args Args) []string {
 
 	lines := make([]string, totalLen)
 
-	for i := range(totalLen) {
+	for i := range totalLen {
 		line := ""
 		if i < len(pokemon) {
 			line += pokemon[i]
@@ -120,8 +117,10 @@ func ConcatLines(pokemon []string, speechBubble []string, args Args) []string {
 			line += strings.Repeat(" ", pokemonWidth)
 		}
 		line += " "
-		if totalLen - len(speechBubble) - i > 0 {
+		if totalLen-len(speechBubble)-i > 0 {
 			line += strings.Repeat(" ", speechBubbleWidth)
+		} else if len(speechBubble) == totalLen {
+			line += speechBubble[i]
 		} else {
 			line += speechBubble[i-len(speechBubble)+1]
 		}
