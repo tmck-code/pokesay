@@ -91,15 +91,13 @@ func DetermineBoxChars(unicodeBox bool) *BoxChars {
 	}
 }
 
-// The main print function! This uses a chosen pokemon's index, names and categories, and an
-// embedded filesystem of cowfile data
-// 1. The text received from STDIN is printed inside a speech bubble
-// 2. The cowfile data is retrieved using the matching index, decompressed (un-gzipped),
-// 3. The pokemon is printed along with the name & category information
-func Print(args Args, choice int, names []string, categories []string, cows embed.FS) {
-	speechBubble := drawSpeechBubble(args.BoxChars, bufio.NewScanner(os.Stdin), args)
-	pokemon := drawPokemon(args, choice, names, categories, cows)
-
+// Takes a pikemon sprite and a speech bubble, and concatenates them
+// side-by-side or above-and-below into a single slice of strings,
+// ready to be printed.
+//   - In side-by-side mode, epending on which is taller, the shorter
+//     one is padded with spaces to match the height of the taller one.
+//   - In above-and-below mode, the same thing is done to the width
+func ConcatLines(pokemon []string, speechBubble []string, args Args) []string {
 	fmt.Printf("%#v\n", speechBubble)
 	fmt.Printf("%#v\n", pokemon)
 
@@ -115,15 +113,13 @@ func Print(args Args, choice int, names []string, categories []string, cows embe
 	}
 	fmt.Printf("  result: %+v\x1b[0m\n", string(pb))
 
-
-
 	pokemonWidth := 0
 	for _, line := range pokemon {
 		pokemonWidth = max(pokemonWidth, UnicodeStringLength(line))
 	}
 
 	if len(speechBubble) > len(pokemon) {
-		for range(len(speechBubble) - len(pokemon)) {
+		for range len(speechBubble) - len(pokemon) {
 			pokemon = append(
 				[]string{strings.Repeat(" ", pokemonWidth)},
 				pokemon...,
@@ -132,17 +128,32 @@ func Print(args Args, choice int, names []string, categories []string, cows embe
 	}
 
 	if len(pokemon) > len(speechBubble) {
-		for range(len(pokemon) - len(speechBubble)) {
+		for range len(pokemon) - len(speechBubble) {
 			speechBubble = append(
 				[]string{strings.Repeat(" ", args.Width)},
 				speechBubble...,
 			)
 		}
 	}
+	return pokemon
+}
 
-	for i := 0; i <= len(pokemon)-1; i++ {
-		fmt.Printf("%s%s\n", pokemon[len(pokemon)-i-1], speechBubble[i])
-	}
+// The main print function! This uses a chosen pokemon's index, names and categories, and an
+// embedded filesystem of cowfile data
+// 1. The text received from STDIN is printed inside a speech bubble
+// 2. The cowfile data is retrieved using the matching index, decompressed (un-gzipped),
+// 3. The pokemon is printed along with the name & category information
+func Print(args Args, choice int, names []string, categories []string, cows embed.FS) {
+	fmt.Println(
+		strings.Join(
+			ConcatLines(
+				drawSpeechBubble(args.BoxChars, bufio.NewScanner(os.Stdin), args),
+				drawPokemon(args, choice, names, categories, cows),
+				args,
+			),
+			"\n",
+		),
+	)
 }
 
 // Prints text from STDIN, surrounded by a speech bubble.
