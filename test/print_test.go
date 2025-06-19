@@ -431,3 +431,89 @@ func TestReverseANSIString(test *testing.T) {
 		})
 	}
 }
+
+func TestConcatLines(test *testing.T) {
+	testCases := []struct {
+		name     string
+		input    [][]string
+		args     pokesay.Args
+		expected []string
+	}{
+		{
+			name: "Concat simple",
+			input: [][]string{
+				{
+					"_______",
+					"| xyz |",
+					"-------",
+				},
+				{
+					"=======",
+					"= 123 =",
+					"=======",
+				},
+			},
+			args: pokesay.Args{Width: 80},
+			expected: []string{
+				"_______ =======",
+				"| xyz | = 123 =",
+				"------- =======",
+			},
+		},
+		{
+			name: "Concat unicode",
+			input: [][]string{
+				{
+					"╭─────────────╮",
+					"│ → ムクホーク│",
+					"╰─────────────╯",
+				},
+				{
+					"֎֎֎֎",
+					"XXXX",
+					"֎֎֎֎",
+
+				},
+			},
+			args: pokesay.Args{Width: 80},
+			expected: []string{
+					"╭─────────────╮ ֎֎֎֎",
+					"│ → ムクホーク│ XXXX",
+					"╰─────────────╯ ֎֎֎֎",
+			},
+		},
+		{
+			name: "Concat with vertical padding",
+			input: [][]string{
+				{
+					"╭───────────────╮",
+					"│ → 0 ムクホーク│",
+					"│ → 1 ムクホーク│",
+					"│ → 2 ムクホーク│",
+					"╰───────────────╯",
+				},
+				{
+					"╭─────────────╮",
+					"│ → ムクホーク│",
+					"╰─────────────╯",
+				},
+			},
+			args: pokesay.Args{Width: 80},
+			expected: []string{
+				"╭───────────────╮                ",
+				"│ → 0 ムクホーク│                ",
+				"│ → 1 ムクホーク│ ╭─────────────╮",
+				"│ → 2 ムクホーク│ │ → ムクホーク│",
+				"╰───────────────╯ ╰─────────────╯",
+			},
+		},
+	}
+	for _, tc := range testCases {
+		test.Run(tc.name, func(t *testing.T) {
+			result := pokesay.ConcatLines(tc.input[0], tc.input[1], tc.args)
+			fmt.Printf("> %s\n%s\n", "expected", strings.Join(tc.expected, "\n"))
+			fmt.Printf("> %s\n%s\n", "result", strings.Join(result, "\n"))
+			Assert(tc.expected, result, t)
+		})
+	}
+}

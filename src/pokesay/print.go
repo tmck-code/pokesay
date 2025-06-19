@@ -3,7 +3,6 @@ package pokesay
 import (
 	"bufio"
 	"embed"
-	"encoding/json"
 	"fmt"
 	"os"
 	"strings"
@@ -101,41 +100,34 @@ func ConcatLines(pokemon []string, speechBubble []string, args Args) []string {
 	fmt.Printf("%#v\n", speechBubble)
 	fmt.Printf("%#v\n", pokemon)
 
-	sb, err := json.MarshalIndent(speechBubble, "", "  ")
-	if err != nil {
-		fmt.Println("error:", err)
-	}
-	fmt.Printf("  result: %+v\x1b[0m\n", string(sb))
-
-	pb, err := json.MarshalIndent(pokemon, "", "  ")
-	if err != nil {
-		fmt.Println("error:", err)
-	}
-	fmt.Printf("  result: %+v\x1b[0m\n", string(pb))
-
+	totalLen := max(len(pokemon), len(speechBubble))
 	pokemonWidth := 0
 	for _, line := range pokemon {
 		pokemonWidth = max(pokemonWidth, UnicodeStringLength(line))
 	}
-
-	if len(speechBubble) > len(pokemon) {
-		for range len(speechBubble) - len(pokemon) {
-			pokemon = append(
-				[]string{strings.Repeat(" ", pokemonWidth)},
-				pokemon...,
-			)
-		}
+	speechBubbleWidth := 0
+	for _, line := range speechBubble {
+		speechBubbleWidth = max(speechBubbleWidth, UnicodeStringLength(line))
 	}
 
-	if len(pokemon) > len(speechBubble) {
-		for range len(pokemon) - len(speechBubble) {
-			speechBubble = append(
-				[]string{strings.Repeat(" ", args.Width)},
-				speechBubble...,
-			)
+	lines := make([]string, totalLen)
+
+	for i := range(totalLen) {
+		line := ""
+		if i < len(pokemon) {
+			line += pokemon[i]
+		} else {
+			line += strings.Repeat(" ", pokemonWidth)
 		}
+		line += " "
+		if totalLen - len(speechBubble) - i > 0 {
+			line += strings.Repeat(" ", speechBubbleWidth)
+		} else {
+			line += speechBubble[i-len(speechBubble)+1]
+		}
+		lines[i] = line
 	}
-	return pokemon
+	return lines
 }
 
 // The main print function! This uses a chosen pokemon's index, names and categories, and an
