@@ -208,7 +208,6 @@ func TestANSITokenise(test *testing.T) {
 			// purple fg, red bg
 			// the 4 spaces after AAA should have a purple fg, and no bg
 			input: "\x1b[38;5;129mAAA    \x1b[48;5;160m XX \x1b[0m",
-			// expected := "\x1b[0m\x1b[48;5;160m\x1b[38;5;129m XX \x1b[38;5;129m\x1b[49m    AAA\x1b[0m"
 			expected: [][]pokesay.ANSILineToken{
 				{
 					pokesay.ANSILineToken{FG: "\x1b[38;5;129m", BG: "\x1b[49m", T: "AAA    "},
@@ -221,7 +220,6 @@ func TestANSITokenise(test *testing.T) {
 			// purple fg, red bg
 			// the 4 spaces after AAA should have a purple fg, and no bg
 			input: "\x1b[38;5;129mAAA    \x1b[48;5;160m XX \x1b[0m",
-			// expected := "\x1b[0m\x1b[48;5;160m\x1b[38;5;129m XX \x1b[38;5;129m\x1b[49m    AAA\x1b[0m"
 			expected: [][]pokesay.ANSILineToken{
 				{
 					pokesay.ANSILineToken{FG: "\x1b[38;5;129m", BG: "\x1b[49m", T: "AAA    "},
@@ -282,7 +280,6 @@ func TestReverseANSIString(test *testing.T) {
 			name: "Single line with ANSI colours",
 			// The AAA has a purple fg, and the XX has a red bg
 			input: "\x1b[38;5;129mAAA \x1b[48;5;160m XX \x1b[0m",
-			// expected: "\x1b[0m\x1b[38;5;129m\x1b[48;5;160m XX \x1b[49m AAA\x1b[0m",
 			expected: [][]pokesay.ANSILineToken{
 				{
 					{"", "", ""},
@@ -296,7 +293,6 @@ func TestReverseANSIString(test *testing.T) {
 			// purple fg, red bg
 			// the 4 spaces after AAA should have a purple fg, and no bg
 			input: "\x1b[38;5;129mAAA    \x1b[48;5;160m XX \x1b[0m",
-			// expected: "\x1b[0m\x1b[38;5;129m\x1b[48;5;160m XX \x1b[0m\x1b[38;5;129m    AAA\x1b[0m",
 			expected: [][]pokesay.ANSILineToken{
 				{
 					{FG: "", BG: "", T: ""},
@@ -323,7 +319,6 @@ func TestReverseANSIString(test *testing.T) {
 		{
 			name:  "Multi-line with colour continuation",
 			input: "\x1b[38;5;160m▄ \x1b[38;5;46m▄\n▄ \x1b[38;5;190m▄",
-			// expected: "\x1b[0m\x1b[38;5;46m▄\x1b[38;5;160m ▄\n\x1b[38;5;190m▄\x1b[38;5;46m ▄\x1b[0m",
 			expected: [][]pokesay.ANSILineToken{
 				{
 					pokesay.ANSILineToken{FG: "", BG: "", T: ""},
