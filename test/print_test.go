@@ -98,6 +98,37 @@ func TestUnicodeReverse(test *testing.T) {
 	}
 }
 
+func AssertANSIResults(input string, expected [][]pokesay.ANSILineToken, result [][]pokesay.ANSILineToken, t *testing.T) {
+	fmt.Printf("input: 	  '\n%s\x1b[0m'\n", AddBorder(input))
+	fmt.Printf("expected:   '\n%s\x1b[0m'\n", AddBorder(pokesay.BuildANSIString(expected, 4)))
+	fmt.Printf("result:   '\n%s\n", AddBorder(pokesay.BuildANSIString(result, 4)))
+
+	for i, line := range expected {
+		if Debug() {
+			fmt.Printf("expected: %+v\x1b[0m\n", line)
+			fmt.Printf("  result: %+v\x1b[0m\n", result[i])
+			rb, err := json.MarshalIndent(result[i], "", "  ")
+			if err != nil {
+				fmt.Println("error:", err)
+			}
+			fmt.Printf("  result: %+v\x1b[0m\n", string(rb))
+			eb, err := json.MarshalIndent(line, "", "  ")
+			if err != nil {
+				fmt.Println("error:", err)
+			}
+			fmt.Printf("expected: %+v\x1b[0m\n", string(eb))
+			for j, token := range result[i] {
+				Assert(line[j], token, t)
+				if (j + 1) < len(line) {
+					break
+				}
+			}
+			Assert(line, result[i], t)
+		}
+	}
+	Assert(expected, result, t)
+}
+
 func TestANSITokenise(test *testing.T) {
 	testCases := []struct {
 		name     string
@@ -231,35 +262,7 @@ func TestANSITokenise(test *testing.T) {
 	for _, tc := range testCases {
 		test.Run(tc.name, func(t *testing.T) {
 			result := pokesay.TokeniseANSIString(tc.input)
-
-			fmt.Printf("input: 	  '\n%s\x1b[0m'\n", AddBorder(tc.input))
-			fmt.Printf("expected:   '\n%s\x1b[0m'\n", AddBorder(pokesay.BuildANSIString(tc.expected, 4)))
-			fmt.Printf("result:   '\n%s\n", AddBorder(pokesay.BuildANSIString(result, 4)))
-
-			for i, line := range tc.expected {
-				if Debug() {
-					fmt.Printf("expected: %+v\x1b[0m\n", line)
-					fmt.Printf("  result: %+v\x1b[0m\n", result[i])
-					rb, err := json.MarshalIndent(result[i], "", "  ")
-					if err != nil {
-						fmt.Println("error:", err)
-					}
-					fmt.Printf("  result: %+v\x1b[0m\n", string(rb))
-					eb, err := json.MarshalIndent(line, "", "  ")
-					if err != nil {
-						fmt.Println("error:", err)
-					}
-					fmt.Printf("expected: %+v\x1b[0m\n", string(eb))
-					for j, token := range result[i] {
-						Assert(line[j], token, t)
-						if (j + 1) < len(line) {
-							break
-						}
-					}
-					Assert(line, result[i], t)
-				}
-			}
-			Assert(tc.expected, result, t)
+			AssertANSIResults(tc.input, tc.expected, result, t)
 		})
 	}
 }
@@ -424,35 +427,7 @@ func TestReverseANSIString(test *testing.T) {
 	for _, tc := range testCases {
 		test.Run(tc.name, func(t *testing.T) {
 			result := pokesay.ReverseANSIString(pokesay.TokeniseANSIString(tc.input))
-
-			fmt.Printf("input: 	  '\n%s\x1b[0m'\n", AddBorder(tc.input))
-			fmt.Printf("expected:   '\n%s\n", AddBorder(pokesay.BuildANSIString(tc.expected, 4)))
-			fmt.Printf("result:   '\n%s\n", AddBorder(pokesay.BuildANSIString(result, 4)))
-			for i, line := range tc.expected {
-				if Debug() {
-					fmt.Printf("expected: %+v\x1b[0m\n", line)
-					fmt.Printf("  result: %+v\x1b[0m\n", result[i])
-
-					eb, err := json.MarshalIndent(line, "", "  ")
-					if err != nil {
-						fmt.Println("error:", err)
-					}
-					fmt.Printf("expected: %+v\x1b[0m\n", string(eb))
-					rb, err := json.MarshalIndent(result[i], "", "  ")
-					if err != nil {
-						fmt.Println("error:", err)
-					}
-					fmt.Printf("  result: %+v\x1b[0m\n", string(rb))
-					for j, token := range result[i] {
-						Assert(line[j], token, t)
-						if (j + 1) < len(line) {
-							break
-						}
-					}
-					Assert(line, result[i], t)
-				}
-			}
-			Assert(tc.expected, result, t)
+			AssertANSIResults(tc.input, tc.expected, result, t)
 		})
 	}
 }
