@@ -111,10 +111,12 @@ func ConcatLines(pokemon []string, speechBubble []string, args Args) []string {
 
 	for i := range totalLen {
 		line := ""
-		if i < len(pokemon) {
+		if totalLen-len(pokemon)-i > 0 {
+			line += strings.Repeat(" ", pokemonWidth)
+		} else if len(pokemon) == totalLen {
 			line += pokemon[i]
 		} else {
-			line += strings.Repeat(" ", pokemonWidth)
+			line += pokemon[i-len(pokemon)+1]
 		}
 		line += " "
 		if totalLen-len(speechBubble)-i > 0 {
