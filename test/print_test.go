@@ -535,8 +535,18 @@ func TestConcatLines(test *testing.T) {
 	for _, tc := range testCases {
 		test.Run(tc.name, func(t *testing.T) {
 			result := pokesay.ConcatLines(tc.input[0], tc.input[1], tc.args)
-			fmt.Printf("> %s\n%s\n", "expected", strings.Join(tc.expected, "\n"))
-			fmt.Printf("> %s\n%s\n", "result", strings.Join(result, "\n"))
+			fmt.Printf(
+				"> %s\n%s\n%s\n",
+				"expected",
+				strings.Join(tc.expected, "\n"),
+				strings.Repeat("─", 40),
+			)
+			fmt.Printf(
+				"> %s\n%s\n%s\n\n",
+				"result",
+				strings.Join(result, "\n"),
+				strings.Repeat("─", 40),
+			)
 			Assert(tc.expected, result, t)
 		})
 	}
