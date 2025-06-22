@@ -96,35 +96,34 @@ func DetermineBoxChars(unicodeBox bool) *BoxChars {
 //   - In side-by-side mode, epending on which is taller, the shorter
 //     one is padded with spaces to match the height of the taller one.
 //   - In above-and-below mode, the same thing is done to the width
-func ConcatLines(pokemon []string, speechBubble []string, args Args) []string {
-	totalLen := max(len(pokemon), len(speechBubble))
-	pokemonWidth := 0
-	for _, line := range pokemon {
-		pokemonWidth = max(pokemonWidth, UnicodeStringLength(line))
+func ConcatLines(lhs []string, rhs []string, args Args) []string {
+	totalLen := max(len(lhs), len(rhs))
+	lhsWidth := 0
+	for _, line := range lhs {
+		lhsWidth = max(lhsWidth, UnicodeStringLength(line))
 	}
-	speechBubbleWidth := 0
-	for _, line := range speechBubble {
-		speechBubbleWidth = max(speechBubbleWidth, UnicodeStringLength(line))
+	rhsWidth := 0
+	for _, line := range rhs {
+		rhsWidth = max(rhsWidth, UnicodeStringLength(line))
 	}
-
 	lines := make([]string, totalLen)
 
 	for i := range totalLen {
 		line := ""
-		if totalLen-len(pokemon)-i > 0 {
-			line += strings.Repeat(" ", pokemonWidth)
-		} else if len(pokemon) == totalLen {
-			line += pokemon[i]
+		if totalLen-len(lhs)-i > 0 {
+			line += strings.Repeat(" ", lhsWidth)
+		} else if len(lhs) == totalLen {
+			line += lhs[i]
 		} else {
-			line += pokemon[i-len(pokemon)+1]
+			line += lhs[i-totalLen+len(lhs)]
 		}
 		line += " "
-		if totalLen-len(speechBubble)-i > 0 {
-			line += strings.Repeat(" ", speechBubbleWidth)
-		} else if len(speechBubble) == totalLen {
-			line += speechBubble[i]
+		if totalLen-len(rhs)-i > 0 {
+			line += strings.Repeat(" ", rhsWidth)
+		} else if len(rhs) == totalLen {
+			line += rhs[i]
 		} else {
-			line += speechBubble[i-len(speechBubble)+1]
+			line += rhs[i-totalLen+len(rhs)]
 		}
 		lines[i] = line
 	}
