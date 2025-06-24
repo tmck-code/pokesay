@@ -98,6 +98,7 @@ func DetermineBoxChars(unicodeBox bool) *BoxChars {
 //   - In above-and-below mode, the same thing is done to the width
 func ConcatLines(lhs []string, rhs []string, args Args) []string {
 	totalLen := max(len(lhs), len(rhs))
+	lhsMiddle := (totalLen - len(lhs)/2)
 	lhsWidth := 0
 	for _, line := range lhs {
 		lhsWidth = max(lhsWidth, UnicodeStringLength(line))
@@ -117,7 +118,15 @@ func ConcatLines(lhs []string, rhs []string, args Args) []string {
 		} else {
 			line += lhs[i-totalLen+len(lhs)]
 		}
-		line += " "
+		padding := lhsWidth - UnicodeStringLength(line)
+		if i == lhsMiddle {
+			line += strings.Repeat("─", max(padding, 1))
+		} else {
+			if padding > 0 {
+				line += strings.Repeat(" ", padding)
+			}
+			line += " "
+		}
 		if totalLen-len(rhs)-i > 0 {
 			line += strings.Repeat(" ", rhsWidth)
 		} else if len(rhs) == totalLen {
