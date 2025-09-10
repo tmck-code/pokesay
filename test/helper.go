@@ -13,16 +13,16 @@ var (
 	failMark    = "❌"
 )
 
-// Checks if the test is running in debug mode, i.e. has been run with the ENV var DEBUG=true.
+// Checks if the test is running in Debug mode, i.e. has been run with the ENV var DEBUG=true.
 // To do this, either first run `export DEBUG=true`, and then run the test command,
 // or do it all at once with `DEBUG=true go test -v ./test“
-func debug() bool {
+func Debug() bool {
 	return os.Getenv("DEBUG") == "true"
 }
 
 // Fails a test with a formatted message showing the expected vs. result. (These are both printed in %#v form)
 func Fail(expected interface{}, result interface{}, test *testing.T) {
-	test.Fatalf("%s items don't match!\n> expected:\t%#v\n>   result:\t%#v\n", failMark, expected, result)
+	test.Fatalf("\n\x1b[38;5;196m%s items don't match!\x1b[0m\n> expected:\t%#v\x1b[0m\n>   result:\t%#v\x1b[0m\n\n", failMark, expected, result)
 }
 
 // Takes in an expected & result object, of any type.
@@ -32,8 +32,8 @@ func Fail(expected interface{}, result interface{}, test *testing.T) {
 func Assert(expected interface{}, result interface{}, test *testing.T) {
 	expectedString, resultString := fmt.Sprintf("%#v", expected), fmt.Sprintf("%#v", result)
 	if expectedString == resultString {
-		if debug() {
-			fmt.Printf("%s items match!\n> expected:\t%s\n>   result:\t%s\n", successMark, expected, result)
+		if Debug() {
+			fmt.Printf("\x1b[38;5;46m%s items match!\x1b[0m\n> expected:\t%#v\x1b[0m\n>   result:\t%#v\x1b[0m\n\n", successMark, expected, result)
 		}
 		return
 	}
@@ -47,7 +47,7 @@ func Assert(expected interface{}, result interface{}, test *testing.T) {
 func AssertContains[T any](slice []T, item T, test *testing.T) {
 	for _, el := range slice {
 		if reflect.DeepEqual(el, item) {
-			if debug() {
+			if Debug() {
 				fmt.Printf("%s found expected item!\n>  item:\t%v\n> slice:\t%v\n", successMark, item, slice)
 			}
 			return

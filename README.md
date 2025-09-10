@@ -2,9 +2,7 @@
 
 Print pokemon in the CLI! An adaptation of the classic "cowsay"
 
-<p align="center">
-  <img src="https://github.com/tmck-code/pokesay/assets/9894426/794ee42d-4bc2-4d0c-bce0-aafa3dca2e78" alt="demo"/>
-</p>
+<img width="1050" alt="image" src="https://github.com/user-attachments/assets/4c145f23-8837-41df-835c-aeaa49afd13d" />
 
 - [pokesay](#pokesay)
   - [One-line installs](#one-line-installs)
@@ -12,8 +10,8 @@ Print pokemon in the CLI! An adaptation of the classic "cowsay"
     - [Full Usage](#full-usage)
     - [Examples](#examples)
   - [How it works](#how-it-works)
-  - [TODO](#todo)
   - [Similar projects](#similar-projects)
+  - [TODO](#todo)
 
 **Other docs**
 
@@ -65,6 +63,10 @@ echo 'fortune | pokesay' >> $HOME/.bashrc
 ```
 
 > _Note: The pokesay tool is intended to only be used with piped text input from STDIN, entering text by typing (or other methods) might not work as expected!_
+
+<p align="center">
+  <kbd><img src="https://github.com/tmck-code/pokesay/assets/9894426/794ee42d-4bc2-4d0c-bce0-aafa3dca2e78" alt="demo"/></kbd>
+</p>
 
 ### Full Usage
 
@@ -171,26 +173,6 @@ easily popped into a directory in the user's `$PATH`
 If all you are after is installing the program to use, then there are no dependencies required!
 Navigate to the Releases and download the latest binary.
 
----
-
-## TODO
-
-- Short-term
-  - [ ] optionally print ID assigned to each pokemon, support deterministic selection via the same ID
-- Longer-term
-- In Beta
-  - [x] support long and short cli args (e.g. --name/-n)
-- Completed
-  - [x] Make the category struct faster to load - currently takes up to 80% of the execution time
-  - [x] Store metadata and names in a more storage-efficient manner
-  - [x] Import japanese names from data/pokemon.json
-  - [x] Fix bad whitespace stripping when building assets
-  - [x] List all names
-  - [x] Make data structure to hold categories, names and pokemon
-  - [x] Increase speed
-  - [x] Improve categories to be more specific than shiny/regular
-  - [x] Filter by both name and category
-
 ## Similar projects
 
 There are many other projects that bring pokemon to the terminal!
@@ -207,3 +189,30 @@ Inspired by the [pokeshell](https://github.com/acxz/pokeshell) project, I've inc
 | [pokeTerm](https://github.com/31marcosalsa/pokeTerm) | python3 | ? | ? | ? | ? | ? | ? |
 | [krabby](https://github.com/yannjor/krabby) | rust, cargo | ? | ❌ | ❌ | ✓ | ❌ | ❌ |
 | [pokemonsay](https://github.com/dfrankland/pokemonsay) | npm | ? | ? | ? | ? | ? | ? |
+
+---
+
+## TODO
+
+- **In progress**
+  - [ ] optionally print ID assigned to each pokemon, support deterministic selection via the same ID
+- **Short-term**
+- [ ] requesting mew returns mewtwo also
+- [ ] add option to flip Pokemon to face right or left, remove all "right" facing cowfiles
+- [ ] create "vertical" friendly display mode, place the Pokemon standing beside the text box, on the left or right
+- **Longer-term**
+  - [ ] make the process async.
+    - (Currently the searching/pokemon fetching is done _before_ any printing begins. There's an opportunity to start printing the speech bubble while also fetching the pokemon to print below it)
+    - [ ] implement native lolcat/rainbow HR/colour
+- **In Beta**
+  - [x] support long and short cli args (e.g. --name/-n)
+- **Completed**
+  - [x] Make the category struct faster to load - currently takes up to 80% of the execution time
+  - [x] Store metadata and names in a more storage-efficient manner
+  - [x] Import japanese names from data/pokemon.json
+  - [x] Fix bad whitespace stripping when building assets
+  - [x] List all names
+  - [x] Make data structure to hold categories, names and pokemon
+  - [x] Increase speed
+  - [x] Improve categories to be more specific than shiny/regular
+  - [x] Filter by both name and category

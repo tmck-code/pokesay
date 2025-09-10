@@ -5,6 +5,8 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"path/filepath"
+	"strings"
 
 	"github.com/tmck-code/pokesay/src/bin"
 	"github.com/tmck-code/pokesay/src/pokedex"
@@ -37,7 +39,7 @@ func parseArgs() CowBuildArgs {
 	json.Unmarshal([]byte(*skipDirs), &args.SkipDirs)
 
 	if DEBUG {
-		fmt.Println("%+v", args)
+		fmt.Printf("%+v\n", args)
 	}
 	return args
 }
@@ -52,9 +54,44 @@ func main() {
 
 	fmt.Println("Converting PNGs -> cowfiles")
 	pbar := bin.NewProgressBar(len(fpaths))
+
+	allData := make([]string, 0, len(fpaths))
+	nDuplicates, nFailures := 0, 0
+
 	for _, f := range fpaths {
-		pokedex.ConvertPngToCow(args.FromDir, f, args.ToDir, args.Padding)
+		data, err := pokedex.ConvertPngToCow(args.FromDir, f, args.ToDir, args.Padding)
+		if err != nil {
+			nFailures++
+			continue
+		}
+
+		// check if this cawfile is a duplicate of one that has already been written
+		found := false
+		for _, existingData := range allData {
+			if existingData == data {
+				found = true
+				break
+			}
+		}
+		if found && args.Debug {
+			fmt.Println("Skipping duplicate data for", f)
+			nDuplicates++
+			pbar.Add(1)
+			continue
+		}
+		allData = append(allData, data)
+
+		destDirpath := filepath.Join(
+			args.ToDir,
+			// strip the root "source dirpath" from the source path
+			// e.g. fpath: /a/b/c.txt sourceDir: /a/ -> b/c.txt
+			filepath.Dir(strings.ReplaceAll(f, args.FromDir, "")),
+		)
+		destFpath := filepath.Join(destDirpath, strings.ReplaceAll(filepath.Base(f), ".png", ".cow"))
+
+		pokedex.WriteToCowfile(data, destDirpath, destFpath)
 		pbar.Add(1)
 	}
-	fmt.Println("Finished converting", len(fpaths), "pokesprite PNGs", "-> cowfiles")
+	fmt.Println("Finished converting", len(fpaths), "pokesprite PNGs -> cowfiles")
+	fmt.Println("(skipped", nDuplicates, "duplicates and", nFailures, "failures)")
 }

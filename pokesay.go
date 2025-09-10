@@ -58,6 +58,7 @@ func parseFlags() pokesay.Args {
 	noWrap := getopt.BoolLong("no-wrap", 'W', "disable text wrapping (fastest)")
 	noTabSpaces := getopt.BoolLong("no-tab-spaces", 's', "do not replace tab characters (fastest)")
 	fastest := getopt.BoolLong("fastest", 'f', "run with the fastest possible configuration (--nowrap & --notabspaces)")
+	noBubble := getopt.BoolLong("no-bubble", 'B', "do not draw the speech bubble")
 
 	// info box options
 	japaneseName := getopt.BoolLong("japanese-name", 'j', "print the japanese name in the info box")
@@ -67,24 +68,26 @@ func parseFlags() pokesay.Args {
 
 	// other option
 	unicodeBorders := getopt.BoolLong("unicode-borders", 'u', "use unicode characters to draw the border around the speech box (and info box if --info-border is enabled)")
+	flipPokemon := getopt.BoolLong("flip", 'F', "flip the pokemon horizontally (face right instead of left)")
 
 	getopt.Parse()
 	var args pokesay.Args
 
 	if *fastest {
 		args = pokesay.Args{
-			Width:         *width,
-			NoWrap:        true,
-			TabSpaces:     "    ",
-			NoTabSpaces:   true,
-			BoxCharacters: pokesay.DetermineBoxCharacters(false),
-			Help:          *help,
-			Verbose:       *verbose,
+			Width:       *width,
+			NoWrap:      true,
+			TabSpaces:   "    ",
+			NoTabSpaces: true,
+			BoxChars:    pokesay.DetermineBoxChars(false),
+			Help:        *help,
+			Verbose:     *verbose,
 		}
 	} else {
 		args = pokesay.Args{
 			Width:          *width,
 			NoWrap:         *noWrap,
+			DrawBubble:     !*noBubble,
 			TabSpaces:      strings.Repeat(" ", *tabWidth),
 			NoTabSpaces:    *noTabSpaces,
 			NoCategoryInfo: *noCategoryInfo,
@@ -96,8 +99,9 @@ func parseFlags() pokesay.Args {
 			IDToken:        *id,
 			JapaneseName:   *japaneseName,
 			ShowID:         *showId,
-			BoxCharacters:  pokesay.DetermineBoxCharacters(*unicodeBorders),
+			BoxChars:       pokesay.DetermineBoxChars(*unicodeBorders),
 			DrawInfoBorder: *drawInfoBorder,
+			FlipPokemon:    *flipPokemon,
 			Help:           *help,
 			Verbose:        *verbose,
 		}
