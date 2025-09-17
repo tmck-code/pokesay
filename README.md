@@ -81,6 +81,7 @@ Usage: pokesay [-bCfhjLlsuvW] [-c value] [-n value] [-t value] [-w value] [param
                     do not print pokemon category information in the info box
  -f, --fastest      run with the fastest possible configuration (--nowrap &
                     --notabspaces)
+ -F, --flip         flip the pokemon horizontally (face right instead of left)
  -h, --help         display this help message
  -j, --japanese-name
                     print the japanese name in the info box
@@ -198,15 +199,15 @@ Inspired by the [pokeshell](https://github.com/acxz/pokeshell) project, I've inc
   - [ ] optionally print ID assigned to each pokemon, support deterministic selection via the same ID
 - **Short-term**
 - [ ] requesting mew returns mewtwo also
-- [ ] add option to flip Pokemon to face right or left, remove all "right" facing cowfiles
 - [ ] create "vertical" friendly display mode, place the Pokemon standing beside the text box, on the left or right
 - **Longer-term**
   - [ ] make the process async.
     - (Currently the searching/pokemon fetching is done _before_ any printing begins. There's an opportunity to start printing the speech bubble while also fetching the pokemon to print below it)
     - [ ] implement native lolcat/rainbow HR/colour
 - **In Beta**
-  - [x] support long and short cli args (e.g. --name/-n)
+- [x] add option to flip Pokemon to face right or left, remove all "right" facing cowfiles
 - **Completed**
+  - [x] support long and short cli args (e.g. --name/-n)
   - [x] Make the category struct faster to load - currently takes up to 80% of the execution time
   - [x] Store metadata and names in a more storage-efficient manner
   - [x] Import japanese names from data/pokemon.json
