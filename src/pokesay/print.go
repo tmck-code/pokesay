@@ -37,9 +37,12 @@ type Args struct {
 	NoCategoryInfo bool
 	ListCategories bool
 	ListNames      bool
+	ListNameToken  string
 	Category       string
 	NameToken      string
+	IDToken        string
 	JapaneseName   bool
+	ShowID         bool
 	BoxChars       *BoxChars
 	DrawInfoBorder bool
 	FlipPokemon    bool
