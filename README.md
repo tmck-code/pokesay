@@ -73,8 +73,9 @@ echo 'fortune | pokesay' >> $HOME/.bashrc
 > Run pokesay with `-h` or `--help` to see the full usage
 
 ```shell
-Usage: pokesay [-bCfhjLlsuvW] [-c value] [-n value] [-t value] [-w value] [parameters ...]
+Usage: pokesay [-bBCfFhIjLsuvW] [-c value] [-i value] [-l value] [-n value] [-t value] [-w value] [parameters ...]
  -b, --info-border  draw a border around the info box
+ -B, --no-bubble    do not draw the speech bubble
  -c, --category=value
                     choose a pokemon from a specific category
  -C, --no-category-info
@@ -83,11 +84,15 @@ Usage: pokesay [-bCfhjLlsuvW] [-c value] [-n value] [-t value] [-w value] [param
                     --notabspaces)
  -F, --flip         flip the pokemon horizontally (face right instead of left)
  -h, --help         display this help message
+ -i, --id=value     choose a pokemon from a specific ID (see `pokesay -l` for
+                    IDs)
+ -I, --id-info      print the pokemon ID in the info box
  -j, --japanese-name
                     print the japanese name in the info box
  -L, --list-categories
                     list all available categories
- -l, --list-names   list all available names
+ -l, --list-names[=value]
+                    list all available names
  -n, --name=value   choose a pokemon from a specific name
  -s, --no-tab-spaces
                     do not replace tab characters (fastest)
@@ -130,6 +135,11 @@ Usage: pokesay [-bCfhjLlsuvW] [-c value] [-n value] [-t value] [-w value] [param
   ```shell
   # for shiny charizards
   echo 'Hello, world!' | pokesay -c shiny -n charizard
+  ```
+- Print a specific pokemon by its ID
+  ```shell
+  # green mewtwo is ID `0491.1719`
+  echo 'Hello, world!' | pokesay -i 0491.1719
   ```
 
 ---
