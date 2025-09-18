@@ -11,6 +11,7 @@ import (
 	"github.com/mattn/go-runewidth"
 	"github.com/mitchellh/go-wordwrap"
 	"github.com/tmck-code/pokesay/src/pokedex"
+	"github.com/tmck-code/pokesay/src/timer"
 )
 
 type BoxChars struct {
@@ -97,6 +98,7 @@ func DetermineBoxChars(unicodeBox bool) *BoxChars {
 // 3. The pokemon is printed along with the name & category information
 func Print(args Args, choice int, names []string, categories []string, cows embed.FS) {
 	printSpeechBubble(args.BoxChars, bufio.NewScanner(os.Stdin), args)
+
 	printPokemon(args, choice, names, categories, cows)
 }
 
@@ -123,6 +125,7 @@ func printSpeechBubble(boxChars *BoxChars, scanner *bufio.Scanner, args Args) {
 			printWrappedText(boxChars, line, args)
 		}
 	}
+	timer.DebugTimer.Mark("scan stdin")
 
 	bottomBorder := strings.Repeat(boxChars.HorizontalEdge, 6) +
 		boxChars.BalloonTether +
@@ -136,6 +139,7 @@ func printSpeechBubble(boxChars *BoxChars, scanner *bufio.Scanner, args Args) {
 	for i := 0; i < 4; i++ {
 		fmt.Printf("%s%s\n", strings.Repeat(" ", i+8), boxChars.BalloonString)
 	}
+	timer.DebugTimer.Mark("print speech bubble")
 }
 
 // Prints a single speech bubble line
@@ -357,6 +361,7 @@ func ReverseANSIString(lines [][]ANSILineToken) [][]ANSILineToken {
 // Prints a pokemon with its name & category information.
 func printPokemon(args Args, index int, names []string, categoryKeys []string, GOBCowData embed.FS) {
 	d, _ := GOBCowData.ReadFile(pokedex.EntryFpath("build/assets/cows", index))
+	timer.DebugTimer.Mark("read sprite file")
 
 	width := nameLength(names)
 	namesFmt := make([]string, 0)
@@ -405,13 +410,20 @@ func printPokemon(args Args, index int, names []string, categoryKeys []string, G
 	} else {
 		infoLine = fmt.Sprintf("%s\n", infoLine)
 	}
+	timer.DebugTimer.Mark("generate string")
 	if args.FlipPokemon {
-		fmt.Printf(
-			"%s%s",
-			BuildANSIString(ReverseANSIString(TokeniseANSIString(string(pokedex.Decompress(d)))), 4),
-			infoLine,
-		)
+		dec := pokedex.Decompress(d)
+		timer.DebugTimer.Mark("gunzip string")
+
+		flipped := BuildANSIString(ReverseANSIString(TokeniseANSIString(string(dec))), 4)
+		timer.DebugTimer.Mark("reverse string")
+
+		fmt.Printf("%s%s", flipped, infoLine)
 	} else {
-		fmt.Printf("%s%s", pokedex.Decompress(d), infoLine)
+		dec := pokedex.Decompress(d)
+		timer.DebugTimer.Mark("gunzip string")
+
+		fmt.Printf("%s%s", dec, infoLine)
 	}
+	timer.DebugTimer.Mark("print to terminal")
 }
