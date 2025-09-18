@@ -45,7 +45,6 @@ func EntryFpath(idx int) string {
 
 func main() {
 	args := parseFlags()
-	t := timer.NewTimer("read_assets", true)
 
 	var metadata pokedex.PokemonMetadata
 
@@ -57,18 +56,18 @@ func main() {
 		metadata = pokedex.ReadMetadataFromFile(fpath)
 	}
 
-	t.Mark("metadata")
+	timer.DebugTimer.Mark("metadata")
 
 	fmt.Println(pokedex.StructToJSON(metadata, 2))
-	t.Mark("toJSON")
+	timer.DebugTimer.Mark("toJSON")
 
 	for i, entry := range metadata.Entries {
 		data := string(pokedex.ReadPokemonCow(GOBCowFiles, EntryFpath(entry.EntryIndex)))
-		t.Mark(fmt.Sprintf("read-cow-%d", i))
+		timer.DebugTimer.Mark(fmt.Sprintf("read-cow-%d", i))
 
 		fmt.Printf("%s\n%s\n", entry.Categories, data)
-		t.Mark(fmt.Sprintf("print-cow-%d", i))
+		timer.DebugTimer.Mark(fmt.Sprintf("print-cow-%d", i))
 	}
-	t.Stop()
-	t.PrintJson()
+	timer.DebugTimer.Stop()
+	timer.DebugTimer.PrintJson()
 }

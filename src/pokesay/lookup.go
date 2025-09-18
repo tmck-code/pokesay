@@ -13,6 +13,7 @@ import (
 	"time"
 
 	"github.com/tmck-code/pokesay/src/pokedex"
+	"github.com/tmck-code/pokesay/src/timer"
 )
 
 var (
@@ -42,11 +43,13 @@ func ChooseByCategory(category string, categoryDir []fs.DirEntry, categoryFiles 
 		log.Fatalf("cannot find pokemon by category '%s'", category)
 	}
 	choice := categoryDir[RandomInt(len(categoryDir))]
+	timer.DebugTimer.Mark("choose category")
 
 	categoryMetadata, err := categoryFiles.ReadFile(
 		pokedex.CategoryFpath(categoryRootDir, category, choice.Name()),
 	)
 	pokedex.Check(err)
+	timer.DebugTimer.Mark("read category file")
 
 	parts := strings.Split(string(categoryMetadata), "/")
 
@@ -71,6 +74,7 @@ func fetchMetadataByName(names map[string][]int, nameToken string, metadataFiles
 		log.Fatalf("cannot find pokemon by name '%s'", nameToken)
 	}
 	nameChoice := match[RandomInt(len(match))]
+	timer.DebugTimer.Mark("choose random name")
 
 	metadata := pokedex.ReadMetadataFromEmbedded(
 		metadataFiles,

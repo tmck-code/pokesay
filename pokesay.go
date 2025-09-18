@@ -174,19 +174,15 @@ func GenerateNames(metadata pokedex.PokemonMetadata, args pokesay.Args, final po
 // - It matches the name to a metadata index, loads the corresponding metadata file, and then chooses a random entry
 // - Finally, it prints the pokemon
 func runPrintByName(args pokesay.Args) {
-	t := timer.NewTimer("runPrintByName", true)
-
 	names := pokedex.ReadStructFromBytes[map[string][]int](GOBAllNames)
-	t.Mark("read name struct")
+	timer.DebugTimer.Mark("read name struct")
 
 	metadata, final := pokesay.ChooseByName(names, args.NameToken, GOBCowNames, MetadataRoot)
-	t.Mark("find/read metadata")
 
-	pokesay.Print(args, final.EntryIndex, GenerateNames(metadata, args, final), final.Categories, GOBCowData)
-	t.Mark("print")
+	pNames := GenerateNames(metadata, args, final)
+	timer.DebugTimer.Mark("generate names")
 
-	t.Stop()
-	t.PrintJson()
+	pokesay.Print(args, final.EntryIndex, pNames, final.Categories, GOBCowData)
 }
 
 // runPrintByID prints a pokemon corresponding to a specific ID
@@ -195,26 +191,19 @@ func runPrintByName(args pokesay.Args) {
 // - It matches the name to a metadata index, loads the corresponding metadata file, and then chooses a random entry
 // - Finally, it prints the pokemon
 func runPrintByID(args pokesay.Args) {
-	t := timer.NewTimer("runPrintByName", true)
-
 	idxs := strings.Split(args.IDToken, ".")
 
 	idx, _ := strconv.Atoi(idxs[0])
 	subIdx, _ := strconv.Atoi(idxs[1])
 
-	t.Mark("format IDs")
+	timer.DebugTimer.Mark("format IDs")
 
 	metadata, final, err := pokesay.ChooseByIndex(idx, subIdx, GOBCowNames, MetadataRoot)
 	if err != nil {
 		log.Fatal(err)
 	}
-	t.Mark("find/read metadata")
 
 	pokesay.Print(args, subIdx, GenerateNames(metadata, args, final), final.Categories, GOBCowData)
-	t.Mark("print")
-
-	t.Stop()
-	t.PrintJson()
 }
 
 // runPrintByCategory prints a pokemon matched by a category
@@ -227,17 +216,11 @@ func runPrintByID(args pokesay.Args) {
 // - It reads the metadata file of the chosen pokemon and chooses the corresponding entry from the category search
 // - Finally, it prints the pokemon
 func runPrintByCategory(args pokesay.Args) {
-	t := timer.NewTimer("runPrintByCategory", true)
-
 	dirPath := pokedex.CategoryDirpath(CategoryRoot, args.Category)
 	dir, _ := GOBCategories.ReadDir(dirPath)
 	metadata, final := pokesay.ChooseByCategory(args.Category, dir, GOBCategories, CategoryRoot, GOBCowNames, MetadataRoot)
 
 	pokesay.Print(args, final.EntryIndex, GenerateNames(metadata, args, final), final.Categories, GOBCowData)
-	t.Mark("print")
-
-	t.Stop()
-	t.PrintJson()
 }
 
 // runPrintByNameAndCategory prints a pokemon matched by a name and category
@@ -245,19 +228,12 @@ func runPrintByCategory(args pokesay.Args) {
 // - It matches the name to a metadata index, loads the corresponding metadata file, and then randomly chooses an entry that matches the category
 // - Finally, it prints the pokemon
 func runPrintByNameAndCategory(args pokesay.Args) {
-	t := timer.NewTimer("runPrintByNameAndCategory", true)
-
 	names := pokedex.ReadStructFromBytes[map[string][]int](GOBAllNames)
-	t.Mark("read name struct")
+	timer.DebugTimer.Mark("read name struct")
 
 	metadata, final := pokesay.ChooseByNameAndCategory(names, args.NameToken, GOBCowNames, MetadataRoot, args.Category)
-	t.Mark("find/read metadata")
 
 	pokesay.Print(args, final.EntryIndex, GenerateNames(metadata, args, final), final.Categories, GOBCowData)
-	t.Mark("print")
-
-	t.Stop()
-	t.PrintJson()
 }
 
 // runPrintRandom prints a random pokemon
@@ -267,24 +243,29 @@ func runPrintByNameAndCategory(args pokesay.Args) {
 // - chooses a random entry from the metadata file
 // - finally prints the pokemon
 func runPrintRandom(args pokesay.Args) {
-	t := timer.NewTimer("runPrintRandom", true)
 	choice := pokesay.RandomInt(pokedex.ReadIntFromBytes(GOBTotal))
-	t.Mark("choose index")
-	metadata := pokedex.ReadMetadataFromEmbedded(GOBCowNames, pokedex.MetadataFpath(MetadataRoot, choice))
-	t.Mark("read metadata")
+	timer.DebugTimer.Mark("choose index")
+
+	metadata := pokedex.ReadMetadataFromEmbedded(
+		GOBCowNames,
+		pokedex.MetadataFpath(MetadataRoot, choice),
+	)
 
 	final := metadata.Entries[pokesay.RandomInt(len(metadata.Entries))]
-	t.Mark("choose entry")
+	timer.DebugTimer.Mark("choose entry")
 
-	pokesay.Print(args, final.EntryIndex, GenerateNames(metadata, args, final), final.Categories, GOBCowData)
-	t.Mark("print")
+	names := GenerateNames(metadata, args, final)
+	timer.DebugTimer.Mark("generate names")
 
-	t.Stop()
-	t.PrintJson()
+	pokesay.Print(args, final.EntryIndex, names, final.Categories, GOBCowData)
 }
 
 func main() {
+	timer.DebugTimer.Mark("started main")
+
 	args := parseFlags()
+	timer.DebugTimer.Mark("parsed flags")
+
 	// if the -h/--help flag is set, print usage and exit
 	if args.Help {
 		getopt.Usage()
@@ -294,8 +275,6 @@ func main() {
 		fmt.Println("Verbose output enabled")
 		timer.DEBUG = true
 	}
-
-	t := timer.NewTimer("main", true)
 
 	if args.ListCategories {
 		runListCategories()
@@ -312,8 +291,9 @@ func main() {
 	} else {
 		runPrintRandom(args)
 	}
-	t.Mark("op")
 
-	t.Stop()
-	t.PrintJson()
+	timer.DebugTimer.Mark("finish")
+
+	timer.DebugTimer.Stop()
+	timer.DebugTimer.PrintJson()
 }

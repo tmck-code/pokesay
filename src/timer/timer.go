@@ -10,6 +10,7 @@ import (
 
 var (
 	DEBUG bool = os.Getenv("DEBUG") != ""
+	DebugTimer *Timer = NewTimer("Debug Timer", true)
 )
 
 // Timer is a simple timer that can be used to time the duration of program stages.
@@ -101,6 +102,5 @@ func (t *Timer) PrintJson() {
 		return
 	}
 	json, _ := json.MarshalIndent(t, "", strings.Repeat(" ", 2))
-	// json, _ := json.Marshal(t)
 	fmt.Fprintln(os.Stderr, string(json))
 }
