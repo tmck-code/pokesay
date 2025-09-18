@@ -134,12 +134,11 @@ func CreateNameMetadata(idx string, key string, name PokemonName, rootDir string
 	entryCategories := make(map[int][][]string, 0)
 
 	for i, fpath := range fpaths {
-		localFpath := strings.TrimPrefix(fpath, rootDir)
-
-		if strings.Contains(localFpath, strings.ToLower(name.Slug)) {
+		basename := strings.TrimPrefix(fpath, rootDir)
+		if strings.Contains(basename, strings.ToLower(name.Slug)) {
 			data, err := os.ReadFile(fpath)
 			Check(err)
-			cats := createCategories(localFpath, data)
+			cats := createCategories(strings.TrimPrefix(fpath, rootDir), data)
 			entryCategories[i] = append(entryCategories[i], cats)
 		}
 	}
@@ -171,28 +170,10 @@ func CreateCategoryStruct(rootDir string, metadata []PokemonMetadata, debug bool
 }
 
 func createCategories(fpath string, data []byte) []string {
-	// split the path into parts, e.g. "gen7x/shiny/"
 	parts := strings.Split(fpath, "/")
-	// Get the height of the cowfile by counting the number of lines
 	height := sizeCategory(len(strings.Split(string(data), "\n")))
 
-	// split the fname into parts, e.g. "charizard-mega-y.cow"
-	// fmt.Println(fpath)
-	fpathParts := strings.Split(fpath, "/")
-	basename := fpathParts[len(fpathParts)-1]
-	names := strings.SplitN(strings.TrimSuffix(basename, ".cow"), "-", 2)
-	// fmt.Printf("created names from %s: %v\n", fpath, names)
-
-	// return a slice of the parts
-	// height, names from the 2nd to the 2nd to last, and parts from the 1st to the 2nd to last
-
-	c := []string{height}
-	if len(names) > 1 {
-		c = append(c, names[1:]...)
-	}
-	c = append(c, parts[0:len(parts)-1]...)
-	fmt.Printf("fpath %s, names: %v, categories: %v\n", fpath, names, c)
-	return c
+	return append([]string{height}, parts[0:len(parts)-1]...)
 }
 
 func sizeCategory(height int) string {
