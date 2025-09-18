@@ -130,17 +130,13 @@ func main() {
 		data, err := os.ReadFile(fpath)
 		pokedex.Check(err)
 		entryFpath := pokedex.EntryFpath(paths.EntryDirPath, i)
-		fmt.Println("writing", fpath, ">", entryFpath)
 
 		fpathParts := strings.Split(fpath, "/")
 		basename := fpathParts[len(fpathParts)-1]
 		name := strings.SplitN(strings.TrimSuffix(basename, ".cow"), "-", 2)[0]
-		fmt.Println("name", name)
-		for i, key := range nameTokens {
+		for _, key := range nameTokens {
 			if name == key {
-				fmt.Println("found", name, key, i, pokemonNames[key], pokemonMetadata[i])
 				nameVariants[name] = append(nameVariants[name], basename)
-				fmt.Println("name ++", name, fmt.Sprintf("%04d.%04d", i, len(nameVariants[name])))
 				break
 			}
 		}
