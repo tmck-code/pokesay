@@ -203,7 +203,11 @@ func runPrintRandom(args pokesay.Args) {
 }
 
 func main() {
+	timer.DebugTimer.Mark("started main")
+
 	args := parseFlags()
+	timer.DebugTimer.Mark("parsed flags")
+
 	// if the -h/--help flag is set, print usage and exit
 	if args.Help {
 		getopt.Usage()
@@ -213,8 +217,6 @@ func main() {
 		fmt.Println("Verbose output enabled")
 		timer.DEBUG = true
 	}
-
-	timer.DebugTimer.Mark("parsed flags")
 
 	if args.ListCategories {
 		runListCategories()
@@ -229,7 +231,8 @@ func main() {
 	} else {
 		runPrintRandom(args)
 	}
-	timer.DebugTimer.Mark("op")
+
+	timer.DebugTimer.Mark("finish")
 
 	timer.DebugTimer.Stop()
 	timer.DebugTimer.PrintJson()
