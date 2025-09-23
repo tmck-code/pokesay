@@ -198,7 +198,7 @@ Inspired by the [pokeshell](https://github.com/acxz/pokeshell) project, I've inc
 | [pokemon-icat](https://github.com/aflaag/pokemon-icat) | python | ? | ? | ? | ? | ? | ? |
 | [pokemon-colorscripts](https://gitlab.com/phoneybadger/pokemon-colorscripts) | python3 | ? | ? | ? | ? | ? | ? |
 | [pokemonsay-newgenerations](https://github.com/HRKings/pokemonsay-newgenerations) | cowsay (perl) | ? | ? | ? | ? | ? | ? |
-| [pokeTerm](https://github.com/31marcosalsa/pokeTerm) | python3 | ? | ? | ? | ? | ? | ? |
+| [31marcosalsa/pokeTerm](https://github.com/31marcosalsa/pokeTerm) | python, imagemagick, img2xterm | ~62ms | ❌ | ❌ | ❌ | ❌ | ❌ |
 | [krabby](https://github.com/yannjor/krabby) | rust, cargo | ? | ❌ | ❌ | ✓ | ❌ | ❌ |
 | [pokemonsay](https://github.com/dfrankland/pokemonsay) | npm | ? | ? | ? | ? | ? | ? |
 | [possatti/pokemonsay](https://github.com/possatti/pokemonsay) | none 🎉 | ~26.3ms | ❌ | ❌ | ✅ | ❌ | ❌ | 
