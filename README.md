@@ -193,6 +193,7 @@ Inspired by the [pokeshell](https://github.com/acxz/pokeshell) project, I've inc
 
 | project | dependencies | speed | japanese names | size categories | selection by name | selection by category | animated sprites |
 |--|--|--|--|--|--|--|--|
+| [tmck-code/pokesay](https://github.com/tmck-code/pokesay) | none 🎉 | ~2.5ms | ✅ | ✅ | ✅ | ✅ | ❌ |
 | [pokeshell](https://github.com/acxz/pokeshell) | imagemagick, chafa | ? | ? | ? | ? | ? | ? |
 | [pokemon-icat](https://github.com/aflaag/pokemon-icat) | python | ? | ? | ? | ? | ? | ? |
 | [pokemon-colorscripts](https://gitlab.com/phoneybadger/pokemon-colorscripts) | python3 | ? | ? | ? | ? | ? | ? |
@@ -200,6 +201,7 @@ Inspired by the [pokeshell](https://github.com/acxz/pokeshell) project, I've inc
 | [pokeTerm](https://github.com/31marcosalsa/pokeTerm) | python3 | ? | ? | ? | ? | ? | ? |
 | [krabby](https://github.com/yannjor/krabby) | rust, cargo | ? | ❌ | ❌ | ✓ | ❌ | ❌ |
 | [pokemonsay](https://github.com/dfrankland/pokemonsay) | npm | ? | ? | ? | ? | ? | ? |
+| [possatti/pokemonsay](https://github.com/possatti/pokemonsay) | none 🎉 | ~26.3ms | ❌ | ❌ | ✅ | ❌ | ❌ | 
 
 ---
 
