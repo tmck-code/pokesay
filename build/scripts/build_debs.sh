@@ -24,9 +24,13 @@ function build_deb() {
     local bin="build/bin/pokesay-${os}-${arch}${suffix}"
     local pkg_name="pokesay-${os}-${arch}"
 
-    mkdir -p "$pkg_name" "$pkg_name/pokesay/DEBIAN" "$pkg_name/pokesay/usr/bin"
+    mkdir -p "$pkg_name" \
+        "$pkg_name/pokesay/DEBIAN" \
+        "$pkg_name/pokesay/usr/bin" \
+        "$pkg_name/pokesay/usr/share/man/man1"
 
     cp "$bin" "$pkg_name/pokesay/usr/bin/pokesay"
+    gzip -c "docs/pokesay.1" > "$pkg_name/pokesay/usr/share/man/man1/pokesay.1.gz"
 
     cat > "$pkg_name/pokesay/DEBIAN/control" <<EOF
 Package: pokesay
