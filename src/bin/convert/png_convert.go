@@ -92,6 +92,6 @@ func main() {
 		pokedex.WriteToCowfile(data, destDirpath, destFpath)
 		pbar.Add(1)
 	}
-	fmt.Println("Finished converting", len(fpaths), "pokesprite PNGs -> cowfiles")
+	fmt.Println("\nFinished converting", len(fpaths), "pokesprite PNGs -> cowfiles")
 	fmt.Println("(skipped", nDuplicates, "duplicates and", nFailures, "failures)")
 }

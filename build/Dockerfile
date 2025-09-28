@@ -1,20 +1,21 @@
-FROM golang:1.23
+FROM golang:1.24
 
 WORKDIR /usr/local/src
 
-RUN BUILD_DEPS="make gcc"
+ENV DEBIAN_FRONTEND=noninteractive
+ENV BUILD_DEPS="make gcc"
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends "${BUILD_DEPS}" libmagickwand-dev ncurses-dev jq imagemagick
+    && apt-get install -y --no-install-recommends $BUILD_DEPS libmagickwand-dev ncurses-dev jq imagemagick
 
-RUN git clone --depth 1 https://github.com/denilsonsa/img2xterm \
+RUN git clone -q --depth 1 https://github.com/denilsonsa/img2xterm \
     && (cd img2xterm && make && make install) \
     && rm -rf img2xterm \
-    && apt purge -y "${BUILD_DEPS}" \
-    && apt-get purge -y --auto-remove \
+    && apt-get purge -y $BUILD_DEPS \
+    && apt-get autoremove --purge -y \
     && rm -rf /var/lib/apt/lists/* \
     && rm -rf /tmp/* /var/tmp/*
 
-RUN git clone --depth 1 https://github.com/msikma/pokesprite /tmp/original/pokesprite
+RUN git clone -q --depth 1 https://github.com/msikma/pokesprite /tmp/original/pokesprite
 
 WORKDIR /usr/local/src/
 ADD src/ /usr/local/src/src/
