@@ -124,7 +124,7 @@ func main() {
 		pbar.Add(1)
 	}
 
-	fmt.Println("- Writing entries to file")
+	fmt.Println("\n- Writing entries to file")
 	pbar = bin.NewProgressBar(len(cowfileFpaths))
 	for i, fpath := range cowfileFpaths {
 		data, err := os.ReadFile(fpath)
@@ -147,8 +147,8 @@ func main() {
 
 	pokedex.WriteStructToFile(uniqueNames, "build/assets/names.txt")
 
-	// 2. Create the category struct using the cowfile paths, pokemon names and indexes\
-	fmt.Println("- Writing categories to file")
+	// 2. Create the category struct using the cowfile paths, pokemon names and indexes
+	fmt.Println("\n- Writing categories to file")
 	categories := pokedex.CreateCategoryStruct(args.FromDir, pokemonMetadata, args.Debug)
 	pokedex.WriteStructToFile(categories, "build/assets/category_keys.txt")
 
