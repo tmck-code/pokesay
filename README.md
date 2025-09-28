@@ -24,26 +24,66 @@ Print pokemon in the CLI! An adaptation of the classic "cowsay"
 
 _(These commands can also be used to update your existing pokesay)_
 
-- OSX / darwin
-    ```shell
-    bash -c "$(curl https://raw.githubusercontent.com/tmck-code/pokesay/master/build/scripts/install.sh)" bash darwin amd64
-    ```
-- OSX / darwin (M1)
-    ```shell
-    bash -c "$(curl https://raw.githubusercontent.com/tmck-code/pokesay/master/build/scripts/install.sh)" bash darwin arm64
-    ```
-- Linux x64
-    ```shell
-    bash -c "$(curl https://raw.githubusercontent.com/tmck-code/pokesay/master/build/scripts/install.sh)" bash linux amd64
-    ```
-- Android ARM64 (Termux)
-    ```shell
-    bash -c "$(curl https://raw.githubusercontent.com/tmck-code/pokesay/master/build/scripts/install.sh)" bash android arm64
-    ```
-- Windows x64 (.exe)
-    ```shell
-    bash -c "$(curl https://raw.githubusercontent.com/tmck-code/pokesay/master/build/scripts/install.sh)" bash windows amd64
-    ```
+<table>
+<tr>
+  <td>OS/arch</td> <td>command</td>
+</tr>
+<tr>
+  <td>OSX / darwin</td>
+  <td>
+
+```shell
+bash -c "$(curl https://raw.githubusercontent.com/tmck-code/pokesay/master/build/scripts/install.sh)" \
+  bash darwin amd64
+```
+
+  </td>
+</tr>
+<tr>
+  <td>OSX / darwin (M1)</td>
+  <td>
+
+```shell
+bash -c "$(curl https://raw.githubusercontent.com/tmck-code/pokesay/master/build/scripts/install.sh)" \
+  bash darwin arm64
+```
+
+  </td>
+</tr>
+<tr>
+  <td>Linux / x64</td>
+  <td>
+
+```shell
+bash -c "$(curl https://raw.githubusercontent.com/tmck-code/pokesay/master/build/scripts/install.sh)" \
+  bash linux amd64
+```
+
+  </td>
+</tr>
+<tr>
+  <td>Android / arm64 (termux)</td>
+  <td>
+
+```shell
+bash -c "$(curl https://raw.githubusercontent.com/tmck-code/pokesay/master/build/scripts/install.sh)" \
+  bash android arm64
+```
+
+  </td>
+</tr>
+<tr>
+  <td>Windows / x64 (.exe)</td>
+  <td>
+
+```shell
+bash -c "$(curl https://raw.githubusercontent.com/tmck-code/pokesay/master/build/scripts/install.sh)" \
+  bash windows amd64
+```
+
+  </td>
+</tr>
+</table>
 
 ---
 
