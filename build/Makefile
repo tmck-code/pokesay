@@ -53,7 +53,8 @@ build/arch:
 		--platform linux/amd64 \
 		--rm --name pokesay \
 		  archlinux:base-devel \
-		  bash -c "/usr/local/src/build/scripts/build_packages.sh arch_as_user"
+		  bash -c "useradd u -m && su - u -c 'bash /usr/local/src/build/scripts/build_packages.sh arch'"
+# 		  bash -c "/usr/local/src/build/scripts/build_packages.sh arch_as_user"
 
 build/packages: build/deb build/arch
 	@echo "\n> Built packages:"

@@ -47,11 +47,6 @@ EOF
     mv -v "$OUTPUT_DIR/pokesay_${VERSION}_${arch}.deb" /usr/local/src/build/packages/
 }
 
-function build_arch_as_user() {
-    useradd u -m
-    su - u -c "bash /usr/local/src/build/scripts/build_packages.sh arch"
-}
-
 function build_arch() {
     local os=$1
     local arch=$2
@@ -60,7 +55,7 @@ function build_arch() {
 
     cd /usr/local/src
 
-    ARCH_DIR="./build/arch"
+    ARCH_DIR="/usr/local/src/build/arch"
     mkdir -p "$ARCH_DIR"
 
     cp "build/bin/pokesay-${os}-${arch}${suffix}" "$ARCH_DIR/"
@@ -85,7 +80,6 @@ package() {
 EOF
     cd "$ARCH_DIR"
     makepkg -f --noconfirm
-    cd -
 
     mv -v "$ARCH_DIR"/*.pkg.tar.zst /usr/local/src/build/packages/
     rm -rf "$ARCH_DIR"
@@ -94,6 +88,5 @@ EOF
 case "${1}" in
     deb)   build_deb linux amd64; build_deb android arm64 ;;
     arch)  build_arch linux amd64 x86_64 ;;
-    arch_as_user)  build_arch_as_user ;;
     *)     echo "Usage: $0 {deb|arch}" ;;
 esac
