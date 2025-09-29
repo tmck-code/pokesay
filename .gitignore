@@ -6,7 +6,7 @@
 # All binaries
 build/assets
 build/bin
-build/deb
+build/packages
 
 # Built binaries
 # pokesay

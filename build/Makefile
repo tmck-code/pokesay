@@ -37,13 +37,27 @@ build/release: build/assets
 		  build/scripts/build.sh
 	tree $(PWD)/bin/
 
-build/deb: build/release
-	docker run \
+build/deb:
+	@echo "\n> Building DEB packages"
+	@docker run \
 		-v $(PWD)/../:/usr/local/src \
 		--rm --name pokesay \
 		  $(DOCKER_IMAGE) \
-		  build/scripts/build_debs.sh
-	tree $(PWD)/deb/
+		  bash -c "/usr/local/src/build/scripts/build_packages.sh deb"
+
+build/arch:
+	@echo "\n> Building Arch packages"
+	@docker run \
+		-it \
+		-v $(PWD)/../:/usr/local/src \
+		--platform linux/amd64 \
+		--rm --name pokesay \
+		  archlinux:base-devel \
+		  bash -c "/usr/local/src/build/scripts/build_packages.sh arch_as_user"
+
+build/packages: build/deb build/arch
+	@echo "\n> Built packages:"
+	@ls -alh $(PWD)/packages/
 
 test:
 	docker run \
@@ -52,4 +66,5 @@ test:
 			$(DOCKER_IMAGE) \
 			gotestsum --format dots
 
-.PHONY: all build/docker build/cows build/assets build/release build/deb test
+.PHONY: all build/docker build/cows build/assets build/release test
+.PHONY: build/deb build/arch build/packages
