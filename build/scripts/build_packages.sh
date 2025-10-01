@@ -9,7 +9,7 @@ function get_latest_version() {
      | sed -E 's/",$|v//g'
 }
 
-VERSION="$(get_latest_version)"
+VERSION="${VERSION:-$(get_latest_version)}"
 MAINTAINER="Tom McKeesick <tmck01@gmail.com>"
 DESCRIPTION="Print pokemon in the CLI! An adaptation of the classic 'cowsay'"
 

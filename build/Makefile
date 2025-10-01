@@ -42,7 +42,9 @@ build/deb:
 	@echo "\n> Building DEB packages"
 	@docker run \
 		-v $(PWD)/../:/usr/local/src \
-		--rm --name pokesay \
+		-e VERSION=$(VERSION) \
+		--rm \
+		--name pokesay \
 		  $(DOCKER_IMAGE) \
 		  bash -c "/usr/local/src/build/scripts/build_packages.sh deb"
 
@@ -51,8 +53,10 @@ build/arch:
 	@docker run \
 		-it \
 		-v $(PWD)/../:/usr/local/src \
+		-e VERSION=$(VERSION) \
 		--platform linux/amd64 \
-		--rm --name pokesay \
+		--rm \
+		--name pokesay \
 		  archlinux:base-devel \
 		  bash -c "useradd u -m && su - u -c 'bash /usr/local/src/build/scripts/build_packages.sh arch'"
 
