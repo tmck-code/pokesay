@@ -5,7 +5,7 @@ DOCKER_TAG ?= latest
 DOCKER_IMAGE=$(DOCKER_REPO)/pokesay:$(DOCKER_TAG)
 
 
-all: build/docker build/cows build/assets test build/release build/packages
+all: build/docker build/cows build/assets test build/bin build/packages
 
 build/docker:
 	echo "Building $(DOCKER_IMAGE)"
@@ -29,13 +29,13 @@ build/assets:
 	    $(DOCKER_IMAGE) \
 			build/scripts/build_assets.sh
 
-build/release: build/assets
+build/bin: build/assets
 	docker run \
 		-v $(PWD)/../:/usr/local/src \
 		--user root \
 		--rm --name pokesay \
 		  $(DOCKER_IMAGE) \
-		  build/scripts/build.sh
+		  build/scripts/build_bin.sh
 	tree $(PWD)/bin/
 
 build/deb:
@@ -68,5 +68,5 @@ test:
 			$(DOCKER_IMAGE) \
 			gotestsum --format dots
 
-.PHONY: all build/docker build/cows build/assets build/release test
+.PHONY: all build/docker build/cows build/assets build/bin test
 .PHONY: build/deb build/arch build/packages
