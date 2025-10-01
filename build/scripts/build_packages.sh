@@ -26,9 +26,12 @@ function build_deb() {
     local bin="build/bin/pokesay-${os}-${arch}${suffix}"
     local pkg_name="pokesay-${os}-${arch}"
 
-    mkdir -p "$pkg_name/pokesay/DEBIAN" "$pkg_name/pokesay/usr/bin"
+    mkdir -p "$pkg_name/pokesay/DEBIAN" "$pkg_name/pokesay/usr/bin" "$pkg_name/pokesay/usr/share/man/man1"
 
     cp "$bin" "$pkg_name/pokesay/usr/bin/pokesay"
+
+    # Compress and install the man page
+    gzip -c "build/pokesay.1" > "$pkg_name/pokesay/usr/share/man/man1/pokesay.1.gz"
 
     cat > "$pkg_name/pokesay/DEBIAN/control" <<EOF
 Package: pokesay
@@ -59,6 +62,7 @@ function build_arch() {
     mkdir -p "$ARCH_DIR"
 
     cp "build/bin/pokesay-${os}-${arch}${suffix}" "$ARCH_DIR/"
+    cp "build/pokesay.1" "$ARCH_DIR/"
 
     cat > "$ARCH_DIR/PKGBUILD" <<EOF
 # Maintainer: $MAINTAINER
@@ -76,6 +80,7 @@ sha256sums=('SKIP')
 
 package() {
     install -Dm755 "\$srcdir/pokesay-linux-amd64" "\$pkgdir/usr/bin/pokesay"
+    install -Dm644 "\$srcdir/../pokesay.1" "\$pkgdir/usr/share/man/man1/pokesay.1"
 }
 EOF
     cd "$ARCH_DIR"
