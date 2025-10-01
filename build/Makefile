@@ -5,7 +5,7 @@ DOCKER_TAG ?= latest
 DOCKER_IMAGE=$(DOCKER_REPO)/pokesay:$(DOCKER_TAG)
 
 
-all: build/docker build/cows build/assets test build/release build/deb
+all: build/docker build/cows build/assets test build/bin build/packages
 
 build/docker:
 	echo "Building $(DOCKER_IMAGE)"
@@ -29,27 +29,48 @@ build/assets:
 	    $(DOCKER_IMAGE) \
 			build/scripts/build_assets.sh
 
-build/release: build/assets
+build/bin: build/assets
 	docker run \
 		-v $(PWD)/../:/usr/local/src \
+		--user root \
 		--rm --name pokesay \
 		  $(DOCKER_IMAGE) \
-		  build/scripts/build.sh
+		  build/scripts/build_bin.sh
 	tree $(PWD)/bin/
 
-build/deb: build/release
-	docker run \
+build/deb:
+	@echo "\n> Building DEB packages"
+	@docker run \
 		-v $(PWD)/../:/usr/local/src \
-		--rm --name pokesay \
+		-e VERSION=$(VERSION) \
+		--rm \
+		--name pokesay \
 		  $(DOCKER_IMAGE) \
-		  build/scripts/build_debs.sh
-	tree $(PWD)/deb/
+		  bash -c "/usr/local/src/build/scripts/build_packages.sh deb"
+
+build/arch:
+	@echo "\n> Building Arch packages"
+	@docker run \
+		-it \
+		-v $(PWD)/../:/usr/local/src \
+		-e VERSION=$(VERSION) \
+		--platform linux/amd64 \
+		--rm \
+		--name pokesay \
+		  archlinux:base-devel \
+		  bash -c "useradd u -m && su - u -c 'bash /usr/local/src/build/scripts/build_packages.sh arch'"
+
+build/packages: build/deb build/arch
+	@echo "\n> Built packages:"
+	@ls -alh $(PWD)/packages/
 
 test:
 	docker run \
 		-v $(PWD)/../:/usr/local/src \
+		--user root \
 		--rm --name pokesay-test \
 			$(DOCKER_IMAGE) \
 			gotestsum --format dots
 
-.PHONY: all build/docker build/cows build/assets build/release build/deb test
+.PHONY: all build/docker build/cows build/assets build/bin test
+.PHONY: build/deb build/arch build/packages

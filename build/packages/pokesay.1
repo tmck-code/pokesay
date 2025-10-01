@@ -1,0 +1,138 @@
+.TH POKESAY 1 "September 2025" "pokesay 0.17.0" "User Commands"
+.SH NAME
+pokesay \- print Pokémon in the CLI! An adaptation of the classic "cowsay"
+.SH SYNOPSIS
+.B pokesay
+[\fIOPTIONS\fR] [\fIPARAMETERS\fR ...]
+.SH DESCRIPTION
+.B pokesay
+takes piped text and displays it in a speech bubble spoken by a Pokémon sprite.
+
+.SH OPTIONS
+.TP
+.BR \-b ", " --info-border
+Draw a border around the info box.
+.TP
+.BR \-B ", " --no-bubble
+Do not draw the speech bubble.
+.TP
+.BR \-c ", " --category=\fIVALUE\fR
+Choose a Pokémon from a specific category.
+.TP
+.BR \-C ", " --no-category-info
+Do not print Pokémon category information in the info box.
+.TP
+.BR \-f ", " --fastest
+Run with the fastest possible configuration (\-\-nowrap & \-\-notabspaces).
+.TP
+.BR \-F ", " --flip
+Flip the Pokémon horizontally (face right instead of left).
+.TP
+.BR \-h ", " --help
+Display this help message.
+.TP
+.BR \-i ", " --id=\fIVALUE\fR
+Choose a Pokémon from a specific ID (see \fBpokesay -l\fR for IDs).
+.TP
+.BR \-I ", " --id-info
+Print the Pokémon ID in the info box.
+.TP
+.BR \-j ", " --japanese-name
+Print the Japanese name in the info box.
+.TP
+.BR \-L ", " --list-categories
+List all available categories.
+.TP
+.BR \-l ", " --list-names[=\fIVALUE\fR]
+List all available names.
+.TP
+.BR \-n ", " --name=\fIVALUE\fR
+Choose a Pokémon from a specific name.
+.TP
+.BR \-s ", " --no-tab-spaces
+Do not replace tab characters (fastest).
+.TP
+.BR \-t ", " --tab-width=\fIVALUE\fR
+Replace any tab characters with N spaces [4].
+.TP
+.BR \-u ", " --unicode-borders
+Use unicode characters to draw the border around the speech box (and info box if \-\-info-border is enabled).
+.TP
+.BR \-v ", " --verbose
+Print verbose output.
+.TP
+.BR \-W ", " --no-wrap
+Disable text wrapping (fastest).
+.TP
+.BR \-w ", " --width=\fIVALUE\fR
+The max speech bubble width [80].
+
+
+.SH EXAMPLES
+Pipe text to pokesay:
+
+.EX
+    echo "yolo" | pokesay
+.EE
+
+See a random fortune every time you open a terminal (requires fortune):
+
+.EX
+    echo 'fortune | pokesay' >> $HOME/.bashrc
+.EE
+
+List all available categories:
+
+.EX
+    pokesay -L
+.EE
+
+List all available names:
+
+.EX
+    pokesay -l
+.EE
+
+Print a message with a random pokemon:
+
+.EX
+    echo 'Hello, world!' | pokesay
+.EE
+
+Print a message with a specific pokemon:
+
+.EX
+    echo 'Hello, world!' | pokesay -n pikachu
+.EE
+
+Print a message with a specific pokemon category:
+
+.EX
+    echo 'Hello, world!' | pokesay -c big
+    echo 'Hello, world!' | pokesay -c shiny
+.EE
+
+Print a message with a specific pokemon category and name:
+
+.EX
+    echo 'Hello, world!' | pokesay -c shiny -n charizard
+.EE
+
+Print a specific pokemon by its ID:
+
+.EX
+    echo 'Hello, world!' | pokesay -i 0491.1719
+.EE
+
+.SH FILES
+None.
+
+.SH AUTHOR
+Tom McKeesick <tmck01@gmail.com>
+
+.SH SEE ALSO
+.BR cowsay (1)
+
+.SH HOMEPAGE
+https://github.com/tmck-code/pokesay
+

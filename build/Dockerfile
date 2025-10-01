@@ -15,14 +15,17 @@ RUN git clone -q --depth 1 https://github.com/denilsonsa/img2xterm \
     && rm -rf /var/lib/apt/lists/* \
     && rm -rf /tmp/* /var/tmp/*
 
-RUN git clone -q --depth 1 https://github.com/msikma/pokesprite /tmp/original/pokesprite
-
 WORKDIR /usr/local/src/
 ADD src/ /usr/local/src/src/
 ADD go.* /usr/local/src/
 RUN go mod tidy \
     && go get -v github.com/mitchellh/go-wordwrap \
     && go install gotest.tools/gotestsum@latest
+
+RUN useradd u -m
+USER u
+
+RUN git clone -q --depth 1 https://github.com/msikma/pokesprite /tmp/original/pokesprite
 
 # Convert all of the pokesprite .pngs -> cowfiles for the terminal
 RUN go run /usr/local/src/src/bin/convert/png_convert.go \

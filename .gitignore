@@ -6,11 +6,7 @@
 # All binaries
 build/assets
 build/bin
-build/deb
-
-# Built binaries
-# pokesay
-# pokedex
+dist/
 
 # Test binary, built with `go test -c`
 *.test
