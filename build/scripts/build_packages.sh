@@ -31,7 +31,7 @@ function build_deb() {
     cp "$bin" "$pkg_name/pokesay/usr/bin/pokesay"
 
     # Compress and install the man page
-    gzip -c "build/pokesay.1" > "$pkg_name/pokesay/usr/share/man/man1/pokesay.1.gz"
+    gzip -c "build/packages/pokesay.1" > "$pkg_name/pokesay/usr/share/man/man1/pokesay.1.gz"
 
     cat > "$pkg_name/pokesay/DEBIAN/control" <<EOF
 Package: pokesay
@@ -62,7 +62,7 @@ function build_arch() {
     mkdir -p "$ARCH_DIR"
 
     cp "build/bin/pokesay-${os}-${arch}${suffix}" "$ARCH_DIR/"
-    cp "build/pokesay.1" "$ARCH_DIR/"
+    cp "build/packages/pokesay.1" "$ARCH_DIR/"
 
     cat > "$ARCH_DIR/PKGBUILD" <<EOF
 # Maintainer: $MAINTAINER
