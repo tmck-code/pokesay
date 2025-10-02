@@ -7,26 +7,28 @@ GOARCH="$2"
 VERSION="${3:-latest}"
 
 function get_latest_version() {
-   curl -s https://api.github.com/repos/tmck-code/pokesay/releases/latest \
-     | grep tag_name \
-     | cut -d "\"" -f 4- \
-     | sed 's/",$//g'
+  curl -s https://api.github.com/repos/tmck-code/pokesay/releases/latest \
+    | grep tag_name \
+    | cut -d "\"" -f 4- \
+    | sed 's/",$//g'
+    | tr -d 'v'
 }
 
 # Downloads the release corresponding to the VERSION, GOOS and GOARCH arguments
 function download_bin() {
-  local pokesay_bin="pokesay-$GOOS-$GOARCH"
   local release_version="$VERSION"
 
   if [ "$VERSION" == "latest" ]; then
     echo "- No specific release version given, finding latest version..."
     release_version=$(get_latest_version)
   fi
+
+  local pokesay_bin="pokesay-$release_version-$GOOS-$GOARCH"
   if [ "$GOOS" == "windows" ]; then
     pokesay_bin="${pokesay_bin}.exe"
   fi
 
-  url="https://github.com/tmck-code/pokesay/releases/download/${release_version}/${pokesay_bin}"
+  url="https://github.com/tmck-code/pokesay/releases/download/v${release_version}/${pokesay_bin}"
   echo "- VERSION: $release_version, GOOS=$GOOS, GOARCH=$GOARCH"
 
   # check if the release version is 0.13.0 or later
@@ -35,7 +37,7 @@ function download_bin() {
   if test -f $HOME/bin/pokesay; then
     echo "- Checking for breaking changes in $release_version..."
 
-    if [ $release_version == "v0.13.0" ]; then
+    if [ $release_version == "0.13.0" ]; then
       continue="n"
       echo -e "\nWARNING: This version of pokesay has breaking changes to the CLI args!"
       echo -e "         Please check the release for the changes to the CLI args:"

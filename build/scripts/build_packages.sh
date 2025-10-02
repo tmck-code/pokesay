@@ -20,11 +20,11 @@ function build_deb() {
     local arch=$2
     local suffix=${3:-}
 
-    OUTPUT_DIR="build/deb"
+    OUTPUT_DIR="dist/packages"
     mkdir -p "$OUTPUT_DIR"
 
-    local bin="build/bin/pokesay-${os}-${arch}${suffix}"
-    local pkg_name="pokesay-${os}-${arch}"
+    local bin="dist/bin/pokesay-${VERSION}-${os}-${arch}${suffix}"
+    local pkg_name="pokesay-${VERSION}-${os}-${arch}"
 
     mkdir -p "$pkg_name/pokesay/DEBIAN" "$pkg_name/pokesay/usr/bin" "$pkg_name/pokesay/usr/share/man/man1"
 
@@ -44,10 +44,9 @@ Maintainer: $MAINTAINER
 Description: $DESCRIPTION
 EOF
 
-    dpkg-deb --build "$pkg_name/pokesay/" "$OUTPUT_DIR/pokesay_${VERSION}_${arch}.deb"
+    dpkg-deb --build "$pkg_name/pokesay/" "$OUTPUT_DIR/pokesay-${VERSION}-${os}-${arch}.deb"
 
     rm -rf "$pkg_name"
-    mv -v "$OUTPUT_DIR/pokesay_${VERSION}_${arch}.deb" /usr/local/src/build/packages/
 }
 
 function build_arch() {
@@ -61,8 +60,9 @@ function build_arch() {
     ARCH_DIR="/usr/local/src/build/arch"
     mkdir -p "$ARCH_DIR"
 
-    cp "build/bin/pokesay-${os}-${arch}${suffix}" "$ARCH_DIR/"
+    cp "dist/bin/pokesay-${VERSION}-${os}-${arch}${suffix}" "$ARCH_DIR/"
     cp "build/packages/pokesay.1" "$ARCH_DIR/"
+    cp LICENSE "$ARCH_DIR/"
 
     cat > "$ARCH_DIR/PKGBUILD" <<EOF
 # Maintainer: $MAINTAINER
@@ -75,18 +75,20 @@ arch=('$arch_arch')
 url="https://github.com/tmck-code/pokesay"
 license=('BSD-3-Clause')
 depends=()
-source=("pokesay-linux-amd64")
+source=("pokesay-${VERSION}-${os}-${arch}${suffix}")
 sha256sums=('SKIP')
 
 package() {
-    install -Dm755 "\$srcdir/pokesay-linux-amd64" "\$pkgdir/usr/bin/pokesay"
+    install -Dm755 "\$srcdir/pokesay-${VERSION}-${os}-${arch}${suffix}" "\$pkgdir/usr/bin/pokesay"
     install -Dm644 "\$srcdir/../pokesay.1" "\$pkgdir/usr/share/man/man1/pokesay.1"
+    install -Dm644 "\$srcdir/../LICENSE" "\$pkgdir/usr/share/licenses/pokesay/LICENSE"
 }
 EOF
     cd "$ARCH_DIR"
+    makepkg --printsrcinfo > .SRCINFO
     makepkg -f --noconfirm
 
-    mv -v "$ARCH_DIR"/*.pkg.tar.zst /usr/local/src/build/packages/
+    cp "$ARCH_DIR"/*.pkg.tar.zst /usr/local/src/dist/packages/
     rm -rf "$ARCH_DIR"
 }
 
