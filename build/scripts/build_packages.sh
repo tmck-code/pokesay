@@ -24,7 +24,10 @@ function build_deb() {
         "$pkg_name/pokesay/usr/share/man/man1"
 
     cp "$bin" "$pkg_name/pokesay/usr/bin/pokesay"
-    gzip -c "build/packages/pokesay.1" > "$pkg_name/pokesay/usr/share/man/man1/pokesay.1.gz"
+    cat build/packages/pokesay.1 | \
+      sed -e "s/DATE/$(date '+%B %Y')/g" \
+          -e "s/VERSION/$VERSION/g" | \
+      gzip -c > "$pkg_name/pokesay/usr/share/man/man1/pokesay.1.gz"
 
     cat build/packages/DEBIAN/control | \
       sed -e "s/VERSION/$VERSION/g" \
@@ -50,7 +53,10 @@ function build_arch() {
     mkdir -p "$ARCH_DIR"
 
     cp "dist/bin/$BIN_FILE" "$ARCH_DIR/"
-    cp "build/packages/pokesay.1" "$ARCH_DIR/"
+    cat "build/packages/pokesay.1" | \
+      sed -e "s/DATE/$(date '+%B %Y')/g" \
+          -e "s/VERSION/$VERSION/g" \
+      > "$ARCH_DIR/pokesay.1"
     cp LICENSE "$ARCH_DIR/"
 
     SHA256_SUM=$(sha256sum "$ARCH_DIR/$BIN_FILE" | cut -d' ' -f1)

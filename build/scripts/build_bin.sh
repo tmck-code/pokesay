@@ -7,7 +7,9 @@ set -euo pipefail
 OUTPUT_DIR="dist/bin"
 mkdir -p "$OUTPUT_DIR"
 
-cp build/packages/pokesay.1 .
+cat build/packages/pokesay.1 | \
+  sed -e "s/DATE/$(date '+%B %Y')/g" \
+      -e "s/VERSION/$VERSION/g" > pokesay.1
 
 function build() {
     echo "- building $1 / $2"
