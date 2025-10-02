@@ -1,8 +1,8 @@
 #!/bin/bash
 
 set -euo pipefail
-
-[ -z "${VERSION:-}" ] && exit 1
+[ -n "${DEBUG:-}" ] && set -x
+[ -z "${VERSION:-}" ] && echo "no VERSION!" && exit 1
 
 OUTPUT_DIR="dist/bin"
 mkdir -p "$OUTPUT_DIR"

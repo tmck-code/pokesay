@@ -1,0 +1,8 @@
+Package: pokesay
+Version: VERSION
+Standards-Version: VERSION
+Section: utils
+Priority: optional
+Architecture: ARCH
+Maintainer: MAINTAINER
+Description: DESCRIPTION

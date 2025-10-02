@@ -1,0 +1,18 @@
+# Maintainer: MAINTAINER
+pkgname=pokesay
+gitname=pokesay
+pkgver=VERSION
+pkgrel=1
+pkgdesc="DESCRIPTION"
+arch=("ARCH_ARCH")
+url="https://github.com/tmck-code/pokesay"
+license=("BSD-3-Clause")
+depends=()
+source=("BIN_FILE")
+sha256sums=(SHA256_SUM)
+
+package() {
+    install -Dm755 "$srcdir/BIN_FILE" "$pkgdir/usr/bin/pokesay"
+    install -Dm644 "$srcdir/../pokesay.1" "$pkgdir/usr/share/man/man1/pokesay.1"
+    install -Dm644 "$srcdir/../LICENSE" "$pkgdir/usr/share/licenses/pokesay/LICENSE"
+}

@@ -1,19 +1,11 @@
 #!/bin/bash
 
 set -euo pipefail
+[ -n "${DEBUG:-}" ] && set -x
+[ -z "${VERSION:-}" ] && echo "no VERSION!" && exit 1
 
-function get_latest_version() {
-   curl -s https://api.github.com/repos/tmck-code/pokesay/releases/latest \
-     | grep tag_name \
-     | cut -d "\"" -f 4- \
-     | sed -E 's/",$|v//g'
-}
-
-VERSION="${VERSION:-$(get_latest_version)}"
 MAINTAINER="Tom McKeesick <tmck01@gmail.com>"
 DESCRIPTION="Print pokemon in the CLI! An adaptation of the classic 'cowsay'"
-
-mkdir -p /usr/local/src/build/packages
 
 function build_deb() {
     local os=$1
@@ -26,26 +18,22 @@ function build_deb() {
     local bin="dist/bin/pokesay-${VERSION}-${os}-${arch}${suffix}"
     local pkg_name="pokesay-${VERSION}-${os}-${arch}"
 
-    mkdir -p "$pkg_name/pokesay/DEBIAN" "$pkg_name/pokesay/usr/bin" "$pkg_name/pokesay/usr/share/man/man1"
+    mkdir -p \
+        "$pkg_name/pokesay/DEBIAN" \
+        "$pkg_name/pokesay/usr/bin" \
+        "$pkg_name/pokesay/usr/share/man/man1"
 
     cp "$bin" "$pkg_name/pokesay/usr/bin/pokesay"
-
-    # Compress and install the man page
     gzip -c "build/packages/pokesay.1" > "$pkg_name/pokesay/usr/share/man/man1/pokesay.1.gz"
 
-    cat > "$pkg_name/pokesay/DEBIAN/control" <<EOF
-Package: pokesay
-Version: $VERSION
-Standards-Version: $VERSION
-Section: utils
-Priority: optional
-Architecture: $arch
-Maintainer: $MAINTAINER
-Description: $DESCRIPTION
-EOF
+    cat build/packages/DEBIAN/control | \
+      sed -e "s/VERSION/$VERSION/g" \
+          -e "s/ARCH/$arch/g" \
+          -e "s/MAINTAINER/$MAINTAINER/g" \
+          -e "s/DESCRIPTION/$DESCRIPTION/g" \
+      > "$pkg_name/pokesay/DEBIAN/control"
 
     dpkg-deb --build "$pkg_name/pokesay/" "$OUTPUT_DIR/pokesay-${VERSION}-${os}-${arch}.deb"
-
     rm -rf "$pkg_name"
 }
 
@@ -58,32 +46,24 @@ function build_arch() {
     cd /usr/local/src
 
     ARCH_DIR="/usr/local/src/build/arch"
+    BIN_FILE="pokesay-${VERSION}-${os}-${arch}${suffix}"
     mkdir -p "$ARCH_DIR"
 
-    cp "dist/bin/pokesay-${VERSION}-${os}-${arch}${suffix}" "$ARCH_DIR/"
+    cp "dist/bin/$BIN_FILE" "$ARCH_DIR/"
     cp "build/packages/pokesay.1" "$ARCH_DIR/"
     cp LICENSE "$ARCH_DIR/"
 
-    cat > "$ARCH_DIR/PKGBUILD" <<EOF
-# Maintainer: $MAINTAINER
-pkgname=pokesay
-gitname=pokesay
-pkgver=$VERSION
-pkgrel=1
-pkgdesc="$DESCRIPTION"
-arch=('$arch_arch')
-url="https://github.com/tmck-code/pokesay"
-license=('BSD-3-Clause')
-depends=()
-source=("pokesay-${VERSION}-${os}-${arch}${suffix}")
-sha256sums=('SKIP')
+    SHA256_SUM=$(sha256sum "$ARCH_DIR/$BIN_FILE" | cut -d' ' -f1)
 
-package() {
-    install -Dm755 "\$srcdir/pokesay-${VERSION}-${os}-${arch}${suffix}" "\$pkgdir/usr/bin/pokesay"
-    install -Dm644 "\$srcdir/../pokesay.1" "\$pkgdir/usr/share/man/man1/pokesay.1"
-    install -Dm644 "\$srcdir/../LICENSE" "\$pkgdir/usr/share/licenses/pokesay/LICENSE"
-}
-EOF
+    cat build/packages/arch/PKGBUILD | \
+      sed -e "s/VERSION/$VERSION/g" \
+          -e "s/ARCH_ARCH/$arch_arch/g" \
+          -e "s/BIN_FILE/$BIN_FILE/g" \
+          -e "s/MAINTAINER/$MAINTAINER/g" \
+          -e "s/DESCRIPTION/$DESCRIPTION/g" \
+          -e "s/SHA256_SUM/$SHA256_SUM/g" \
+      > "$ARCH_DIR/PKGBUILD"
+
     cd "$ARCH_DIR"
     makepkg --printsrcinfo > .SRCINFO
     makepkg -f --noconfirm
