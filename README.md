@@ -4,23 +4,24 @@ Print pokemon in the CLI! An adaptation of the classic 'cowsay'
 
 <img width="1065" alt="464197914-4c145f23-8837-41df-835c-aeaa49afd13d 2" src="https://github.com/user-attachments/assets/57d33b92-95cf-4a5b-890c-39ff530d447c" />
 
-- [pokesay](#pokesay)
-  - [One-line installs](#one-line-installs)
-  - [Usage](#usage)
-    - [Full Usage](#full-usage)
-    - [Examples](#examples)
-  - [How it works](#how-it-works)
-  - [Similar projects](#similar-projects)
-  - [TODO](#todo)
-
-**Other docs**
-
-- [Building binaries](./docs/build.md)
-- [Developing/Deploying](./docs/development.md)
-
 ---
 
-## One-line installs
+## Installation
+
+- Via homebrew (MacOS/Linux/Windows)
+  ```shell
+  brew install tmck-code/tap/pokesay
+  ```
+- Via the AUR (Arch Linux)
+  ```shell
+  yay -S pokesay-bin
+  ```
+
+Pokesay is a single binary with no dependencies that can be run on `arm64/amd64 OSX`, `amd64 Linux`, `arm64 Android` and `amd64 Windows`.   
+For installation without a package manager, see the options below.
+
+<details>
+<summary><i>Via the install script (Others)</i></summary>
 
 _(These commands can also be used to update your existing pokesay)_
 
@@ -84,6 +85,8 @@ bash -c "$(curl https://raw.githubusercontent.com/tmck-code/pokesay/master/build
   </td>
 </tr>
 </table>
+
+</details>
 
 ---
 
@@ -248,19 +251,19 @@ Inspired by the [pokeshell](https://github.com/acxz/pokeshell) project, I've inc
 ## TODO
 
 - **In progress**
-  - [ ] optionally print ID assigned to each pokemon, support deterministic selection via the same ID
 - **Short-term**
-- [ ] requesting mew returns mewtwo also
-- [ ] create "vertical" friendly display mode, place the Pokemon standing beside the text box, on the left or right
-- [ ] create Debian package
-- [ ] create Arch package
+  - [ ] requesting mew returns mewtwo also
+  - [ ] create "vertical" friendly display mode, place the Pokemon standing beside the text box, on the left or right
 - **Longer-term**
   - [ ] make the process async.
     - (Currently the searching/pokemon fetching is done _before_ any printing begins. There's an opportunity to start printing the speech bubble while also fetching the pokemon to print below it)
     - [ ] implement native lolcat/rainbow HR/colour
 - **In Beta**
-- [x] add option to flip Pokemon to face right or left, remove all "right" facing cowfiles
+  - [x] optionally print ID assigned to each pokemon, support deterministic selection via the same ID
 - **Completed**
+  - [x] add option to flip Pokemon to face right or left, remove all "right" facing cowfiles
+  - [x] create Debian package
+  - [x] create Arch package
   - [x] support long and short cli args (e.g. --name/-n)
   - [x] Make the category struct faster to load - currently takes up to 80% of the execution time
   - [x] Store metadata and names in a more storage-efficient manner
@@ -271,3 +274,9 @@ Inspired by the [pokeshell](https://github.com/acxz/pokeshell) project, I've inc
   - [x] Increase speed
   - [x] Improve categories to be more specific than shiny/regular
   - [x] Filter by both name and category
+
+
+## Other docs
+
+- [Building binaries](./docs/build.md)
+- [Developing/Deploying](./docs/development.md)
