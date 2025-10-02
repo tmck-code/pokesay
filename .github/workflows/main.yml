@@ -14,6 +14,8 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: Pull image from ghcr.io
         run: docker pull ghcr.io/tmck-code/pokesay:latest
+      - name: Make dist directory
+        run: mkdir -p dist/bin/ dist/packages/ dist/tarballs/
       - name: Build go binary assets
         run: docker run -v ${PWD}:/usr/local/src -e VERSION=latest ghcr.io/tmck-code/pokesay:latest ./build/scripts/build_assets.sh
       - name: Build go binaries
