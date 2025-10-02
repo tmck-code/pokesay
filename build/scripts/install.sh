@@ -10,7 +10,7 @@ function get_latest_version() {
   curl -s https://api.github.com/repos/tmck-code/pokesay/releases/latest \
     | grep tag_name \
     | cut -d "\"" -f 4- \
-    | sed 's/",$//g'
+    | sed 's/",$//g' \
     | tr -d 'v'
 }
 
