@@ -34,19 +34,17 @@ build/bin: build/assets
 	@mkdir -p $(PWD)/../dist/bin/ $(PWD)/../dist/packages/ $(PWD)/../dist/tarballs/
 	@docker run \
 		-v $(PWD)/../:/usr/local/src \
-		-v $(PWD)/../dist/:/usr/local/src/dist/ \
 		-e VERSION=$(VERSION) \
 		--user root \
 		--rm --name pokesay \
 		  $(DOCKER_IMAGE) \
 		  build/scripts/build_bin.sh
-	@tree $(PWD)/../dist/bin/
+	@tree $(PWD)/../dist/
 
 build/deb:
 	@echo -e "\n> Building DEB packages"
 	@docker run \
 		-v $(PWD)/../:/usr/local/src \
-		-v $(PWD)/../dist/:/usr/local/src/dist/ \
 		-e VERSION=$(VERSION) \
 		--rm \
 		--name pokesay \
@@ -58,7 +56,6 @@ build/arch:
 	@docker run \
 		-it \
 		-v $(PWD)/../:/usr/local/src \
-		-v $(PWD)/../dist/:/usr/local/src/dist/ \
 		-e VERSION=$(VERSION) \
 		--platform linux/amd64 \
 		--rm \
