@@ -19,9 +19,9 @@ jobs:
       - name: Build go binaries
         run: docker run -v ${PWD}:/usr/local/src ghcr.io/tmck-code/pokesay:latest ./build/scripts/build_bin.sh
       - name: Check build
-        run: ls -alh build/bin
+        run: ls -alh dist/bin
       - name: Test build
-        run: echo w | ./build/bin/pokesay-linux-amd64
+        run: echo w | ./dist/bin/pokesay-*-linux-amd64
       - name: Run unit tests
         run: docker run -v ${PWD}:/usr/local/src ghcr.io/tmck-code/pokesay:latest gotestsum --format dots
 
