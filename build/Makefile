@@ -3,6 +3,7 @@ DOCKER_REPO ?= tmckcode
 DOCKER_TAG ?= latest
 
 DOCKER_IMAGE=$(DOCKER_REPO)/pokesay:$(DOCKER_TAG)
+DEBUG ?= ""
 
 
 all: build/docker build/cows build/assets test build/bin build/packages
@@ -29,12 +30,13 @@ build/assets:
 	    $(DOCKER_IMAGE) \
 			build/scripts/build_assets.sh
 
-build/bin: build/assets
+build/bin:
 	@echo -e "\n> Building binaries"
 	@mkdir -p $(PWD)/../dist/bin/ $(PWD)/../dist/packages/ $(PWD)/../dist/tarballs/
 	@docker run \
 		-v $(PWD)/../:/usr/local/src \
 		-e VERSION=$(VERSION) \
+		-e DEBUG=$(DEBUG) \
 		--user root \
 		--rm --name pokesay \
 		  $(DOCKER_IMAGE) \
