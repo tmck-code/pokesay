@@ -23,25 +23,30 @@ build/cows:
 
 # generate embedded bin files for category/metadata/the actual pokemon
 build/assets:
-	docker run \
+	@docker run \
 		-v $(PWD)/../:/usr/local/src \
 		--rm --name pokesay \
 	    $(DOCKER_IMAGE) \
 			build/scripts/build_assets.sh
 
 build/bin: build/assets
-	docker run \
+	@echo -e "\n> Building binaries"
+	@mkdir -p $(PWD)/../dist/bin/ $(PWD)/../dist/packages/ $(PWD)/../dist/tarballs/
+	@docker run \
 		-v $(PWD)/../:/usr/local/src \
+		-v $(PWD)/../dist/:/usr/local/src/dist/ \
+		-e VERSION=$(VERSION) \
 		--user root \
 		--rm --name pokesay \
 		  $(DOCKER_IMAGE) \
 		  build/scripts/build_bin.sh
-	tree $(PWD)/bin/
+	@tree $(PWD)/../dist/bin/
 
 build/deb:
-	@echo "\n> Building DEB packages"
+	@echo -e "\n> Building DEB packages"
 	@docker run \
 		-v $(PWD)/../:/usr/local/src \
+		-v $(PWD)/../dist/:/usr/local/src/dist/ \
 		-e VERSION=$(VERSION) \
 		--rm \
 		--name pokesay \
@@ -49,20 +54,21 @@ build/deb:
 		  bash -c "/usr/local/src/build/scripts/build_packages.sh deb"
 
 build/arch:
-	@echo "\n> Building Arch packages"
+	@echo -e "\n> Building Arch packages"
 	@docker run \
 		-it \
 		-v $(PWD)/../:/usr/local/src \
+		-v $(PWD)/../dist/:/usr/local/src/dist/ \
 		-e VERSION=$(VERSION) \
 		--platform linux/amd64 \
 		--rm \
 		--name pokesay \
 		  archlinux:base-devel \
-		  bash -c "useradd u -m && su - u -c 'bash /usr/local/src/build/scripts/build_packages.sh arch'"
+		  bash -c "useradd u -m && su - u -c 'VERSION=$(VERSION) bash /usr/local/src/build/scripts/build_packages.sh arch'"
 
 build/packages: build/deb build/arch
-	@echo "\n> Built packages:"
-	@ls -alh $(PWD)/packages/
+	@echo -e "\n> Built packages:"
+	@tree $(PWD)/../dist/
 
 test:
 	docker run \
