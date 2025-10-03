@@ -1,0 +1,38 @@
+FROM archlinux:base-devel
+
+RUN pacman-key --init \
+    && pacman-key --populate archlinux \
+    && pacman -Syu --noconfirm \
+        git base-devel nodejs npm just go \
+    && pacman -Sy --noconfirm sudo \
+    && useradd -m poke-bench \
+    && echo "poke-bench ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
+
+USER poke-bench
+WORKDIR /home/poke-bench
+
+RUN git clone https://aur.archlinux.org/yay.git \
+    && cd yay \
+    && makepkg -csi --noconfirm
+
+RUN yay -Sy --noconfirm \
+    hyperfine jq \
+    krabby-bin \
+    pokemon-colorscripts-git \
+    pokego-bin \
+    pokemonsay-newgenerations-git \
+    kingler-bin \
+    pokeget \
+    pokesay
+
+
+RUN sudo mv -v /usr/bin/pokemonsay /usr/bin/pokemonsay-newgenerations
+
+RUN sudo npm install -g pokemonsay
+RUN sudo mv /usr/sbin/pokemonsay /usr/sbin/pokemonsay-npm
+
+WORKDIR /home/poke-bench
+RUN git clone http://github.com/possatti/pokemonsay \
+    && cd pokemonsay \
+    && ./install.sh \
+    && mv -v /home/poke-bench/bin/pokemonsay /home/poke-bench/bin/pokemonsay-bash
