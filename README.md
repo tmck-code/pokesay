@@ -237,17 +237,17 @@ Check them out via the links.
 
 Inspired by the [pokeshell](https://github.com/acxz/pokeshell) project, I've included a comparison table
 
-| project                                                                                     | language           | speed      | jp   | size | name | category  | flip | id | tab completion |
-|---------------------------------------------------------------------------------------------|------------------- |------------|------|------|------|-----------|------|----|----------------|
-| [`tmck-code/pokesay`](https://github.com/tmck-code/pokesay)                                 | go                 | 1.7ms      | ✅   | ✅   | ✅   | ✅        | ✅   | ✅ | ❌            |
-| [`yannjor/krabby`](https://github.com/yannjor/krabby)                                       | rust               | 5.2ms      | ✅   | ✅   | ✅   | ✅        | ❌   | ✅ | ❌            |
-| [`Altair-39/kingler`](https://github.com/Altair-39/kingler)                                 | rust, python, shell| 39.2ms     | ✅   | ✅   | ✅   | ✅        | ❌   | ✅ | ✅            |
-| [`xiota/pokemon-colorscripts`](https://gitlab.com/xiota/pokemon-colorscripts)               | bash               | 26.7ms     | ❌   | ✅   | ✅   | ✅        | ❌   | ❌ | ❌            |
-| [`rubiin/pokego`](https://github.com/rubiin/pokego)                                         | go                 | 2.0ms      | ❌   | ❌   | ✅   | ❌        | ❌   | ❌ | ❌            |
-| [`talwat/pokeget-rs`](https://github.com/talwat/pokeget-rs)                                 | rust               | 1.5ms      | ❌   | ✅   | ✅   | ✅        | ❌   | ✅ | ❌            |
-| [`possatti/pokemonsay`](https://github.com/possatti/pokemonsay)                             | cowsay (perl)      | 26.3ms     | ❌   | ❌   | ✅   | ❌        | ❌   | ✅ | ❌            |
-| [`HRKings/pokemonsay-newgenerations`](https://github.com/HRKings/pokemonsay-newgenerations) | cowsay (perl)      | 26.9ms     | ❌   | ✅   | ✅   | ✅        | ❌   | ✅ | ❌            |
-| [`dfrankland/pokemonsay`](https://github.com/dfrankland/pokemonsay)                         | npm                | 180.2ms    | ❌   | ✅   | ✅   | ❌        | ❌   | ✅ | ❌            |
+| project                                                                                     | language      | speed      | jp   | size | name | category  | flip | id | tab completion |
+|---------------------------------------------------------------------------------------------|---------------|------------|------|------|------|-----------|------|----|----------------|
+| [`tmck-code/pokesay`](https://github.com/tmck-code/pokesay)                                 | go            | 1.7ms      | ✅   | ✅   | ✅   | ✅        | ✅   | ✅ | ❌            |
+| [`yannjor/krabby`](https://github.com/yannjor/krabby)                                       | rust          | 5.2ms      | ✅   | ✅   | ✅   | ✅        | ❌   | ✅ | ❌            |
+| [`Altair-39/kingler`](https://github.com/Altair-39/kingler)                                 | rust          | 39.2ms     | ✅   | ✅   | ✅   | ✅        | ❌   | ✅ | ✅            |
+| [`xiota/pokemon-colorscripts`](https://gitlab.com/xiota/pokemon-colorscripts)               | bash          | 26.7ms     | ❌   | ✅   | ✅   | ✅        | ❌   | ❌ | ❌            |
+| [`rubiin/pokego`](https://github.com/rubiin/pokego)                                         | go            | 2.0ms      | ❌   | ❌   | ✅   | ❌        | ❌   | ❌ | ❌            |
+| [`talwat/pokeget-rs`](https://github.com/talwat/pokeget-rs)                                 | rust          | 1.5ms      | ❌   | ✅   | ✅   | ✅        | ❌   | ✅ | ❌            |
+| [`possatti/pokemonsay`](https://github.com/possatti/pokemonsay)                             | cowsay (perl) | 26.3ms     | ❌   | ❌   | ✅   | ❌        | ❌   | ✅ | ❌            |
+| [`HRKings/pokemonsay-newgenerations`](https://github.com/HRKings/pokemonsay-newgenerations) | cowsay (perl) | 26.9ms     | ❌   | ✅   | ✅   | ✅        | ❌   | ✅ | ❌            |
+| [`dfrankland/pokemonsay`](https://github.com/dfrankland/pokemonsay)                         | nodejs        | 180.2ms    | ❌   | ✅   | ✅   | ❌        | ❌   | ✅ | ❌            |
 
 ---
 
