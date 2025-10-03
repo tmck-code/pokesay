@@ -98,18 +98,47 @@ Just pipe some text! e.g.
 echo yolo | pokesay
 ```
 
+> _Note: The pokesay tool is intended to only be used with piped text input from STDIN, entering text by typing (or other methods) might not work as expected!_
+
+<table>
+<tr>
+  <td valign="top"><b>Default output</b><br><img width="350" alt="p_00_fortune" src="https://github.com/user-attachments/assets/019a9055-0a71-472e-84df-791ff8803bb4" /></td>
+  <td valign="top"><b>Set bubble width (-w)</b><br><img width="350" alt="p_01_set_width" src="https://github.com/user-attachments/assets/c458d24d-ea0c-4d36-abd3-1a329e81dfde" /></td>
+  <td valign="top"><b>Unicode borders (-u)</b><br><img width="350" alt="p_02_unicode" src="https://github.com/user-attachments/assets/9620db09-58e3-4c38-b1a4-99aab6b6e85e" /></td>
+</tr>
+<tr>
+  <td valign="top"><b>Info border (-b)</b><br><img width="350" alt="p_03_info_border" src="https://github.com/user-attachments/assets/fe857d59-4400-4251-824b-171d5f10ac52" /></td>
+  <td valign="top"><b>Show name (-n)</b><br><img width="350" alt="p_04_name" src="https://github.com/user-attachments/assets/88e5fc35-28ac-4b48-a04d-fb1f14446d9d" /></td>
+  <td valign="top"><b>No category info (-C)</b><br><img width="350" alt="p_05_no_category" src="https://github.com/user-attachments/assets/dc9217b8-77a8-4add-a42c-c734d488d1ec" /></td>
+</tr>
+<tr>
+  <td valign="top"><b>Show Japanese name (-j)</b><br><img width="350" alt="p_06_japanese" src="https://github.com/user-attachments/assets/34ebce1c-4448-4560-aa78-704cbabaef1e" /></td>
+  <td valign="top"><b>Show ID (-I)</b><br><img width="350" alt="p_07_id" src="https://github.com/user-attachments/assets/cd2ba951-89db-4764-9dbd-553105d54707" /></td>
+  <td valign="top"><b>Small size (-c small)</b><br><img width="350" alt="p_08_small_size" src="https://github.com/user-attachments/assets/644d9574-2c67-4e2c-a586-b4b0aa95211c" /></td>
+</tr>
+<tr>
+  <td valign="top"><b>Medium size (-c medium)</b><br><img width="350" alt="p_09_medium_size" src="https://github.com/user-attachments/assets/9979c100-76a2-479c-a5fc-cea858906b25" /></td>
+  <td valign="top"><b>Big size (-c big)</b><br><img width="350" alt="p_10_big_size" src="https://github.com/user-attachments/assets/a65c822c-fcd8-4a1a-bdc0-bb81ff9e164e" /></td>
+  <td valign="top"><b>Shiny (-c shiny)</b><br><img width="350" alt="p_10_shiny" src="https://github.com/user-attachments/assets/1a0022fb-921f-46b8-911c-8db7a8e8769b" /></td>
+</tr>
+<tr>
+  <td valign="top"><b>Size and name (-c big -n ...)</b><br><img width="350" alt="p_11_size_and_name" src="https://github.com/user-attachments/assets/e0dc9d09-b439-4dc5-81b0-ea5419308c47" /></td>
+  <td valign="top"><b>Size and name 2 (-c big -n ...)</b><br><img width="350" alt="p_12_size_and_name_2" src="https://github.com/user-attachments/assets/339a2832-9488-49bf-89ef-abf0f376e336" /></td>
+  <td valign="top"></td>
+</tr>
+<tr>
+  <td valign="top"><b>Select by ID (-i)</b><br><img width="350" alt="p_13_select_by_id" src="https://github.com/user-attachments/assets/73aa44c5-bec5-41b0-98b7-717dd29b395f" /></td>
+  <td valign="top"><b>Flip (-F)</b><br><img width="350" alt="p_14_flip" src="https://github.com/user-attachments/assets/f610c99d-6ad4-4eaa-82ff-0afbe1a7d2a3" /></td>
+  <td valign="top"><b>Figlet + lolcat</b><br><img width="350" alt="p_15_figlet_lolcat" src="https://github.com/user-attachments/assets/1e88880b-adb2-4cc2-9ee9-29c0acf26f57" /></td>
+</tr>
+</table>
+
 To see it every time you open a terminal, add it to your `.bashrc` file!   
 _(This requires that you have `fortune` installed)_
 
 ```shell
 echo 'fortune | pokesay' >> $HOME/.bashrc
 ```
-
-> _Note: The pokesay tool is intended to only be used with piped text input from STDIN, entering text by typing (or other methods) might not work as expected!_
-
-<p align="center">
-  <kbd><img src="https://github.com/tmck-code/pokesay/assets/9894426/794ee42d-4bc2-4d0c-bce0-aafa3dca2e78" alt="demo"/></kbd>
-</p>
 
 ### Full Usage
 
@@ -184,17 +213,6 @@ Usage: pokesay [-bBCfFhIjLsuvW] [-c value] [-i value] [-l value] [-n value] [-t 
   # green mewtwo is ID `0491.1719`
   echo 'Hello, world!' | pokesay -i 0491.1719
   ```
-
----
-
-|   |   |   |
-|---|---|---|
-| <img width="300" alt="p00" src="https://github.com/user-attachments/assets/202d7142-8ced-4bd9-afef-53024e215ea3" /> | <img width="300" alt="p01" src="https://github.com/user-attachments/assets/9916020d-bb32-45b6-b701-b1a9e0c010d3" /> | <img width="300" alt="p02" src="https://github.com/user-attachments/assets/a060690f-a12a-46e4-b16f-a2b88242da78" /> |
-| <img width="300" alt="p03" src="https://github.com/user-attachments/assets/904a9e99-f6f9-4ab7-a9fc-fae7b1a60780" /> | <img width="300" alt="p04" src="https://github.com/user-attachments/assets/603bb240-ace8-433d-b85a-e9e78db081d0" /> | <img width="300" alt="p05" src="https://github.com/user-attachments/assets/e45bd570-bad3-4bb6-92e9-06aa318f3cae" /> |
-| <img width="300" alt="p06" src="https://github.com/user-attachments/assets/b5603034-3d36-4257-8948-a4258698fc5d" /> | <img width="300" alt="p07" src="https://github.com/user-attachments/assets/30e425f7-7fbb-44a6-958a-2046dc7c4bb3" /> | <img width="300" alt="p08" src="https://github.com/user-attachments/assets/d88d4ed0-a47a-458f-8eca-b397e0552569" /> |
-| <img width="300" alt="p09" src="https://github.com/user-attachments/assets/9dfe7f26-46e4-4eb0-b476-02571a3a64af" /> | <img width="300" alt="p10" src="https://github.com/user-attachments/assets/d928cf62-0a48-43b9-8640-c3f9255fc7b3" /> | <img width="300" alt="p11" src="https://github.com/user-attachments/assets/b1b1c7dc-cd93-4993-86e8-38d8bd69ab5f" /> |
-| <img width="300" alt="p12" src="https://github.com/user-attachments/assets/153c804f-3251-471d-9887-9e92b1955a2c" /> | <img width="300" alt="p13" src="https://github.com/user-attachments/assets/b42b009c-5b80-4816-99a7-db0d4248a6b0" /> | <img width="300" alt="p14" src="https://github.com/user-attachments/assets/41005ff1-8fb0-43cb-99be-8e662818479f" /> |
-| <img width="300" alt="p15" src="https://github.com/user-attachments/assets/7e537507-8b9b-4447-8061-a700d3f83412" /> |  |  |
 
 ---
 
