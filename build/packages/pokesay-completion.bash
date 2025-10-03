@@ -11,8 +11,8 @@ _pokesay_completions()
     )
 
     # Read names and ids from external files
-    names="$(<"${BASH_SOURCE%/*}/pokesay-names.txt")"
-    ids="$(<"${BASH_SOURCE%/*}/pokesay-ids.txt")"
+    names="$(</usr/share/pokesay/pokesay-names.txt)"
+    ids="$(</usr/share/pokesay/pokesay-ids.txt)"
     cats="big female gen7x gen8 medium regular right shiny small"
 
     if [[ ${cur} == -* ]] ; then

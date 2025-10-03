@@ -1,7 +1,7 @@
 function __pokesay_complete
     set -l opts --help -h --verbose -v --name -n --id -i --category -c --list-names -l --list-categories -L --width -w --tab-width -t --no-wrap -W --no-tab-spaces -s --fastest -f --no-bubble -B --japanese-name -j --id-info -I --no-category-info -C --info-border -b --unicode-borders -u --flip -F completion
-    set -l names (cat (dirname (status filename))/pokesay-names.txt)
-    set -l ids (cat (dirname (status filename))/pokesay-ids.txt)
+    set -l names (cat /usr/share/pokesay/pokesay-names.txt)
+    set -l ids (cat /usr/share/pokesay/pokesay-ids.txt)
     set -l cats big female gen7x gen8 medium regular right shiny small
 
     for opt in $opts
