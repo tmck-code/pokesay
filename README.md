@@ -13,7 +13,7 @@ Print pokemon in the CLI! An adaptation of the classic 'cowsay'
 
 ## Installation
 
-Pokesay is a single binary with no dependencies that can be run on `arm64/amd64 OSX`, `amd64 Linux`, `arm64 Android` and `amd64 Windows`.   
+Pokesay is a single binary with no dependencies that can be run on `arm64/amd64 OSX`, `amd64 Linux`, `arm64 Android` and `amd64 Windows`.
 
 - Via homebrew (MacOS/Linux/Windows)
   ```shell
@@ -237,17 +237,17 @@ Check them out via the links.
 
 Inspired by the [pokeshell](https://github.com/acxz/pokeshell) project, I've included a comparison table
 
-| project | dependencies | speed | japanese names | size categories | selection by name | selection by category | animated sprites |
-|--|--|--|--|--|--|--|--|
-| [tmck-code/pokesay](https://github.com/tmck-code/pokesay) | none 🎉 | ~2.5ms | ✅ | ✅ | ✅ | ✅ | ❌ |
-| [pokeshell](https://github.com/acxz/pokeshell) | imagemagick, chafa | ? | ? | ? | ? | ? | ? |
-| [pokemon-icat](https://github.com/aflaag/pokemon-icat) | python | ? | ? | ? | ? | ? | ? |
-| [pokemon-colorscripts](https://gitlab.com/phoneybadger/pokemon-colorscripts) | python3 | ? | ? | ? | ? | ? | ? |
-| [pokemonsay-newgenerations](https://github.com/HRKings/pokemonsay-newgenerations) | cowsay (perl) | ? | ? | ? | ? | ? | ? |
-| [31marcosalsa/pokeTerm](https://github.com/31marcosalsa/pokeTerm) | python, imagemagick, img2xterm | ~62ms | ❌ | ❌ | ❌ | ❌ | ❌ |
-| [krabby](https://github.com/yannjor/krabby) | rust, cargo | ? | ❌ | ❌ | ✓ | ❌ | ❌ |
-| [pokemonsay](https://github.com/dfrankland/pokemonsay) | npm | ? | ? | ? | ? | ? | ? |
-| [possatti/pokemonsay](https://github.com/possatti/pokemonsay) | none 🎉 | ~26.3ms | ❌ | ❌ | ✅ | ❌ | ❌ | 
+| project                                                                                     | language           | speed      | jp   | size | name | category  | flip | id | tab completion |
+|---------------------------------------------------------------------------------------------|------------------- |------------|------|------|------|-----------|------|----|----------------|
+| [`tmck-code/pokesay`](https://github.com/tmck-code/pokesay)                                 | go                 | 1.7ms      | ✅   | ✅   | ✅   | ✅        | ✅   | ✅ | ❌            |
+| [`yannjor/krabby`](https://github.com/yannjor/krabby)                                       | rust               | 5.2ms      | ✅   | ✅   | ✅   | ✅        | ❌   | ✅ | ❌            |
+| [`Altair-39/kingler`](https://github.com/Altair-39/kingler)                                 | rust, python, shell| 39.2ms     | ✅   | ✅   | ✅   | ✅        | ❌   | ✅ | ✅            |
+| [`xiota/pokemon-colorscripts`](https://gitlab.com/xiota/pokemon-colorscripts)               | bash               | 26.7ms     | ❌   | ✅   | ✅   | ✅        | ❌   | ❌ | ❌            |
+| [`rubiin/pokego`](https://github.com/rubiin/pokego)                                         | go                 | 2.0ms      | ❌   | ❌   | ✅   | ❌        | ❌   | ❌ | ❌            |
+| [`talwat/pokeget-rs`](https://github.com/talwat/pokeget-rs)                                 | rust               | 1.5ms      | ❌   | ✅   | ✅   | ✅        | ❌   | ✅ | ❌            |
+| [`possatti/pokemonsay`](https://github.com/possatti/pokemonsay)                             | cowsay (perl)      | 26.3ms     | ❌   | ❌   | ✅   | ❌        | ❌   | ✅ | ❌            |
+| [`HRKings/pokemonsay-newgenerations`](https://github.com/HRKings/pokemonsay-newgenerations) | cowsay (perl)      | 26.9ms     | ❌   | ✅   | ✅   | ✅        | ❌   | ✅ | ❌            |
+| [`dfrankland/pokemonsay`](https://github.com/dfrankland/pokemonsay)                         | npm                | 180.2ms    | ❌   | ✅   | ✅   | ❌        | ❌   | ✅ | ❌            |
 
 ---
 
