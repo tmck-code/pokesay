@@ -9,15 +9,12 @@ Print pokemon in the CLI! An adaptation of the classic 'cowsay'
 
 <img width="1065" alt="464197914-4c145f23-8837-41df-835c-aeaa49afd13d 2" src="https://github.com/user-attachments/assets/57d33b92-95cf-4a5b-890c-39ff530d447c" />
 
----
 
 _Pokesay is a single binary with zero dependencies that can be run on any popular OS and architecture._
 
 _Its output is **flexible** ⚙️, and offers the most features of any similar project, while being the **fastest** to run_ 🚀
 
 ## Installation
-
-
 
 - Via homebrew (MacOS/Linux/Windows)
   ```shell
