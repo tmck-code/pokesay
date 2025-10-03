@@ -100,6 +100,8 @@ echo yolo | pokesay
 
 > _Note: The pokesay tool is intended to only be used with piped text input from STDIN, entering text by typing (or other methods) might not work as expected!_
 
+### Examples
+
 <table>
 <tr>
   <td valign="top"><b>Default output</b><br><img width="350" alt="p_00_fortune" src="https://github.com/user-attachments/assets/019a9055-0a71-472e-84df-791ff8803bb4" /></td>
@@ -177,42 +179,6 @@ Usage: pokesay [-bBCfFhIjLsuvW] [-c value] [-i value] [-l value] [-n value] [-t 
  -W, --no-wrap      disable text wrapping (fastest)
  -w, --width=value  the max speech bubble width [80]
 ```
-
-### Examples
-
-- List all available categories
-  ```shell
-  pokesay -L
-  ```
-- List all available names
-  ```shell
-  pokesay -l
-  ```
-- Print a message with a random pokemon
-  ```shell
-  echo 'Hello, world!' | pokesay
-  ```
-- Print a message with a specific pokemon
-  ```shell
-  echo 'Hello, world!' | pokesay -n pikachu
-  ```
-- Print a message with a specific pokemon category
-  ```shell
-  # big pokemon (i.e. with a large dimensions in the terminal)
-  echo 'Hello, world!' | pokesay -c big
-  # shiny pokemon
-  echo 'Hello, world!' | pokesay -c shiny
-  ```
-- Print a message with a specific pokemon category and name
-  ```shell
-  # for shiny charizards
-  echo 'Hello, world!' | pokesay -c shiny -n charizard
-  ```
-- Print a specific pokemon by its ID
-  ```shell
-  # green mewtwo is ID `0491.1719`
-  echo 'Hello, world!' | pokesay -i 0491.1719
-  ```
 
 ---
 
