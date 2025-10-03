@@ -102,38 +102,40 @@ echo yolo | pokesay
 
 ### Examples
 
+
 <table>
 <tr>
-  <td valign="top"><b>Default output</b><br><img width="350" alt="p_00_fortune" src="https://github.com/user-attachments/assets/019a9055-0a71-472e-84df-791ff8803bb4" /></td>
-  <td valign="top"><b>Set bubble width (-w)</b><br><img width="350" alt="p_01_set_width" src="https://github.com/user-attachments/assets/c458d24d-ea0c-4d36-abd3-1a329e81dfde" /></td>
-  <td valign="top"><b>Unicode borders (-u)</b><br><img width="350" alt="p_02_unicode" src="https://github.com/user-attachments/assets/9620db09-58e3-4c38-b1a4-99aab6b6e85e" /></td>
+  <td valign="top">Default output<br><img width="350" alt="p_00_fortune" src="https://github.com/user-attachments/assets/019a9055-0a71-472e-84df-791ff8803bb4" /></td>
+  <td valign="top">Set bubble width <b><code>-w</code></b><br><img width="350" alt="p_01_set_width" src="https://github.com/user-attachments/assets/c458d24d-ea0c-4d36-abd3-1a329e81dfde" /></td>
+  <td valign="top">Unicode borders <b><code>-u</code></b><br><img width="350" alt="p_02_unicode" src="https://github.com/user-attachments/assets/9620db09-58e3-4c38-b1a4-99aab6b6e85e" /></td>
 </tr>
 <tr>
-  <td valign="top"><b>Info border (-b)</b><br><img width="350" alt="p_03_info_border" src="https://github.com/user-attachments/assets/fe857d59-4400-4251-824b-171d5f10ac52" /></td>
-  <td valign="top"><b>Show name (-n)</b><br><img width="350" alt="p_04_name" src="https://github.com/user-attachments/assets/88e5fc35-28ac-4b48-a04d-fb1f14446d9d" /></td>
-  <td valign="top"><b>No category info (-C)</b><br><img width="350" alt="p_05_no_category" src="https://github.com/user-attachments/assets/dc9217b8-77a8-4add-a42c-c734d488d1ec" /></td>
+  <td valign="top">Info border <b><code>-b</code></b><br><img width="350" alt="p_03_info_border" src="https://github.com/user-attachments/assets/fe857d59-4400-4251-824b-171d5f10ac52" /></td>
+  <td valign="top">Choose by name <b><code>-n</code></b><br><img width="350" alt="p_04_name" src="https://github.com/user-attachments/assets/88e5fc35-28ac-4b48-a04d-fb1f14446d9d" /></td>
+  <td valign="top">No category info <b><code>-C</code></b><br><img width="350" alt="p_05_no_category" src="https://github.com/user-attachments/assets/dc9217b8-77a8-4add-a42c-c734d488d1ec" /></td>
 </tr>
 <tr>
-  <td valign="top"><b>Show Japanese name (-j)</b><br><img width="350" alt="p_06_japanese" src="https://github.com/user-attachments/assets/34ebce1c-4448-4560-aa78-704cbabaef1e" /></td>
-  <td valign="top"><b>Show ID (-I)</b><br><img width="350" alt="p_07_id" src="https://github.com/user-attachments/assets/cd2ba951-89db-4764-9dbd-553105d54707" /></td>
-  <td valign="top"><b>Small size (-c small)</b><br><img width="350" alt="p_08_small_size" src="https://github.com/user-attachments/assets/644d9574-2c67-4e2c-a586-b4b0aa95211c" /></td>
+  <td valign="top">Show Japanese name <b><code>-j</code></b><br><img width="350" alt="p_06_japanese" src="https://github.com/user-attachments/assets/34ebce1c-4448-4560-aa78-704cbabaef1e" /></td>
+  <td valign="top">Show ID <b><code>-I</code></b><br><img width="350" alt="p_07_id" src="https://github.com/user-attachments/assets/cd2ba951-89db-4764-9dbd-553105d54707" /></td>
+  <td valign="top">Small size <b><code>-c small</code></b><br><img width="350" alt="p_08_small_size" src="https://github.com/user-attachments/assets/644d9574-2c67-4e2c-a586-b4b0aa95211c" /></td>
 </tr>
 <tr>
-  <td valign="top"><b>Medium size (-c medium)</b><br><img width="350" alt="p_09_medium_size" src="https://github.com/user-attachments/assets/9979c100-76a2-479c-a5fc-cea858906b25" /></td>
-  <td valign="top"><b>Big size (-c big)</b><br><img width="350" alt="p_10_big_size" src="https://github.com/user-attachments/assets/a65c822c-fcd8-4a1a-bdc0-bb81ff9e164e" /></td>
-  <td valign="top"><b>Shiny (-c shiny)</b><br><img width="350" alt="p_10_shiny" src="https://github.com/user-attachments/assets/1a0022fb-921f-46b8-911c-8db7a8e8769b" /></td>
+  <td valign="top">Medium size <b><code>-c medium</code></b><br><img width="350" alt="p_09_medium_size" src="https://github.com/user-attachments/assets/9979c100-76a2-479c-a5fc-cea858906b25" /></td>
+  <td valign="top">Big size <b><code>-c big</code></b><br><img width="350" alt="p_10_big_size" src="https://github.com/user-attachments/assets/a65c822c-fcd8-4a1a-bdc0-bb81ff9e164e" /></td>
+  <td valign="top">Shiny <b><code>-c shiny</code></b><br><img width="350" alt="p_10_shiny" src="https://github.com/user-attachments/assets/1a0022fb-921f-46b8-911c-8db7a8e8769b" /></td>
 </tr>
 <tr>
-  <td valign="top"><b>Size and name (-c big -n ...)</b><br><img width="350" alt="p_11_size_and_name" src="https://github.com/user-attachments/assets/e0dc9d09-b439-4dc5-81b0-ea5419308c47" /></td>
-  <td valign="top"><b>Size and name 2 (-c big -n ...)</b><br><img width="350" alt="p_12_size_and_name_2" src="https://github.com/user-attachments/assets/339a2832-9488-49bf-89ef-abf0f376e336" /></td>
+  <td valign="top">Size and name <b><code>-c small -n ...</code></b><br><img width="350" alt="p_11_size_and_name" src="https://github.com/user-attachments/assets/e0dc9d09-b439-4dc5-81b0-ea5419308c47" /></td>
+  <td valign="top">Size and name <b><code>-c big -n ...</code></b><br><img width="350" alt="p_12_size_and_name_2" src="https://github.com/user-attachments/assets/339a2832-9488-49bf-89ef-abf0f376e336" /></td>
   <td valign="top"></td>
 </tr>
 <tr>
-  <td valign="top"><b>Select by ID (-i)</b><br><img width="350" alt="p_13_select_by_id" src="https://github.com/user-attachments/assets/73aa44c5-bec5-41b0-98b7-717dd29b395f" /></td>
-  <td valign="top"><b>Flip (-F)</b><br><img width="350" alt="p_14_flip" src="https://github.com/user-attachments/assets/f610c99d-6ad4-4eaa-82ff-0afbe1a7d2a3" /></td>
-  <td valign="top"><b>Figlet + lolcat</b><br><img width="350" alt="p_15_figlet_lolcat" src="https://github.com/user-attachments/assets/1e88880b-adb2-4cc2-9ee9-29c0acf26f57" /></td>
+  <td valign="top">Select by ID <b><code>-i</code></b><br><img width="350" alt="p_13_select_by_id" src="https://github.com/user-attachments/assets/73aa44c5-bec5-41b0-98b7-717dd29b395f" /></td>
+  <td valign="top">Flip <b><code>-F</code></b><br><img width="350" alt="p_14_flip" src="https://github.com/user-attachments/assets/f610c99d-6ad4-4eaa-82ff-0afbe1a7d2a3" /></td>
+  <td valign="top">Figlet + lolcat<br><img width="350" alt="p_15_figlet_lolcat" src="https://github.com/user-attachments/assets/1e88880b-adb2-4cc2-9ee9-29c0acf26f57" /></td>
 </tr>
 </table>
+
 
 To see it every time you open a terminal, add it to your `.bashrc` file!   
 _(This requires that you have `fortune` installed)_
