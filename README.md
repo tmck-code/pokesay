@@ -8,6 +8,8 @@ Print pokemon in the CLI! An adaptation of the classic 'cowsay'
 
 ## Installation
 
+Pokesay is a single binary with no dependencies that can be run on `arm64/amd64 OSX`, `amd64 Linux`, `arm64 Android` and `amd64 Windows`.   
+
 - Via homebrew (MacOS/Linux/Windows)
   ```shell
   brew install tmck-code/tap/pokesay
@@ -17,7 +19,6 @@ Print pokemon in the CLI! An adaptation of the classic 'cowsay'
   yay -S pokesay-bin
   ```
 
-Pokesay is a single binary with no dependencies that can be run on `arm64/amd64 OSX`, `amd64 Linux`, `arm64 Android` and `amd64 Windows`.   
 For installation without a package manager, see the options below.
 
 <details>
