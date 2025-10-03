@@ -187,26 +187,14 @@ Usage: pokesay [-bBCfFhIjLsuvW] [-c value] [-i value] [-l value] [-n value] [-t 
 
 ---
 
-<img width="1000" height="1008" alt="p18" src="https://github.com/user-attachments/assets/5a1b8e27-15f8-40df-9f3e-6117dd5ebda5" />
-<img width="550" height="670" alt="p17" src="https://github.com/user-attachments/assets/146d0fa1-8d82-4350-9a12-c3fe9840b78a" />
-<img width="550" height="670" alt="p16" src="https://github.com/user-attachments/assets/7e080bb1-b60d-421d-8f9c-70196f04c8dd" />
-<img width="520" height="592" alt="p15" src="https://github.com/user-attachments/assets/6b8dd048-30f0-4dd4-b4fb-8013062dbded" />
-<img width="500" height="592" alt="p14" src="https://github.com/user-attachments/assets/0762fa3a-5bd7-4ef8-9b53-bae1c0e7ba2e" />
-<img width="500" height="592" alt="p13" src="https://github.com/user-attachments/assets/1b3fe721-8561-42e4-9d09-008c602cbe00" />
-<img width="500" height="540" alt="p12" src="https://github.com/user-attachments/assets/b51a5b0a-2c64-4a6f-a55a-5fb207ddfe7d" />
-<img width="500" height="592" alt="p11" src="https://github.com/user-attachments/assets/8a7252d2-a1a5-4005-883a-685bfa285dbb" />
-<img width="500" height="592" alt="p10" src="https://github.com/user-attachments/assets/3c89e6ab-3910-45fc-a4d0-e9bb5c4a3c9f" />
-<img width="600" height="800" alt="p09" src="https://github.com/user-attachments/assets/c2d3014e-5192-475d-810d-c034cf394756" />
-<img width="550" height="592" alt="p08" src="https://github.com/user-attachments/assets/d536097b-1243-4f90-841a-b5e10496b7b9" />
-<img width="600" height="800" alt="p07" src="https://github.com/user-attachments/assets/084fc382-fac9-4d18-a7b3-941f8525f99d" />
-<img width="500" height="670" alt="p06" src="https://github.com/user-attachments/assets/e0bb0c74-6fae-4c84-a436-389d9c0ac27d" />
-<img width="450" height="540" alt="p05" src="https://github.com/user-attachments/assets/bdd9b63c-3b3d-422a-819a-c0b1529258f7" />
-<img width="450" height="566" alt="p04" src="https://github.com/user-attachments/assets/d1c69b37-2aae-4879-b957-0b79d694d868" />
-<img width="450" height="592" alt="p03" src="https://github.com/user-attachments/assets/653002a8-5b8f-44c0-9387-5777938022e7" />
-<img width="450" height="514" alt="p02" src="https://github.com/user-attachments/assets/f929038c-4a45-45f2-a1e8-7c3aee9a5ecf" />
-<img width="450" height="514" alt="p01" src="https://github.com/user-attachments/assets/4d94d2d0-6b88-4fa6-9e59-50341cfbb369" />
-<img width="900" height="566" alt="p00" src="https://github.com/user-attachments/assets/e8c4dfda-a007-4969-8b93-4a75ac5fc21d" />
-
+|   |   |   |
+|---|---|---|
+| <img width="300" alt="p00" src="https://github.com/user-attachments/assets/202d7142-8ced-4bd9-afef-53024e215ea3" /> | <img width="300" alt="p01" src="https://github.com/user-attachments/assets/9916020d-bb32-45b6-b701-b1a9e0c010d3" /> | <img width="300" alt="p02" src="https://github.com/user-attachments/assets/a060690f-a12a-46e4-b16f-a2b88242da78" /> |
+| <img width="300" alt="p03" src="https://github.com/user-attachments/assets/904a9e99-f6f9-4ab7-a9fc-fae7b1a60780" /> | <img width="300" alt="p04" src="https://github.com/user-attachments/assets/603bb240-ace8-433d-b85a-e9e78db081d0" /> | <img width="300" alt="p05" src="https://github.com/user-attachments/assets/e45bd570-bad3-4bb6-92e9-06aa318f3cae" /> |
+| <img width="300" alt="p06" src="https://github.com/user-attachments/assets/b5603034-3d36-4257-8948-a4258698fc5d" /> | <img width="300" alt="p07" src="https://github.com/user-attachments/assets/30e425f7-7fbb-44a6-958a-2046dc7c4bb3" /> | <img width="300" alt="p08" src="https://github.com/user-attachments/assets/d88d4ed0-a47a-458f-8eca-b397e0552569" /> |
+| <img width="300" alt="p09" src="https://github.com/user-attachments/assets/9dfe7f26-46e4-4eb0-b476-02571a3a64af" /> | <img width="300" alt="p10" src="https://github.com/user-attachments/assets/d928cf62-0a48-43b9-8640-c3f9255fc7b3" /> | <img width="300" alt="p11" src="https://github.com/user-attachments/assets/b1b1c7dc-cd93-4993-86e8-38d8bd69ab5f" /> |
+| <img width="300" alt="p12" src="https://github.com/user-attachments/assets/153c804f-3251-471d-9887-9e92b1955a2c" /> | <img width="300" alt="p13" src="https://github.com/user-attachments/assets/b42b009c-5b80-4816-99a7-db0d4248a6b0" /> | <img width="300" alt="p14" src="https://github.com/user-attachments/assets/41005ff1-8fb0-43cb-99be-8e662818479f" /> |
+| <img width="300" alt="p15" src="https://github.com/user-attachments/assets/7e537507-8b9b-4447-8061-a700d3f83412" /> |  |  |
 
 ---
 
