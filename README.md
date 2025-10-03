@@ -2,8 +2,8 @@
 
 ![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/tmck-code/pokesay/main.yml)
 ![AUR](https://img.shields.io/aur/version/pokesay-bin)
-![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/tmck-code/pokesay/total)
-![GitHub Downloads (all assets, latest release)](https://img.shields.io/github/downloads/tmck-code/pokesay/latest/total)
+![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/tmck-code/pokesay/total?color=red)
+![GitHub Downloads (all assets, latest release)](https://img.shields.io/github/downloads/tmck-code/pokesay/latest/total?color=orange)
 
 Print pokemon in the CLI! An adaptation of the classic 'cowsay'
 
