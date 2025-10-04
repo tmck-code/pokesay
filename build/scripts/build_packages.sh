@@ -21,13 +21,24 @@ function build_deb() {
     mkdir -p \
         "$pkg_name/pokesay/DEBIAN" \
         "$pkg_name/pokesay/usr/bin" \
-        "$pkg_name/pokesay/usr/share/man/man1"
+        "$pkg_name/pokesay/usr/share/man/man1" \
+        "$pkg_name/pokesay/usr/share/bash-completion/completions" \
+        "$pkg_name/pokesay/usr/share/zsh/site-functions" \
+        "$pkg_name/pokesay/usr/share/fish/vendor_completions.d" \
+        "$pkg_name/pokesay/usr/share/pokesay"
 
     cp "$bin" "$pkg_name/pokesay/usr/bin/pokesay"
     cat build/packages/pokesay.1 | \
       sed -e "s/DATE/$(date '+%B %Y')/g" \
           -e "s/VERSION/$VERSION/g" | \
       gzip -c > "$pkg_name/pokesay/usr/share/man/man1/pokesay.1.gz"
+
+    # Add completions and data files
+    cp build/packages/pokesay-completion.bash "$pkg_name/pokesay/usr/share/bash-completion/completions/pokesay"
+    cp build/packages/pokesay-completion.zsh "$pkg_name/pokesay/usr/share/zsh/site-functions/_pokesay"
+    cp build/packages/pokesay-completion.fish "$pkg_name/pokesay/usr/share/fish/vendor_completions.d/pokesay.fish"
+    cp build/packages/pokesay-names.txt "$pkg_name/pokesay/usr/share/pokesay/pokesay-names.txt"
+    cp build/packages/pokesay-ids.txt "$pkg_name/pokesay/usr/share/pokesay/pokesay-ids.txt"
 
     cat build/packages/DEBIAN/control | \
       sed -e "s/VERSION/$VERSION/g" \
@@ -70,9 +81,18 @@ function build_arch() {
           -e "s/SHA256_SUM/$SHA256_SUM/g" \
       > "$ARCH_DIR/PKGBUILD"
 
-    cd "$ARCH_DIR"
-    makepkg --printsrcinfo > .SRCINFO
-    makepkg -f --noconfirm
+    cp build/packages/pokesay-completion.bash "$ARCH_DIR/"
+    cp build/packages/pokesay-completion.zsh "$ARCH_DIR/"
+    cp build/packages/pokesay-completion.fish "$ARCH_DIR/"
+    cp build/packages/pokesay-names.txt "$ARCH_DIR/"
+    cp build/packages/pokesay-ids.txt "$ARCH_DIR/"
+
+    chown -R u:u "$ARCH_DIR"
+
+    su - u -c "\
+      cd \"$ARCH_DIR\" && \
+      makepkg --printsrcinfo > .SRCINFO && \
+      makepkg -f --noconfirm"
 
     cp "$ARCH_DIR"/*.pkg.tar.zst /usr/local/src/dist/packages/
     rm -rf "$ARCH_DIR"

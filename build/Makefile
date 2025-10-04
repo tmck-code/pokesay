@@ -10,7 +10,7 @@ all: build/docker build/cows build/assets test build/bin build/packages
 
 build/docker:
 	echo "Building $(DOCKER_IMAGE)"
-	docker build -f Dockerfile -t $(DOCKER_IMAGE) ..
+	docker build --platform linux/amd64 -f Dockerfile -t $(DOCKER_IMAGE) ..
 
 build/cows:
 	@rm -rf cows.tar.gz cows/
@@ -63,14 +63,15 @@ build/arch:
 		--rm \
 		--name pokesay \
 		  archlinux:base-devel \
-		  bash -c "useradd u -m && su - u -c 'VERSION=$(VERSION) bash /usr/local/src/build/scripts/build_packages.sh arch'"
+		  bash -c "useradd u -m && VERSION=$(VERSION) /usr/local/src/build/scripts/build_packages.sh arch"
 
 build/packages: build/deb build/arch
 	@echo -e "\n> Built packages:"
 	@tree $(PWD)/../dist/
 
 test:
-	docker run \
+	@echo -e "\n> Running tests"
+	@docker run \
 		-v $(PWD)/../:/usr/local/src \
 		--user root \
 		--rm --name pokesay-test \

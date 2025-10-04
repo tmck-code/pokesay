@@ -23,7 +23,13 @@ function tarball() {
 
     tar czf \
         "dist/tarballs/pokesay-${VERSION}-${1}-${2}${3:-}.tar.gz" \
-        "pokesay-${VERSION}-${1}-${2}${3:-}" LICENSE pokesay.1
+        "pokesay-${VERSION}-${1}-${2}${3:-}" \
+        LICENSE pokesay.1 \
+        build/packages/pokesay-completion.bash \
+        build/packages/pokesay-completion.zsh \
+        build/packages/pokesay-completion.fish \
+        build/packages/pokesay-names.txt \
+        build/packages/pokesay-ids.txt
 
     rm -f "pokesay-${VERSION}-${1}-${2}${3:-}"
 }
