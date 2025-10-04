@@ -87,6 +87,8 @@ function build_arch() {
     cp build/packages/pokesay-names.txt "$ARCH_DIR/"
     cp build/packages/pokesay-ids.txt "$ARCH_DIR/"
 
+    chown -R u:u "$ARCH_DIR"
+
     su - u -c "\
       cd \"$ARCH_DIR\" && \
       makepkg --printsrcinfo > .SRCINFO && \

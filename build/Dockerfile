@@ -23,7 +23,6 @@ RUN go mod tidy \
     && go install gotest.tools/gotestsum@latest
 
 RUN useradd u -m
-USER u
 
 RUN git clone -q --depth 1 https://github.com/msikma/pokesprite /tmp/original/pokesprite
 
@@ -37,4 +36,5 @@ RUN go run /usr/local/src/src/bin/convert/png_convert.go \
     && mv -v /tmp/cows/pokemon-gen7x /tmp/cows/gen7x \
     && cat /tmp/original/pokesprite/data/pokemon.json | jq -c .[] > /tmp/cows/pokemon.json \
     && rm -rf /tmp/original/pokesprite
+
 ADD . .
