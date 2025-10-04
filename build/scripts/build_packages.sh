@@ -87,10 +87,10 @@ function build_arch() {
     cp build/packages/pokesay-names.txt "$ARCH_DIR/"
     cp build/packages/pokesay-ids.txt "$ARCH_DIR/"
 
-    cd "$ARCH_DIR"
-    makepkg --printsrcinfo > .SRCINFO
-    makepkg -f --noconfirm
-
+    su - u -c "\
+      cd \"$ARCH_DIR\" && \
+      makepkg --printsrcinfo > .SRCINFO && \
+      makepkg -f --noconfirm"
 
     cp "$ARCH_DIR"/*.pkg.tar.zst /usr/local/src/dist/packages/
     rm -rf "$ARCH_DIR"

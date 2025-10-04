@@ -63,7 +63,7 @@ build/arch:
 		--rm \
 		--name pokesay \
 		  archlinux:base-devel \
-		  bash -c "useradd u -m && su - u -c 'VERSION=$(VERSION) bash /usr/local/src/build/scripts/build_packages.sh arch'"
+		  bash -c "useradd u -m && VERSION=$(VERSION) /usr/local/src/build/scripts/build_packages.sh arch"
 
 build/packages: build/deb build/arch
 	@echo -e "\n> Built packages:"

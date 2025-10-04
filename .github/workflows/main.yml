@@ -29,4 +29,4 @@ jobs:
       - name: Build deb package
         run: docker run -v ${PWD}:/usr/local/src -e VERSION=0.1 ghcr.io/tmck-code/pokesay:latest bash -c "./build/scripts/build_packages.sh deb"
       - name: Build arch package
-        run: docker run -v ${PWD}:/usr/local/src -e VERSION=0.1 archlinux:base-devel bash -c "useradd u -m && su - u -c 'VERSION=0.1 bash /usr/local/src/build/scripts/build_packages.sh arch'"
+        run: docker run -v ${PWD}:/usr/local/src -e VERSION=0.1 archlinux:base-devel bash -c "useradd u -m && VERSION=0.1 /usr/local/src/build/scripts/build_packages.sh arch"
