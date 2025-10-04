@@ -3,9 +3,11 @@ FROM golang:1.24
 WORKDIR /usr/local/src
 
 ENV DEBIAN_FRONTEND=noninteractive
-ENV BUILD_DEPS="make gcc"
+ENV BUILD_DEPS="make gcc libmagickwand-dev ncurses-dev"
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends $BUILD_DEPS libmagickwand-dev ncurses-dev jq imagemagick
+    && apt-get upgrade -y \
+    && apt-get install -y --no-install-recommends \
+        $BUILD_DEPS jq imagemagick
 
 RUN git clone -q --depth 1 https://github.com/denilsonsa/img2xterm \
     && (cd img2xterm && make && make install) \
@@ -15,19 +17,22 @@ RUN git clone -q --depth 1 https://github.com/denilsonsa/img2xterm \
     && rm -rf /var/lib/apt/lists/* \
     && rm -rf /tmp/* /var/tmp/*
 
-WORKDIR /usr/local/src/
-ADD src/ /usr/local/src/src/
-ADD go.* /usr/local/src/
+RUN useradd u -m 
+ADD --chown=u:u src/ /home/u/pokesay/src/
+ADD --chown=u:u go.* /home/u/pokesay/
+WORKDIR /home/u/pokesay/
+USER u
+ENV GOPATH=/home/u/go
+ENV PATH=$GOPATH/bin:$PATH
+
 RUN go mod tidy \
     && go get -v github.com/mitchellh/go-wordwrap \
     && go install gotest.tools/gotestsum@latest
 
-RUN useradd u -m
-
 RUN git clone -q --depth 1 https://github.com/msikma/pokesprite /tmp/original/pokesprite
 
 # Convert all of the pokesprite .pngs -> cowfiles for the terminal
-RUN go run /usr/local/src/src/bin/convert/png_convert.go \
+RUN go run /home/u/pokesay/src/bin/convert/png_convert.go \
         -from /tmp/original/pokesprite/ \
         -to /tmp/cows/ \
         -padding 4 \
@@ -37,4 +42,4 @@ RUN go run /usr/local/src/src/bin/convert/png_convert.go \
     && cat /tmp/original/pokesprite/data/pokemon.json | jq -c .[] > /tmp/cows/pokemon.json \
     && rm -rf /tmp/original/pokesprite
 
-ADD . .
+ADD --chown=u:u . .

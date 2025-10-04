@@ -10,13 +10,15 @@ all: build/docker build/cows build/assets test build/bin build/packages
 
 build/docker:
 	echo "Building $(DOCKER_IMAGE)"
-	docker build --platform linux/amd64 -f Dockerfile -t $(DOCKER_IMAGE) ..
+# 	docker build --platform linux/amd64 -f Dockerfile -t $(DOCKER_IMAGE) ..
+	docker build -f Dockerfile -t $(DOCKER_IMAGE) ..
 
 build/cows:
+	@echo -e "\n> Building cows"
 	@rm -rf cows.tar.gz cows/
-	docker rm -f pokebuilder
+	@docker inspect pokebuilder > /dev/null 2>&1 && docker rm -f pokebuilder || true
 	docker create --name pokebuilder $(DOCKER_IMAGE)
-	@docker cp pokebuilder:$(DOCKER_OUTPUT_DIR)/ cows/
+	docker cp pokebuilder:$(DOCKER_OUTPUT_DIR)/ cows/
 	@tar czf cows.tar.gz cows/
 	@rm -rf cows/
 	@docker rm -f pokebuilder
@@ -25,19 +27,19 @@ build/cows:
 # generate embedded bin files for category/metadata/the actual pokemon
 build/assets:
 	@docker run \
-		-v $(PWD)/../:/usr/local/src \
+		-v $(PWD)/../:/home/u/pokesay \
 		--rm --name pokesay \
 	    $(DOCKER_IMAGE) \
 			build/scripts/build_assets.sh
+	@tree -L 1 assets
 
 build/bin:
 	@echo -e "\n> Building binaries"
 	@mkdir -p $(PWD)/../dist/bin/ $(PWD)/../dist/packages/ $(PWD)/../dist/tarballs/
 	@docker run \
-		-v $(PWD)/../:/usr/local/src \
+		-v $(PWD)/../:/home/u/pokesay \
 		-e VERSION=$(VERSION) \
 		-e DEBUG=$(DEBUG) \
-		--user root \
 		--rm --name pokesay \
 		  $(DOCKER_IMAGE) \
 		  build/scripts/build_bin.sh
@@ -45,25 +47,22 @@ build/bin:
 
 build/deb:
 	@echo -e "\n> Building DEB packages"
-	@docker run \
-		-v $(PWD)/../:/usr/local/src \
+	@docker run --rm \
+		-v $(PWD)/../:/home/u/pokesay \
 		-e VERSION=$(VERSION) \
-		--rm \
 		--name pokesay \
 		  $(DOCKER_IMAGE) \
-		  bash -c "/usr/local/src/build/scripts/build_packages.sh deb"
+		  bash -c "build/scripts/build_packages.sh deb"
 
 build/arch:
 	@echo -e "\n> Building Arch packages"
-	@docker run \
-		-it \
-		-v $(PWD)/../:/usr/local/src \
+	@docker run --rm \
+		-v $(PWD)/../:/home/u/pokesay \
 		-e VERSION=$(VERSION) \
 		--platform linux/amd64 \
-		--rm \
 		--name pokesay \
 		  archlinux:base-devel \
-		  bash -c "useradd u -m && VERSION=$(VERSION) /usr/local/src/build/scripts/build_packages.sh arch"
+		  bash -c "useradd u && /home/u/pokesay/build/scripts/build_packages.sh arch"
 
 build/packages: build/deb build/arch
 	@echo -e "\n> Built packages:"
@@ -72,8 +71,7 @@ build/packages: build/deb build/arch
 test:
 	@echo -e "\n> Running tests"
 	@docker run \
-		-v $(PWD)/../:/usr/local/src \
-		--user root \
+		-v $(PWD)/../:/home/u/pokesay \
 		--rm --name pokesay-test \
 			$(DOCKER_IMAGE) \
 			gotestsum --format dots

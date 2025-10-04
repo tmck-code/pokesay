@@ -17,16 +17,16 @@ jobs:
       - name: Make dist directory
         run: mkdir -p dist/bin/ dist/packages/ dist/tarballs/
       - name: Build go binary assets
-        run: docker run -v ${PWD}:/usr/local/src -e VERSION=0.1 ghcr.io/tmck-code/pokesay:latest ./build/scripts/build_assets.sh
+        run: docker run -v ${PWD}:/home/u/pokesay -e VERSION=0.1 ghcr.io/tmck-code/pokesay:latest ./build/scripts/build_assets.sh
       - name: Build go binaries
-        run: docker run -v ${PWD}:/usr/local/src -e VERSION=0.1 ghcr.io/tmck-code/pokesay:latest ./build/scripts/build_bin.sh
+        run: docker run -v ${PWD}:/home/u/pokesay -e VERSION=0.1 ghcr.io/tmck-code/pokesay:latest ./build/scripts/build_bin.sh
       - name: Check build
         run: ls -alh dist/bin
       - name: Test build
         run: echo w | ./dist/bin/pokesay-0.1-linux-amd64
       - name: Run unit tests
-        run: docker run -v ${PWD}:/usr/local/src ghcr.io/tmck-code/pokesay:latest gotestsum --format dots
+        run: docker run -v ${PWD}:/home/u/pokesay ghcr.io/tmck-code/pokesay:latest gotestsum --format dots
       - name: Build deb package
-        run: docker run -v ${PWD}:/usr/local/src -u root -e VERSION=0.1 -e DEBUG=1 ghcr.io/tmck-code/pokesay:latest bash -c "./build/scripts/build_packages.sh deb"
+        run: docker run -v ${PWD}:/home/u/pokesay -e VERSION=0.1 -e DEBUG=1 ghcr.io/tmck-code/pokesay:latest bash -c "./build/scripts/build_packages.sh deb"
       - name: Build arch package
-        run: docker run -v ${PWD}:/usr/local/src -u root -e VERSION=0.1 -e DEBUG=1 archlinux:base-devel bash -c "useradd u -m && VERSION=0.1 /usr/local/src/build/scripts/build_packages.sh arch"
+        run: docker run -v ${PWD}:/home/u/pokesay -e VERSION=0.1 -e DEBUG=1 archlinux:base-devel bash -c "useradd u && VERSION=0.1 /home/u/pokesay/build/scripts/build_packages.sh arch"
