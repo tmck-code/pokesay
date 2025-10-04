@@ -57,9 +57,9 @@ function build_arch() {
     local arch_arch=$3
     local suffix=${4:-}
 
-    cd /home/u/pokesay
+    cd /usr/local/src
 
-    ARCH_DIR="/home/u/pokesay/build/arch"
+    ARCH_DIR="/usr/local/src/build/arch"
     BIN_FILE="pokesay-${VERSION}-${os}-${arch}${suffix}"
     mkdir -p "$ARCH_DIR"
 
@@ -87,12 +87,14 @@ function build_arch() {
     cp build/packages/pokesay-names.txt "$ARCH_DIR/"
     cp build/packages/pokesay-ids.txt "$ARCH_DIR/"
 
+    chown -R u:u "$ARCH_DIR"
+
     su - u -c "\
       cd \"$ARCH_DIR\" && \
       makepkg --printsrcinfo > .SRCINFO && \
       makepkg -f --noconfirm"
 
-    cp "$ARCH_DIR"/*.pkg.tar.zst dist/packages/
+    cp "$ARCH_DIR"/*.pkg.tar.zst /usr/local/src/dist/packages/
     rm -rf "$ARCH_DIR"
 }
 
