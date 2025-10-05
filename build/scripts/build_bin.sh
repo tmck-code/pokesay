@@ -56,7 +56,7 @@ function tarball() {
         pokesay-completion.fish \
         usr/share/pokesay/
 
-    rm -f pokesay.1 pokesay-* usr/
+    rm -rf pokesay.1 pokesay-* usr/
 }
 
 build darwin  amd64 &
