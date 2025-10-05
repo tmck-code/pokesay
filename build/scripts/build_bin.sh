@@ -19,19 +19,28 @@ function build() {
 
 function tarball() {
     echo "- tarballing $1 / $2"
-    cp "${OUTPUT_DIR}/pokesay-${VERSION}-${1}-${2}${3:-}" .
+    local binfile="pokesay-${VERSION}-${1}-${2}${3:-}"
 
-    tar czf \
-        "dist/tarballs/pokesay-${VERSION}-${1}-${2}${3:-}.tar.gz" \
-        "pokesay-${VERSION}-${1}-${2}${3:-}" \
-        LICENSE pokesay.1 \
-        build/packages/pokesay-completion.bash \
+    cp -v "${OUTPUT_DIR}/$binfile" "./$binfile"
+    cp -v build/packages/pokesay-completion.bash \
         build/packages/pokesay-completion.zsh \
         build/packages/pokesay-completion.fish \
         build/packages/pokesay-names.txt \
-        build/packages/pokesay-ids.txt
+        build/packages/pokesay-ids.txt \
+        .
 
-    rm -f "pokesay-${VERSION}-${1}-${2}${3:-}"
+    tar czf \
+        "dist/tarballs/${binfile}.tar.gz" \
+        "$binfile" \
+        LICENSE \
+        pokesay.1 \
+        pokesay-completion.bash \
+        pokesay-completion.zsh \
+        pokesay-completion.fish \
+        pokesay-names.txt \
+        pokesay-ids.txt
+
+    rm -f "$binfile" pokesay.1 pokesay-*
 }
 
 build darwin  amd64 &

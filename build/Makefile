@@ -17,7 +17,7 @@ build/docker:
 
 build/cows:
 	@rm -rf cows.tar.gz cows/
-	docker rm -f pokebuilder
+	@docker rm -f pokebuilder > /dev/null 2>&1
 	docker create --name pokebuilder $(DOCKER_IMAGE)
 	@docker cp pokebuilder:$(DOCKER_OUTPUT_DIR)/ cows/
 	@tar czf cows.tar.gz cows/
@@ -36,14 +36,13 @@ build/assets:
 build/bin:
 	@echo -e "\n> Building binaries"
 	@mkdir -p $(PWD)/../dist/bin/ $(PWD)/../dist/packages/ $(PWD)/../dist/tarballs/
-	@docker run \
+	@docker run -it \
 		-v $(PWD)/../:/usr/local/src \
 		-e VERSION=$(VERSION) \
 		-e DEBUG=$(DEBUG) \
-		--user root \
 		--rm --name pokesay \
 		  $(DOCKER_IMAGE) \
-		  build/scripts/build_bin.sh
+		  /usr/local/src/build/scripts/build_bin.sh
 	@tree $(PWD)/../dist/
 
 build/deb:
