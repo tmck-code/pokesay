@@ -8,6 +8,9 @@ DEBUG ?= ""
 
 all: build/docker build/cows build/assets test build/bin build/packages
 
+clean:
+	rm -rf ../dist/ assets/ deb/ arch/ cows/ bin/
+
 build/docker:
 	echo "Building $(DOCKER_IMAGE)"
 	docker build --platform linux/amd64 -f Dockerfile -t $(DOCKER_IMAGE) ..
@@ -78,5 +81,5 @@ test:
 			$(DOCKER_IMAGE) \
 			gotestsum --format dots
 
-.PHONY: all build/docker build/cows build/assets build/bin test
+.PHONY: all clean build/docker build/cows build/assets build/bin test
 .PHONY: build/deb build/arch build/packages
