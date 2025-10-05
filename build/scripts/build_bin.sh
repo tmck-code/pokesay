@@ -42,6 +42,9 @@ function tarball() {
         pokesay-names.txt \
         pokesay-ids.txt
 
+    mkdir -p usr/share/pokesay
+    mv pokesay-names.txt pokesay-ids.txt usr/share/pokesay/
+
     # create a full tarball with all binaries and files (used for homebrew formula)
     tar czf \
         "dist/tarballs/pokesay-$VERSION.tar.gz" \
@@ -51,10 +54,9 @@ function tarball() {
         pokesay-completion.bash \
         pokesay-completion.zsh \
         pokesay-completion.fish \
-        pokesay-names.txt \
-        pokesay-ids.txt
+        usr/share/pokesay/
 
-    rm -f pokesay.1 pokesay-*
+    rm -f pokesay.1 pokesay-* usr/
 }
 
 build darwin  amd64 &
