@@ -28,7 +28,21 @@ Print pokemon in the CLI! An adaptation of the classic 'cowsay'
 For installation without a package manager, see the options below.
 
 <details>
-<summary><i>Via the install script (Others)</i></summary>
+<summary><i>Other installation options</i></summary>
+
+### Install a release package
+
+This option is supported for Debian and Arch Linux based systems.
+
+1. Navigate to the [Releases](https://github.com/tmck-code/pokesay/releases) page.
+2. Download the appropriate package for your system
+   - `.deb` for Debian/Ubuntu based systems
+   - `.pkg.tar.zst` for Arch Linux based systems
+3. Install the package
+   - For `.deb` files, use `sudo dpkg -i pokesay_<version>_linux_amd64.deb`
+   - For `.pkg.tar.zst` files, use `sudo pacman -U pokesay-<version>-1-x86_64.pkg.tar.zst`
+
+### Download a pre-built binary
 
 _(These commands can also be used to update your existing pokesay)_
 
