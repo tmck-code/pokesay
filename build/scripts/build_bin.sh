@@ -21,7 +21,7 @@ function tarball() {
     echo "- tarballing $1 / $2"
     local binfile="pokesay-${VERSION}-${1}-${2}${3:-}"
 
-    cp -v \
+    cp \
         "$OUTPUT_DIR"/pokesay-* \
         build/packages/pokesay-completion.bash \
         build/packages/pokesay-completion.zsh \
