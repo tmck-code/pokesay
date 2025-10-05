@@ -1,6 +1,10 @@
 # pokesay fish completions
 
 function __pokesay_complete
+    set -l names (cat /usr/share/pokesay/pokesay-names.txt)
+    set -l ids (cat /usr/share/pokesay/pokesay-ids.txt)
+    set -l cats big female gen7x gen8 medium regular right shiny small
+
     complete -c pokesay -s b -l info-border        -d "Draw a border around the info box"
     complete -c pokesay -s B -l no-bubble          -d "Do not draw the speech bubble"
     complete -c pokesay -s c -l category           -d "Choose a Pokémon from a specific category" -a "$cats" -r
@@ -20,10 +24,6 @@ function __pokesay_complete
     complete -c pokesay -s v -l verbose            -d "Print verbose output"
     complete -c pokesay -s W -l no-wrap            -d "Disable text wrapping (fastest)"
     complete -c pokesay -s w -l width              -d "Set max speech bubble width [80]"
-
-    set -l names (cat /usr/share/pokesay/pokesay-names.txt)
-    set -l ids (cat /usr/share/pokesay/pokesay-ids.txt)
-    set -l cats big female gen7x gen8 medium regular right shiny small
 end
 
 __pokesay_complete

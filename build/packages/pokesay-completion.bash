@@ -1,12 +1,12 @@
 # pokesay bash completion
 
-_pokesay_completions()
-{
-    local cur prev names ids cats
+_pokesay_completions() {
+    local cur prev opts names ids cats
     COMPREPLY=()
     cur="${COMP_WORDS[COMP_CWORD]}"
     prev="${COMP_WORDS[COMP_CWORD-1]}"
-    local opts=(
+
+    opts=(
         -h --help
         -v --verbose
         -n --name
