@@ -21,14 +21,16 @@ function tarball() {
     echo "- tarballing $1 / $2"
     local binfile="pokesay-${VERSION}-${1}-${2}${3:-}"
 
-    cp -v "${OUTPUT_DIR}/$binfile" "./$binfile"
-    cp -v build/packages/pokesay-completion.bash \
+    cp -v \
+        "$OUTPUT_DIR"/pokesay-* \
+        build/packages/pokesay-completion.bash \
         build/packages/pokesay-completion.zsh \
         build/packages/pokesay-completion.fish \
         build/packages/pokesay-names.txt \
         build/packages/pokesay-ids.txt \
         .
 
+    # create a tarball for the linux/amd64 binary (used for AUR package)
     tar czf \
         "dist/tarballs/${binfile}.tar.gz" \
         "$binfile" \
@@ -40,7 +42,19 @@ function tarball() {
         pokesay-names.txt \
         pokesay-ids.txt
 
-    rm -f "$binfile" pokesay.1 pokesay-*
+    # create a full tarball with all binaries and files (used for homebrew formula)
+    tar czf \
+        "dist/tarballs/pokesay-$VERSION.tar.gz" \
+        pokesay-$VERSION-* \
+        LICENSE \
+        pokesay.1 \
+        pokesay-completion.bash \
+        pokesay-completion.zsh \
+        pokesay-completion.fish \
+        pokesay-names.txt \
+        pokesay-ids.txt
+
+    rm -f pokesay.1 pokesay-*
 }
 
 build darwin  amd64 &
