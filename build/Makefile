@@ -8,13 +8,16 @@ DEBUG ?= ""
 
 all: build/docker build/cows build/assets test build/bin build/packages
 
+clean:
+	rm -rf ../dist/ assets/ deb/ arch/ cows/ bin/
+
 build/docker:
 	echo "Building $(DOCKER_IMAGE)"
-	docker build -f Dockerfile -t $(DOCKER_IMAGE) ..
+	docker build --platform linux/amd64 -f Dockerfile -t $(DOCKER_IMAGE) ..
 
 build/cows:
 	@rm -rf cows.tar.gz cows/
-	docker rm -f pokebuilder
+	@docker rm -f pokebuilder > /dev/null 2>&1
 	docker create --name pokebuilder $(DOCKER_IMAGE)
 	@docker cp pokebuilder:$(DOCKER_OUTPUT_DIR)/ cows/
 	@tar czf cows.tar.gz cows/
@@ -33,14 +36,13 @@ build/assets:
 build/bin:
 	@echo -e "\n> Building binaries"
 	@mkdir -p $(PWD)/../dist/bin/ $(PWD)/../dist/packages/ $(PWD)/../dist/tarballs/
-	@docker run \
+	@docker run -it \
 		-v $(PWD)/../:/usr/local/src \
 		-e VERSION=$(VERSION) \
 		-e DEBUG=$(DEBUG) \
-		--user root \
 		--rm --name pokesay \
 		  $(DOCKER_IMAGE) \
-		  build/scripts/build_bin.sh
+		  /usr/local/src/build/scripts/build_bin.sh
 	@tree $(PWD)/../dist/
 
 build/deb:
@@ -63,19 +65,20 @@ build/arch:
 		--rm \
 		--name pokesay \
 		  archlinux:base-devel \
-		  bash -c "useradd u -m && su - u -c 'VERSION=$(VERSION) bash /usr/local/src/build/scripts/build_packages.sh arch'"
+		  bash -c "useradd u -m && VERSION=$(VERSION) /usr/local/src/build/scripts/build_packages.sh arch"
 
 build/packages: build/deb build/arch
 	@echo -e "\n> Built packages:"
 	@tree $(PWD)/../dist/
 
 test:
-	docker run \
+	@echo -e "\n> Running tests"
+	@docker run \
 		-v $(PWD)/../:/usr/local/src \
 		--user root \
 		--rm --name pokesay-test \
 			$(DOCKER_IMAGE) \
 			gotestsum --format dots
 
-.PHONY: all build/docker build/cows build/assets build/bin test
+.PHONY: all clean build/docker build/cows build/assets build/bin test
 .PHONY: build/deb build/arch build/packages
