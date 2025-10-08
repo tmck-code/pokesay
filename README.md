@@ -10,9 +10,9 @@ Print pokemon in the CLI! An adaptation of the classic 'cowsay'
 <img width="1065" alt="464197914-4c145f23-8837-41df-835c-aeaa49afd13d 2" src="https://github.com/user-attachments/assets/57d33b92-95cf-4a5b-890c-39ff530d447c" />
 
 - 🏃 _Pokesay is a single binary with **zero dependencies** that can run on any popular OS and architecture._
-- ⚙️ _It is **flexible**, offering far more features than its ancestor `cowsay`._
+- ⚙️ _It is **flexible**, offering many options to select and view Pokemon 
 - 🚀 _It is the **fastest** to run compared to similar projects_
-- 🕶️ _It is **modern**, fully supporting
+- 🕶️ _It is **modern**, fully supporting_
   - _unicode borders_
   - _japanese names_
   - _colourful ANSI text_
