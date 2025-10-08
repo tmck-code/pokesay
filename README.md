@@ -254,7 +254,7 @@ Inspired by the [pokeshell](https://github.com/acxz/pokeshell) project, I've inc
 
 | project                                                                                     | language      | speed      | jp   | size | name | category  | flip | id | tab completion |
 |---------------------------------------------------------------------------------------------|---------------|------------|------|------|------|-----------|------|----|----------------|
-| [`tmck-code/pokesay`](https://github.com/tmck-code/pokesay)                                 | go            | 1.7ms      | ✅   | ✅   | ✅   | ✅        | ✅   | ✅ | ❌            |
+| [`tmck-code/pokesay`](https://github.com/tmck-code/pokesay)                                 | go            | 1.7ms      | ✅   | ✅   | ✅   | ✅        | ✅   | ✅ | ✅            |
 | [`yannjor/krabby`](https://github.com/yannjor/krabby)                                       | rust          | 5.2ms      | ✅   | ✅   | ✅   | ✅        | ❌   | ✅ | ❌            |
 | [`Altair-39/kingler`](https://github.com/Altair-39/kingler)                                 | rust          | 39.2ms     | ✅   | ✅   | ✅   | ✅        | ❌   | ✅ | ✅            |
 | [`xiota/pokemon-colorscripts`](https://gitlab.com/xiota/pokemon-colorscripts)               | bash          | 26.7ms     | ❌   | ✅   | ✅   | ✅        | ❌   | ❌ | ❌            |
@@ -272,7 +272,6 @@ Inspired by the [pokeshell](https://github.com/acxz/pokeshell) project, I've inc
 - **Short-term**
   - [ ] requesting mew returns mewtwo also
   - [ ] create "vertical" friendly display mode, place the Pokemon standing beside the text box, on the left or right
-  - [ ] shell completion scripts (bash, zsh, fish)
   - [ ] non-say mode (only print the pokemon, no speech bubble)
 - **Longer-term**
   - [ ] make the process async.
@@ -281,6 +280,7 @@ Inspired by the [pokeshell](https://github.com/acxz/pokeshell) project, I've inc
 - **In Beta**
   - [x] optionally print ID assigned to each pokemon, support deterministic selection via the same ID
 - **Completed**
+  - [x] shell completion scripts (bash, zsh, fish)
   - [x] add option to flip Pokemon to face right or left, remove all "right" facing cowfiles
   - [x] create Debian package
   - [x] create Arch package
