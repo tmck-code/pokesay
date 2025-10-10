@@ -5,7 +5,7 @@ DOCKER_TAG ?= latest
 DOCKER_IMAGE=$(DOCKER_REPO)/pokesay:$(DOCKER_TAG)
 DEBUG ?= ""
 
-ifeq (, $(shell which gecho))
+ifeq (, $(shell which gecho > /dev/null 2>&1))
 	echo := echo
 else
 	echo := gecho
@@ -29,7 +29,7 @@ build/cows:
 	@$(echo) -e "\e[48;5;30m> Building cows\e[0m"
 	@rm -rf cows.tar.gz cows/
 	@docker rm -f pokebuilder > /dev/null 2>&1
-	#docker create \
+	@docker create \
 		--platform linux/amd64 \
 		--name pokebuilder $(DOCKER_IMAGE)
 	@docker cp pokebuilder:$(DOCKER_OUTPUT_DIR)/ cows/
@@ -41,6 +41,7 @@ build/cows:
 # generate embedded bin files for category/metadata/the actual pokemon
 build/assets:
 	@$(echo) -e "\e[48;5;30m> Building assets\e[0m"
+	@mkdir $(PWD)/assets
 	@docker run --rm \
 		-v $(PWD)/../:/usr/local/src \
 		--platform linux/amd64 \
@@ -56,6 +57,7 @@ build/bin:
 		-e VERSION=$(VERSION) \
 		-e DEBUG=$(DEBUG) \
 		--platform linux/amd64 \
+		--user root \
 		--name pokesay \
 		  $(DOCKER_IMAGE) \
 		  /usr/local/src/build/scripts/build_bin.sh
@@ -90,6 +92,7 @@ test:
 	@docker run --rm \
 		-v $(PWD)/../:/usr/local/src \
 		--platform linux/amd64 \
+		--user root \
 		--name pokesay-test \
 			$(DOCKER_IMAGE) \
 			gotestsum --format dots

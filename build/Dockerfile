@@ -23,6 +23,7 @@ RUN go mod tidy \
     && go install gotest.tools/gotestsum@latest
 
 RUN useradd u -m
+USER u
 
 RUN git clone -q --depth 1 https://github.com/msikma/pokesprite /tmp/original/pokesprite
 
