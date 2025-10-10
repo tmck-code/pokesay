@@ -5,7 +5,7 @@ set -euo pipefail
 [ -z "${VERSION:-}" ] && echo "no VERSION!" && exit 1
 
 test -f "/usr/local/opt/coreutils/libexec/gnubin" && \
-  export PATH="/usr/local/opt/coreutils/libexec/gnubin:${PATH}"
+  export PATH="/usr/local/opt/coreutils/libexec/gnubin:${PATH}" || true
 
 OUTPUT_DIR="dist/bin"
 mkdir -p "$OUTPUT_DIR"
@@ -18,8 +18,8 @@ function build() {
     echo -e "  - building $1 / $2"
     GOOS=$1 GOARCH=$2 go build \
       -o "${OUTPUT_DIR}/pokesay-${VERSION}-${1}-${2}${3:-}" \
-      pokesay.go > /dev/null 2>&1
-    echo -e "  \e[1;32m✔ built as ${OUTPUT_DIR}/pokesay-${VERSION}-${1}-${2}${3:-}\e[0m"
+      pokesay.go
+    echo "built as ${OUTPUT_DIR}/pokesay-${VERSION}-${1}-${2}${3:-}"
 }
 
 function tarball() {
@@ -60,7 +60,7 @@ function tarball() {
         pokesay-completion.zsh \
         pokesay-completion.fish \
         usr/share/pokesay/
-    echo -e "  \e[1;32m✔ tarballed as dist/tarballs/${binfile}.tar.gz\e[0m"
+    echo "tarballed as dist/tarballs/${binfile}.tar.gz"
 
     rm -rf pokesay.1 pokesay-* usr/
 }
