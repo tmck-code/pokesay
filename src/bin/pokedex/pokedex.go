@@ -99,11 +99,14 @@ func main() {
 	fmt.Println("- Found", len(cowfileFpaths), "cowfiles")
 	// Read pokemon names
 	pokemonNames := pokedex.ReadNames(args.FromMetadataFname)
+	fmt.Println("- Read", len(pokemonNames), "pokemon names from", args.FromMetadataFname)
+
 	nameTokens := pokedex.GatherMapKeys(pokemonNames)
 	sort.Strings(nameTokens)
-	fmt.Println("names:", nameTokens)
 
-	fmt.Println("- Read", len(pokemonNames), "pokemon names from", args.FromMetadataFname)
+	if args.Debug {
+		fmt.Println("names:", nameTokens)
+	}
 
 	// 1. For each pokemon name, write a metadata file, containing the name information, and
 	// links to all of the matching cowfile indexes
@@ -111,7 +114,7 @@ func main() {
 	pokemonMetadata := make([]pokedex.PokemonMetadata, 0)
 	uniqueNames := make(map[string][]int)
 	nameVariants := make(map[string][]string)
-	i := 0
+
 	pbar := bin.NewProgressBar(len(pokemonNames))
 	for i, key := range nameTokens {
 		name := pokemonNames[key]
@@ -152,12 +155,11 @@ func main() {
 	categories := pokedex.CreateCategoryStruct(args.FromDir, pokemonMetadata, args.Debug)
 	pokedex.WriteStructToFile(categories, "build/assets/category_keys.txt")
 
-	fmt.Println("- Writing total metadata to file")
+	fmt.Println("- Writing total metadata to", paths.TotalFpath)
 	pokedex.WriteIntToFile(len(pokemonMetadata), paths.TotalFpath)
 
 	fmt.Println("✓ Complete! Indexed", len(cowfileFpaths), "total cowfiles")
-	fmt.Println("wrote", i, "names to", "build/assets/names.txt")
-
+	fmt.Println("✓ Wrote names to", "build/assets/names.txt")
 	fmt.Println("✓ Wrote gzipped metadata to", paths.MetadataDirPath)
 	fmt.Println("✓ Wrote gzipped cowfiles to", paths.EntryDirPath)
 	fmt.Println("✓ Wrote 'total' metadata to", paths.TotalFpath, len(pokemonMetadata))

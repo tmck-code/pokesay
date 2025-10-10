@@ -5,9 +5,9 @@ WORKDIR /usr/local/src
 ENV DEBIAN_FRONTEND=noninteractive
 ENV BUILD_DEPS="make gcc"
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends $BUILD_DEPS libmagickwand-dev ncurses-dev jq imagemagick
-
-RUN git clone -q --depth 1 https://github.com/denilsonsa/img2xterm \
+    && apt-get install -y --no-install-recommends \
+        $BUILD_DEPS libmagickwand-dev ncurses-dev jq imagemagick tree \
+    && git clone -q --depth 1 https://github.com/denilsonsa/img2xterm \
     && (cd img2xterm && make && make install) \
     && rm -rf img2xterm \
     && apt-get purge -y $BUILD_DEPS \
@@ -23,6 +23,7 @@ RUN go mod tidy \
     && go install gotest.tools/gotestsum@latest
 
 RUN useradd u -m
+USER u
 
 RUN git clone -q --depth 1 https://github.com/msikma/pokesprite /tmp/original/pokesprite
 
