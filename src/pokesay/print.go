@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"embed"
 	"fmt"
+	"log"
 	"os"
 	"strings"
 
@@ -100,7 +101,11 @@ func DetermineBoxChars(unicodeBox bool) *BoxChars {
 // 2. The cowfile data is retrieved using the matching index, decompressed (un-gzipped),
 // 3. The pokemon is printed along with the name & category information
 func Print(args Args, choice int, names []string, categories []string, cows embed.FS) {
-	printSpeechBubble(args.BoxChars, bufio.NewScanner(os.Stdin), args)
+	scanner := bufio.NewScanner(os.Stdin)
+	printSpeechBubble(args.BoxChars, scanner, args)
+	if err := scanner.Err(); err != nil {
+		log.Fatalf("error reading input: %v", err)
+	}
 
 	printPokemon(args, choice, names, categories, cows)
 }
