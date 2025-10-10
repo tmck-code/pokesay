@@ -23,7 +23,7 @@ jobs:
       - name: Check build
         run: ls -alh dist/bin
       - name: Test build
-        run: file ./dist/bin/pokesay-0.1-linux-amd64 && echo w | ./dist/bin/pokesay-0.1-linux-amd64
+        run: echo w | ./dist/bin/pokesay-0.1-linux-amd64
       - name: Run unit tests
         run: docker run -v ${PWD}:/usr/local/src ghcr.io/tmck-code/pokesay:latest gotestsum --format dots
       - name: Build deb package
