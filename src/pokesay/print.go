@@ -103,8 +103,11 @@ func DetermineBoxChars(unicodeBox bool) *BoxChars {
 func Print(args Args, choice int, names []string, categories []string, cows embed.FS) {
 	scanner := bufio.NewScanner(os.Stdin)
 	printSpeechBubble(args.BoxChars, scanner, args)
-	if err := scanner.Err(); err != nil && err.Error() != "EOF" {
-		log.Fatalf("error reading input: %v", err)
+	if err := scanner.Err(); err != nil {
+		fmt.Fprintf(os.Stderr, "[DEBUG] scanner.Err() type: %T, value: %v\n", err, err)
+		if err.Error() != "EOF" {
+			log.Fatalf("error reading input: %v", err)
+		}
 	}
 
 	printPokemon(args, choice, names, categories, cows)
