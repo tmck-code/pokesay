@@ -13,4 +13,3 @@ go run ./src/bin/pokedex/pokedex.go \
   -toTotalFname total.txt
 
 rm -rf cows
-tree -L 1 build/assets

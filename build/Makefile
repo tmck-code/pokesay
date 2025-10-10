@@ -48,6 +48,7 @@ build/assets:
 		--name pokesay \
 	    $(DOCKER_IMAGE) \
 			build/scripts/build_assets.sh
+	@tree -L 1 $(PWD)/assets/
 
 build/bin:
 	@$(echo) -e "\e[48;5;30m> Building binaries\e[0m"
