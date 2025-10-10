@@ -114,7 +114,7 @@ func main() {
 	pokemonMetadata := make([]pokedex.PokemonMetadata, 0)
 	uniqueNames := make(map[string][]int)
 	nameVariants := make(map[string][]string)
-	i := 0
+
 	pbar := bin.NewProgressBar(len(pokemonNames))
 	for i, key := range nameTokens {
 		name := pokemonNames[key]
@@ -129,7 +129,7 @@ func main() {
 
 	fmt.Println("\n- Writing entries to file")
 	pbar = bin.NewProgressBar(len(cowfileFpaths))
-	for _, fpath := range cowfileFpaths {
+	for i, fpath := range cowfileFpaths {
 		data, err := os.ReadFile(fpath)
 		pokedex.Check(err)
 		entryFpath := pokedex.EntryFpath(paths.EntryDirPath, i)
