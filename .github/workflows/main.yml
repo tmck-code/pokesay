@@ -25,7 +25,7 @@ jobs:
       - name: Test build
         run: echo w | ./dist/bin/pokesay-0.1-linux-amd64
       - name: Run unit tests
-        run: docker run -v ${PWD}:/usr/local/src ghcr.io/tmck-code/pokesay:latest gotestsum --format dots
+        run: docker run -v ${PWD}:/usr/local/src -u root ghcr.io/tmck-code/pokesay:latest gotestsum --debug
       - name: Build deb package
         run: docker run -v ${PWD}:/usr/local/src -u root -e VERSION=0.1 -e DEBUG=1 ghcr.io/tmck-code/pokesay:latest bash -c "./build/scripts/build_packages.sh deb"
       - name: Build arch package
