@@ -172,6 +172,17 @@ func createCategories(fpath string, data []byte) []string {
 	parts := strings.Split(fpath, "/")
 	height := sizeCategory(len(strings.Split(string(data), "\n")))
 
+	extra := []string{"hisui", "galar", "totem", "gmax", "alola", "mega"}
+
+	nameParts := strings.Split(
+		strings.TrimSuffix(parts[len(parts)-1], ".cow"),
+		"-",
+	)
+	for _, ex := range extra {
+		if nameParts[len(nameParts)-1] == ex {
+			return append([]string{height, ex}, parts[0:len(parts)-1]...)
+		}
+	}
 	return append([]string{height}, parts[0:len(parts)-1]...)
 }
 
