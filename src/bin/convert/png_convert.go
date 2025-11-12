@@ -13,7 +13,7 @@ import (
 )
 
 var (
-	DEBUG bool = false
+	DEBUG bool = os.Getenv("DEBUG") != ""
 )
 
 type CowBuildArgs struct {
@@ -29,16 +29,13 @@ func parseArgs() CowBuildArgs {
 	toDir := flag.String("to", ".", "to dir")
 	skipDirs := flag.String("skip", "'[\"resources\"]'", "JSON array of dir patterns to skip converting")
 	padding := flag.Int("padding", 2, "the number of spaces to pad from the left")
-	debug := flag.Bool("debug", DEBUG, "show debug logs")
 
 	flag.Parse()
 
-	DEBUG = *debug
-
-	args := CowBuildArgs{FromDir: *fromDir, ToDir: *toDir, Padding: *padding}
+	args := CowBuildArgs{FromDir: *fromDir, ToDir: *toDir, Padding: *padding, Debug: DEBUG}
 	json.Unmarshal([]byte(*skipDirs), &args.SkipDirs)
 
-	if DEBUG {
+	if args.Debug {
 		fmt.Printf("%+v\n", args)
 	}
 	return args
