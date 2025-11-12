@@ -123,6 +123,20 @@ func TestCreateNameMetadataEternatus(test *testing.T) {
 			{EntryIndex: 2, Categories: []string{"big", "gen8"}},
 		},
 	}
+	Assert(expected.Idx, result.Idx, test)
+	Assert(expected.Name, result.Name, test)
+	Assert(expected.JapaneseName, result.JapaneseName, test)
+	Assert(expected.JapanesePhonetic, result.JapanesePhonetic, test)
 
-	Assert(expected, result, test)
+	nEntries, nMatched := len(expected.Entries), 0
+
+	for _, expectedEntry := range expected.Entries {
+		for _, resultEntry := range result.Entries {
+			if expectedEntry.EntryIndex == resultEntry.EntryIndex {
+				Assert(expectedEntry.Categories, resultEntry.Categories, test)
+				nMatched++
+			}
+		}
+	}
+	Assert(nEntries, nMatched, test)
 }

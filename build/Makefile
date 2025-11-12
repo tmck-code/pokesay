@@ -23,6 +23,7 @@ build/docker:
 		--platform linux/amd64 \
 		-f Dockerfile \
 		-t $(DOCKER_IMAGE) \
+		--build-arg DEBUG=$(DEBUG) \
 		..
 
 build/cows:
@@ -32,7 +33,7 @@ build/cows:
 	@docker create \
 		--platform linux/amd64 \
 		--name pokebuilder $(DOCKER_IMAGE)
-	@docker cp pokebuilder:$(DOCKER_OUTPUT_DIR)/ cows/
+	docker cp pokebuilder:$(DOCKER_OUTPUT_DIR)/ cows/
 	@tar czf cows.tar.gz cows/
 	@rm -rf cows/
 	@docker rm -f pokebuilder > /dev/null 2>&1

@@ -27,6 +27,9 @@ USER u
 
 RUN git clone -q --depth 1 https://github.com/msikma/pokesprite /tmp/original/pokesprite
 
+ARG DEBUG
+ENV DEBUG=$DEBUG
+RUN echo "Debug mode is set to: '$DEBUG'"
 # Convert all of the pokesprite .pngs -> cowfiles for the terminal
 RUN go run /usr/local/src/src/bin/convert/png_convert.go \
         -from /tmp/original/pokesprite/ \
