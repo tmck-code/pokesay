@@ -271,7 +271,6 @@ Inspired by the [pokeshell](https://github.com/acxz/pokeshell) project, I've inc
 
 - **In progress**
 - **Short-term**
-  - [ ] requesting mew returns mewtwo also
   - [ ] create "vertical" friendly display mode, place the Pokemon standing beside the text box, on the left or right
   - [ ] non-say mode (only print the pokemon, no speech bubble)
 - **Longer-term**
@@ -281,6 +280,7 @@ Inspired by the [pokeshell](https://github.com/acxz/pokeshell) project, I've inc
 - **In Beta**
   - [x] optionally print ID assigned to each pokemon, support deterministic selection via the same ID
 - **Completed**
+  - [x] requesting mew returns mewtwo also
   - [x] shell completion scripts (bash, zsh, fish)
   - [x] add option to flip Pokemon to face right or left, remove all "right" facing cowfiles
   - [x] create Debian package
