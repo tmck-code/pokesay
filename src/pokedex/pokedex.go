@@ -132,10 +132,9 @@ func Decompress(data []byte) []byte {
 
 func CreateNameMetadata(idx string, key string, name PokemonName, rootDir string, fpaths []string) *PokemonMetadata {
 	entryCategories := make(map[int][][]string, 0)
-
 	for i, fpath := range fpaths {
 		basename := strings.TrimPrefix(fpath, rootDir)
-		if strings.Contains(basename, strings.ToLower(name.Slug)) {
+		if strings.Contains(basename, "/"+strings.ToLower(name.Slug)+"-") || strings.Contains(basename, "/"+strings.ToLower(name.Slug)+".") {
 			data, err := os.ReadFile(fpath)
 			Check(err)
 			cats := createCategories(strings.TrimPrefix(fpath, rootDir), data)
