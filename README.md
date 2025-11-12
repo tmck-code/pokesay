@@ -2,6 +2,7 @@
 
 ![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/tmck-code/pokesay/main.yml)
 ![AUR](https://img.shields.io/aur/version/pokesay-bin)
+![Homebrew](https://img.shields.io/badge/dynamic/regex?url=https%3A%2F%2Fraw.githubusercontent.com%2Ftmck-code%2Fhomebrew-taps%2Frefs%2Fheads%2Fmain%2FFormula%2Fpokesay.rb&search=releases%2Fdownload%2Fv%28%3F%3Cversion%3E%5Cd%2B%28%3F%3A%5C.%5Cd%2B%29%2B%29&replace=%24%3Cversion%3E&label=homebrew)
 ![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/tmck-code/pokesay/total?color=red)
 ![GitHub Downloads (all assets, latest release)](https://img.shields.io/github/downloads/tmck-code/pokesay/latest/total?color=orange)
 
