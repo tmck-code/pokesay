@@ -437,6 +437,7 @@ func TestConcatLines(test *testing.T) {
 		name     string
 		input    [][]string
 		args     pokesay.Args
+		sep      string
 		expected []string
 	}{
 		{
@@ -454,6 +455,7 @@ func TestConcatLines(test *testing.T) {
 				},
 			},
 			args: pokesay.Args{Width: 80},
+			sep: " ",
 			expected: []string{
 				"_______ =======",
 				"| xyz | = 123 =",
@@ -475,6 +477,7 @@ func TestConcatLines(test *testing.T) {
 				},
 			},
 			args: pokesay.Args{Width: 80},
+			sep: " ",
 			expected: []string{
 				"╭─────────────╮ ֎֎֎֎",
 				"│ → ムクホーク│ XXXX",
@@ -498,6 +501,7 @@ func TestConcatLines(test *testing.T) {
 				},
 			},
 			args: pokesay.Args{Width: 80},
+			sep: " ",
 			expected: []string{
 				"╭───────────────╮                ",
 				"│ → 0 ムクホーク│                ",
@@ -523,6 +527,7 @@ func TestConcatLines(test *testing.T) {
 				},
 			},
 			args: pokesay.Args{Width: 80},
+			sep: " ",
 			expected: []string{
 				"                ╭───────────────╮",
 				"                │ → 0 ムクホーク│",
@@ -563,6 +568,7 @@ func TestConcatLines(test *testing.T) {
 				},
 			},
 			args: pokesay.Args{Width: 80},
+			sep: "─",
 			expected: []string{
 				"                               ╭─────╮",
 				"                               │ 00  │",
@@ -611,6 +617,7 @@ func TestConcatLines(test *testing.T) {
 				},
 			},
 			args: pokesay.Args{Width: 80},
+			sep: "─",
 			expected: []string{
 				"                               ╭─────╮",
 				"                               │ 0   │",
@@ -633,15 +640,21 @@ func TestConcatLines(test *testing.T) {
 	}
 	for _, tc := range testCases {
 		test.Run(tc.name, func(t *testing.T) {
-			result := pokesay.ConcatLines(tc.input[0], tc.input[1], tc.args)
+			result := pokesay.ConcatLines(tc.input[0], tc.input[1], tc.args, tc.sep)
+			match := strings.Join(tc.expected, "\n") == strings.Join(result, "\n")
 			fmt.Printf(
 				"> %s\n%s\n%s\n",
 				"expected",
 				strings.Join(tc.expected, "\n"),
 				strings.Repeat("─", 40),
 			)
+			if match {
+				fmt.Print(" ✔")
+			} else {
+				fmt.Print(" 💥")
+			}
 			fmt.Printf(
-				"> %s\n%s\n%s\n\n",
+				" %s\n%s\n%s\n\n",
 				"result",
 				strings.Join(result, "\n"),
 				strings.Repeat("─", 40),

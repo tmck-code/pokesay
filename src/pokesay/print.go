@@ -96,7 +96,7 @@ func DetermineBoxChars(unicodeBox bool) *BoxChars {
 //   - In side-by-side mode, epending on which is taller, the shorter
 //     one is padded with spaces to match the height of the taller one.
 //   - In above-and-below mode, the same thing is done to the width
-func ConcatLines(lhs []string, rhs []string, args Args) []string {
+func ConcatLines(lhs []string, rhs []string, args Args, sep string) []string {
 	totalLen := max(len(lhs), len(rhs))
 	lhsMiddle := (totalLen - len(lhs)/2)
 	lhsWidth := 0
@@ -120,7 +120,7 @@ func ConcatLines(lhs []string, rhs []string, args Args) []string {
 		}
 		padding := lhsWidth - UnicodeStringLength(line)
 		if i == lhsMiddle {
-			line += strings.Repeat("─", max(padding, 1))
+			line += strings.Repeat(sep, max(padding, 1))
 		} else {
 			if padding > 0 {
 				line += strings.Repeat(" ", padding)
@@ -151,6 +151,7 @@ func Print(args Args, choice int, names []string, categories []string, cows embe
 				drawSpeechBubble(args.BoxChars, bufio.NewScanner(os.Stdin), args),
 				drawPokemon(args, choice, names, categories, cows),
 				args,
+				"─",
 			),
 			"\n",
 		),
