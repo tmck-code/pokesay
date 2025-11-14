@@ -28,22 +28,23 @@ type BoxChars struct {
 }
 
 type Args struct {
-	Width          int
-	NoWrap         bool
-	DrawBubble     bool
-	TabSpaces      string
-	NoTabSpaces    bool
-	NoCategoryInfo bool
-	ListCategories bool
-	ListNames      bool
-	Category       string
-	NameToken      string
-	JapaneseName   bool
-	BoxChars       *BoxChars
-	DrawInfoBorder bool
-	FlipPokemon    bool
-	Help           bool
-	Verbose        bool
+	Width                int
+	NoWrap               bool
+	DrawBubble           bool
+	TabSpaces            string
+	NoTabSpaces          bool
+	NoCategoryInfo       bool
+	ListCategories       bool
+	ListNames            bool
+	Category             string
+	NameToken            string
+	JapaneseName         bool
+	BoxChars             *BoxChars
+	DrawInfoBorder       bool
+	FlipPokemon          bool
+	Help                 bool
+	Verbose              bool
+	SpeechBubbleLocation string
 }
 
 var (
@@ -148,8 +149,8 @@ func Print(args Args, choice int, names []string, categories []string, cows embe
 	fmt.Println(
 		strings.Join(
 			ConcatLines(
-				drawSpeechBubble(args.BoxChars, bufio.NewScanner(os.Stdin), args),
 				drawPokemon(args, choice, names, categories, cows),
+				drawSpeechBubble(args.BoxChars, bufio.NewScanner(os.Stdin), args),
 				args,
 				"─",
 			),

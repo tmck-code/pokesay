@@ -62,38 +62,41 @@ func parseFlags() pokesay.Args {
 	// other option
 	unicodeBorders := getopt.BoolLong("unicode-borders", 'u', "use unicode characters to draw the border around the speech box (and info box if --info-border is enabled)")
 	flipPokemon := getopt.BoolLong("flip", 'F', "flip the pokemon horizontally (face right instead of left)")
+	speechBubbleLocation := getopt.StringLong("speech-bubble-location", 'S', "top", "the location of the speech bubble relative to the pokemon (top/left/right)")
 
 	getopt.Parse()
 	var args pokesay.Args
 
 	if *fastest {
 		args = pokesay.Args{
-			Width:       *width,
-			NoWrap:      true,
-			TabSpaces:   "    ",
-			NoTabSpaces: true,
-			BoxChars:    pokesay.DetermineBoxChars(false),
-			Help:        *help,
-			Verbose:     *verbose,
+			Width:                *width,
+			NoWrap:               true,
+			TabSpaces:            "    ",
+			NoTabSpaces:          true,
+			BoxChars:             pokesay.DetermineBoxChars(false),
+			Help:                 *help,
+			Verbose:              *verbose,
+			SpeechBubbleLocation: *speechBubbleLocation,
 		}
 	} else {
 		args = pokesay.Args{
-			Width:          *width,
-			NoWrap:         *noWrap,
-			DrawBubble:     !*noBubble,
-			TabSpaces:      strings.Repeat(" ", *tabWidth),
-			NoTabSpaces:    *noTabSpaces,
-			NoCategoryInfo: *noCategoryInfo,
-			ListCategories: *listCategories,
-			ListNames:      *listNames,
-			Category:       *category,
-			NameToken:      *name,
-			JapaneseName:   *japaneseName,
-			BoxChars:       pokesay.DetermineBoxChars(*unicodeBorders),
-			DrawInfoBorder: *drawInfoBorder,
-			FlipPokemon:    *flipPokemon,
-			Help:           *help,
-			Verbose:        *verbose,
+			Width:                *width,
+			NoWrap:               *noWrap,
+			DrawBubble:           !*noBubble,
+			TabSpaces:            strings.Repeat(" ", *tabWidth),
+			NoTabSpaces:          *noTabSpaces,
+			NoCategoryInfo:       *noCategoryInfo,
+			ListCategories:       *listCategories,
+			ListNames:            *listNames,
+			Category:             *category,
+			NameToken:            *name,
+			JapaneseName:         *japaneseName,
+			BoxChars:             pokesay.DetermineBoxChars(*unicodeBorders),
+			DrawInfoBorder:       *drawInfoBorder,
+			FlipPokemon:          *flipPokemon,
+			Help:                 *help,
+			Verbose:              *verbose,
+			SpeechBubbleLocation: *speechBubbleLocation,
 		}
 	}
 	return args
