@@ -59,6 +59,7 @@ func worker(args CowBuildArgs, jobs <-chan string, pbar *progressbar.ProgressBar
 			mu.Lock()
 			*nFailures++
 			mu.Unlock()
+			pbar.Add(1)
 			continue
 		}
 
@@ -72,6 +73,7 @@ func worker(args CowBuildArgs, jobs <-chan string, pbar *progressbar.ProgressBar
 			*nDuplicates++
 			if args.SkipDuplicates {
 				mu.Unlock()
+				pbar.Add(1)
 				continue
 			}
 		}
@@ -125,21 +127,19 @@ func main() {
 	}
 	wg.Wait()
 
-	fmt.Println("\nFinished converting", len(fpaths), "pokesprite PNGs -> cowfiles")
+	fmt.Printf("\n- converted %d PNGs -> ANSI\n", len(fpaths))
 	if args.SkipDuplicates {
-		fmt.Println("- skipped", nDuplicates, "duplicates, noticed", nFailures, "failures")
+		fmt.Printf("- skipped %d duplicates\n- noticed %d failures\n\n", nDuplicates, nFailures)
 	} else {
-		fmt.Println("- ignored", nDuplicates, "duplicates, noticed", nFailures, "failures")
+		fmt.Printf("- ignored %d duplicates\n- noticed %d failures\n\n", nDuplicates, nFailures)
 	}
-
 	pbar.Finish()
-	// // wait for progress bar to finish
-	// time.Sleep(100 * time.Millisecond)
 
 	if args.Debug && len(pokedex.Failures) > 0 {
 		fmt.Println("failures:")
 		for _, f := range pokedex.Failures {
 			fmt.Println(" -", f)
 		}
+		fmt.Print("\n\n")
 	}
 }
