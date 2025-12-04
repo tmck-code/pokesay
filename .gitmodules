@@ -1,3 +1,4 @@
-[submodule "build/pokesprite"]
-	path = build/pokesprite
-	url = git@github.com:msikma/pokesprite
+[submodule "build/pokesprite-ansi"]
+	path = build/pokesprite-ansi
+	url = git@github.com:tmck-code/pokesprite-ansi
+	shallow = true
