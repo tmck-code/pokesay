@@ -4,8 +4,10 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v2
+      - name: Checkout 
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
       - name: Log in to the Container registry
         uses: docker/login-action@v1
         with:
@@ -16,16 +18,18 @@ jobs:
         run: docker pull ghcr.io/tmck-code/pokesay:latest
       - name: Make dist directory
         run: mkdir -p dist/bin/ dist/packages/ dist/tarballs/
+      - name: Build cows
+        run: docker run -v ${PWD}:/usr/local/src -v ${PWD}/build/cows:/tmp/cows -v ${PWD}/build/pokesprite:/tmp/original/pokesprite -u root --platform linux/amd64 ghcr.io/tmck-code/pokesay:latest ./build/scripts/build_cowfiles.sh
       - name: Build go binary assets
-        run: docker run -v ${PWD}:/usr/local/src -u root --platform linux/amd64 -e VERSION=0.1 ghcr.io/tmck-code/pokesay:latest ./build/scripts/build_assets.sh
+        run: docker run -v ${PWD}:/usr/local/src -v ${PWD}/build/cows:/tmp/cows -u root --platform linux/amd64 -e VERSION=0.1 ghcr.io/tmck-code/pokesay:latest ./build/scripts/build_assets.sh
+      - name: Run unit tests
+        run: docker run -v ${PWD}:/usr/local/src -u root ghcr.io/tmck-code/pokesay:latest gotestsum --debug
       - name: Build go binaries
         run: docker run -v ${PWD}:/usr/local/src -u root --platform linux/amd64 -e VERSION=0.1 ghcr.io/tmck-code/pokesay:latest ./build/scripts/build_bin.sh
       - name: Check build
         run: ls -alh dist/bin
       - name: Test build
         run: echo w | ./dist/bin/pokesay-0.1-linux-amd64
-      - name: Run unit tests
-        run: docker run -v ${PWD}:/usr/local/src -u root ghcr.io/tmck-code/pokesay:latest gotestsum --debug
       - name: Build deb package
         run: docker run -v ${PWD}:/usr/local/src -u root -e VERSION=0.1 -e DEBUG=1 ghcr.io/tmck-code/pokesay:latest bash -c "./build/scripts/build_packages.sh deb"
       - name: Build arch package

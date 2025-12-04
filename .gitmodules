@@ -1,0 +1,3 @@
+[submodule "build/pokesprite"]
+	path = build/pokesprite
+	url = git@github.com:msikma/pokesprite
