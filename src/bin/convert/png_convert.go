@@ -6,7 +6,11 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
+	"sync"
+
+	"github.com/schollz/progressbar/v3"
 
 	"github.com/tmck-code/pokesay/src/bin"
 	"github.com/tmck-code/pokesay/src/pokedex"
@@ -41,44 +45,33 @@ func parseArgs() CowBuildArgs {
 	return args
 }
 
-func main() {
-	args := parseArgs()
+func worker(args CowBuildArgs, jobs <-chan string, pbar *progressbar.ProgressBar, dataSet map[string]struct{}, nDuplicates *int, nFailures *int, mu *sync.Mutex, wg *sync.WaitGroup) {
+	defer wg.Done()
 
-	fpaths := pokedex.FindFiles(args.FromDir, ".png", args.SkipDirs)
-
-	// Ensure that the destination dir exists
-	os.MkdirAll(args.ToDir, 0755)
-
-	fmt.Println("Converting PNGs -> cowfiles")
-	pbar := bin.NewProgressBar(len(fpaths))
-
-	allData := make([]string, 0, len(fpaths))
-	nDuplicates, nFailures := 0, 0
-
-	for _, f := range fpaths {
+	for f := range jobs {
 		data, err := pokedex.ConvertPngToCow(args.FromDir, f, args.ToDir, args.Padding)
+
 		if err != nil {
-			nFailures++
+			mu.Lock()
+			*nFailures++
+			mu.Unlock()
+			pbar.Add(1)
 			continue
 		}
 
 		// check if this cawfile is a duplicate of one that has already been written
-		found := false
-		for _, existingData := range allData {
-			if existingData == data {
-				found = true
-				break
-			}
-		}
-		if found {
+		mu.Lock()
+		if _, found := dataSet[data]; found {
 			if args.Debug {
 				fmt.Println("Skipping duplicate data for", f)
 			}
-			nDuplicates++
+			*nDuplicates++
+			mu.Unlock()
 			pbar.Add(1)
 			continue
 		}
-		allData = append(allData, data)
+		dataSet[data] = struct{}{}
+		mu.Unlock()
 
 		destDirpath := filepath.Join(
 			args.ToDir,
@@ -91,6 +84,50 @@ func main() {
 		pokedex.WriteToCowfile(data, destDirpath, destFpath)
 		pbar.Add(1)
 	}
+}
+
+func main() {
+	args := parseArgs()
+
+	fpaths := pokedex.FindFiles(args.FromDir, ".png", args.SkipDirs)
+
+	// Ensure that the destination dir exists
+	os.MkdirAll(args.ToDir, 0755)
+
+	fmt.Println("Converting PNGs -> cowfiles")
+	pbar := bin.NewProgressBar(len(fpaths))
+
+	dataSet := make(map[string]struct{})
+	nDuplicates, nFailures := 0, 0
+
+	nWorkers := runtime.NumCPU()
+	var wg sync.WaitGroup
+	var mu sync.Mutex
+
+	// Create a channel to distribute work
+	jobs := make(chan string, len(fpaths))
+
+	// Send all file paths to the jobs channel
+	for _, f := range fpaths {
+		jobs <- f
+	}
+	close(jobs)
+
+	// Start worker goroutines
+	for w := 0; w < nWorkers; w++ {
+		wg.Add(1)
+		go worker(args, jobs, &pbar, dataSet, &nDuplicates, &nFailures, &mu, &wg)
+	}
+
+	// Wait for all workers to finish
+	wg.Wait()
 	fmt.Println("\nFinished converting", len(fpaths), "pokesprite PNGs -> cowfiles")
 	fmt.Println("(skipped", nDuplicates, "duplicates and", nFailures, "failures)")
+
+	if args.Debug && len(pokedex.Failures) > 0 {
+		fmt.Println("failures:")
+		for _, f := range pokedex.Failures {
+			fmt.Println(" -", f)
+		}
+	}
 }

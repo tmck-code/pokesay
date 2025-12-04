@@ -2,7 +2,11 @@ package pokedex
 
 import (
 	"bufio"
+	"crypto/rand"
+	"encoding/hex"
+	"errors"
 	"fmt"
+	"io"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -10,7 +14,7 @@ import (
 )
 
 var (
-	failures     []string
+	Failures     []string
 	COLOUR_RESET string = fmt.Sprintf("%s[%dm\n", "\x1b", 39)
 )
 
@@ -33,18 +37,45 @@ func FindFiles(dirpath string, ext string, skip []string) []string {
 
 // img2xterm converts an image to a cowfile, returning the result as a byte slice
 func img2xterm(sourceFpath string) ([]byte, error) {
-	return exec.Command("bash", "-c", fmt.Sprintf("/usr/local/bin/img2xterm %s", sourceFpath)).Output()
+	return exec.Command("bash", "-c", fmt.Sprintf("/usr/local/bin/img2xterm %s 2>&1", sourceFpath)).Output()
 }
 
 // autoCrop trims the whitespace from the edges of an image, in place
-func autoCrop(sourceFpath string) {
-	destFpath := fmt.Sprintf("/tmp/%s", filepath.Base(sourceFpath))
-	_, err := exec.Command(
-		"bash", "-c", fmt.Sprintf("/usr/bin/convert %s -trim +repage %s", sourceFpath, destFpath),
-	).Output()
-	Check(err)
+func autoCrop(sourceFpath string) error {
+	// Generate a random suffix to avoid conflicts when running in parallel
+	randomBytes := make([]byte, 8)
+	rand.Read(randomBytes)
+	randomSuffix := hex.EncodeToString(randomBytes)
 
-	os.Rename(destFpath, sourceFpath)
+	destFpath := fmt.Sprintf("/tmp/%s-%s", randomSuffix, filepath.Base(sourceFpath))
+	// fmt.Println("Auto-cropping", sourceFpath, "->", destFpath)
+	output, err := exec.Command(
+		"bash", "-c", fmt.Sprintf("/usr/bin/convert %s -trim +repage %s 2>&1", sourceFpath, destFpath),
+	).Output()
+	if err != nil {
+		return fmt.Errorf("auto-crop failed for %s: (%v) - %s", sourceFpath, err, strings.Trim(string(output), "\n"))
+	}
+
+	srcFile, err := os.Open(destFpath)
+	if err != nil {
+		return fmt.Errorf("failed to open cropped file %s: (%v)", destFpath, err)
+	}
+	defer srcFile.Close()
+
+	destFile, err := os.Create(sourceFpath)
+	if err != nil {
+		return fmt.Errorf("failed to open source file %s for writing: (%v)", sourceFpath, err)
+	}
+	defer destFile.Close()
+
+	_, err = io.Copy(destFile, srcFile)
+	if err != nil {
+		return fmt.Errorf("failed to copy cropped data to %s: (%v)", sourceFpath, err)
+	}
+
+	// Clean up the temporary file
+	os.Remove(destFpath)
+	return nil
 }
 
 func countLineLeftPadding(line string) int {
@@ -110,25 +141,43 @@ func padLeft(cowfile []byte, n int) []string {
 func ConvertPngToCow(sourceDirpath string, sourceFpath string, destDirpath string, extraPadding int) (string, error) {
 
 	// Trim the whitespace from the edges of the images. This helps with the conversion
-	autoCrop(sourceFpath)
-	// Some conversions are failing with something about colour channels
-	// Can't be bothered resolving atm, so just skip past any failed conversions
-	converted, _ := img2xterm(sourceFpath)
-
-	if len(converted) == 0 {
-		failures = append(failures, sourceFpath)
-		return "", fmt.Errorf("failed to convert %s", sourceFpath)
+	err := autoCrop(sourceFpath)
+	if err != nil {
+		// If autoCrop fails, still try to convert the original image
+		Failures = append(Failures, string(err.Error()))
+		return "", err
 	}
-	final := stripEmptyLines(padLeft(converted, extraPadding))
+
+	// Some conversions are failing with something about colour channels
+	output, err := img2xterm(sourceFpath)
+	if err != nil {
+		failureMsg := fmt.Sprintf("failed to convert %s: (%v) - %s", sourceFpath, err, strings.Trim(string(output), "\n"))
+		Failures = append(Failures, failureMsg)
+		return "", errors.New(failureMsg)
+	}
+
+	if len(output) == 0 {
+		failureMsg := fmt.Sprintf("failed to convert %s: no output", sourceFpath)
+		Failures = append(Failures, failureMsg)
+		return "", errors.New(failureMsg)
+	}
+	final := stripEmptyLines(padLeft(output, extraPadding))
 	return strings.Join(final, "\n") + COLOUR_RESET, nil
 }
 
 func WriteToCowfile(data string, destDirpath string, destFpath string) {
 	// Ensure that the destination dir exists
-	os.MkdirAll(destDirpath, 0755)
+	err := os.MkdirAll(destDirpath, 0755)
+	if err != nil {
+		fmt.Printf("Failed to create directory %s: %v\n", destDirpath, err)
+		Check(err)
+	}
 
 	ostream, err := os.Create(destFpath)
-	Check(err)
+	if err != nil {
+		fmt.Printf("Failed to create file %s: %v\n", destFpath, err)
+		Check(err)
+	}
 	defer ostream.Close()
 	writer := bufio.NewWriter(ostream)
 
