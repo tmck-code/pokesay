@@ -127,19 +127,22 @@ func main() {
 	}
 	wg.Wait()
 
-	fmt.Printf("\n- converted %d PNGs -> ANSI\n", len(fpaths))
+	if args.Debug && len(pokedex.Failures) > 0 {
+		fmt.Println("failures:")
+		for _, f := range pokedex.Failures {
+			fmt.Println(" -", f)
+		}
+	}
+
+	totalSucceeded := len(fpaths) - nFailures
+	if args.SkipDuplicates {
+		totalSucceeded -= nDuplicates
+	}
+	fmt.Printf("\n- converted %d/%d PNGs -> ANSI\n", totalSucceeded, len(fpaths))
 	if args.SkipDuplicates {
 		fmt.Printf("- skipped %d duplicates\n- noticed %d failures\n\n", nDuplicates, nFailures)
 	} else {
 		fmt.Printf("- ignored %d duplicates\n- noticed %d failures\n\n", nDuplicates, nFailures)
 	}
 	pbar.Finish()
-
-	if args.Debug && len(pokedex.Failures) > 0 {
-		fmt.Println("failures:")
-		for _, f := range pokedex.Failures {
-			fmt.Println(" -", f)
-		}
-		fmt.Print("\n\n")
-	}
 }
