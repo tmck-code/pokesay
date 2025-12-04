@@ -29,14 +29,16 @@ build/docker:
 build/cows:
 	@$(echo) -e "\e[48;5;30m> Building cows\e[0m"
 	@rm -rf cows.tar.gz cows/
-	@docker rm -f pokebuilder > /dev/null 2>&1
-	@docker create \
+	@mkdir -p cows/
+	docker run --rm \
 		--platform linux/amd64 \
-		--name pokebuilder $(DOCKER_IMAGE)
-	docker cp pokebuilder:$(DOCKER_OUTPUT_DIR)/ cows/
-	@tar czf cows.tar.gz cows/
-	@rm -rf cows/
-	@docker rm -f pokebuilder > /dev/null 2>&1
+		-v $(PWD)/../:/usr/local/src \
+		-v $(PWD)/pokesprite:/tmp/original/pokesprite \
+		-v $(PWD)/cows:/tmp/cows \
+		-u u \
+		$(DOCKER_IMAGE) \
+		  build/scripts/build_cowfiles.sh
+	@tar -czf cows.tar.gz ./cows
 	@du -sh cows.tar.gz
 
 # generate embedded bin files for category/metadata/the actual pokemon
