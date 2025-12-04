@@ -9,6 +9,7 @@ import (
 	"runtime"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/schollz/progressbar/v3"
 
@@ -127,6 +128,9 @@ func main() {
 	}
 	wg.Wait()
 
+	pbar.Finish()
+	time.Sleep(100 * time.Millisecond) // wait a moment to let the progress bar finish cleanly
+
 	if args.Debug && len(pokedex.Failures) > 0 {
 		fmt.Println("failures:")
 		for _, f := range pokedex.Failures {
@@ -144,5 +148,4 @@ func main() {
 	} else {
 		fmt.Printf("- ignored %d duplicates\n- noticed %d failures\n\n", nDuplicates, nFailures)
 	}
-	pbar.Finish()
 }
