@@ -5,10 +5,10 @@ DOCKER_TAG ?= latest
 DOCKER_IMAGE=$(DOCKER_REPO)/pokesay:$(DOCKER_TAG)
 DEBUG ?= ""
 
-ifeq (, $(shell which gecho > /dev/null 2>&1))
-	echo := echo
-else
+ifeq ($(shell which gecho > /dev/null 2>&1 && echo 1 || echo 0), 1)
 	echo := gecho
+else
+	echo := echo
 endif
 
 all: build/docker build/cows build/assets test build/bin build/packages
