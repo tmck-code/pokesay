@@ -1,0 +1,4 @@
+build/cows*
+build/pokesprite/
+build/assets/
+dist/

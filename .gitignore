@@ -6,6 +6,7 @@
 # All binaries
 build/assets
 build/bin
+build/cows
 dist/
 
 # Test binary, built with `go test -c`
