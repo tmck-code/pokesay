@@ -10,6 +10,7 @@ go run /usr/local/src/src/bin/convert/png_convert.go \
   -tmpDir /tmp/convert/ \
   -to /tmp/cows/ \
   -padding 4 \
+  -skipDuplicates \
   -skip '["resources/", "misc/", "icons/", "items/", "items-outline/"]' \
   && mv -v /tmp/cows/pokemon-gen8 /tmp/cows/gen8 > /dev/null \
   && mv -v /tmp/cows/pokemon-gen7x /tmp/cows/gen7x > /dev/null \

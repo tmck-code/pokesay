@@ -35,6 +35,7 @@ build/cows:
 		-v $(PWD)/../:/usr/local/src \
 		-v $(PWD)/pokesprite:/tmp/original/pokesprite \
 		-v $(PWD)/cows:/tmp/cows \
+		-e DEBUG=$(DEBUG) \
 		-u u \
 		$(DOCKER_IMAGE) \
 		  build/scripts/build_cowfiles.sh
