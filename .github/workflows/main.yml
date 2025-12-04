@@ -12,8 +12,10 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      - name: Pull image from ghcr.io
-        run: docker pull ghcr.io/tmck-code/pokesay:latest
+      - name: Checkout repository and submodules
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
       - name: Make dist directory
         run: mkdir -p dist/bin/ dist/packages/ dist/tarballs/
       - name: Build cows
