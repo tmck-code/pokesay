@@ -30,7 +30,7 @@ build/cows:
 	@$(echo) -e "\e[48;5;30m> Building cows\e[0m"
 	@rm -rf cows.tar.gz cows/
 	@mkdir -p cows/
-	docker run --rm \
+	@docker run --rm \
 		--platform linux/amd64 \
 		-v $(PWD)/../:/usr/local/src \
 		-v $(PWD)/pokesprite:/tmp/original/pokesprite \
@@ -45,9 +45,13 @@ build/cows:
 build/assets:
 	@$(echo) -e "\e[48;5;30m> Building assets\e[0m"
 	@mkdir -p $(PWD)/assets
+	@rm -rf $(PWD)/cows/
+	@tar -xzf cows.tar.gz
 	@docker run --rm \
 		-v $(PWD)/../:/usr/local/src \
+		-v $(PWD)/cows:/tmp/cows \
 		--platform linux/amd64 \
+		-u u \
 		--name pokesay \
 	    $(DOCKER_IMAGE) \
 			build/scripts/build_assets.sh
@@ -61,7 +65,7 @@ build/bin:
 		-e VERSION=$(VERSION) \
 		-e DEBUG=$(DEBUG) \
 		--platform linux/amd64 \
-		--user root \
+		--user u \
 		--name pokesay \
 		  $(DOCKER_IMAGE) \
 		  /usr/local/src/build/scripts/build_bin.sh
