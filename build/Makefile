@@ -26,6 +26,15 @@ build/docker:
 		--build-arg DEBUG=$(DEBUG) \
 		..
 
+build/docker-convert:
+	@$(echo) -e "\e[48;5;30m> Building docker image $(DOCKER_IMAGE)-convert\e[0m"
+	@docker build \
+		--platform linux/amd64 \
+		-f Dockerfile.convert \
+		-t $(DOCKER_REPO)/pokesay-convert:$(DOCKER_TAG) \
+		--build-arg DEBUG=$(DEBUG) \
+		..
+
 build/cows:
 	@$(echo) -e "\e[48;5;30m> Building cows\e[0m"
 	@rm -rf cows.tar.gz cows/
