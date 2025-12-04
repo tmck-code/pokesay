@@ -6,7 +6,6 @@ import (
 	"encoding/hex"
 	"errors"
 	"fmt"
-	"io"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -41,41 +40,22 @@ func img2xterm(sourceFpath string) ([]byte, error) {
 }
 
 // autoCrop trims the whitespace from the edges of an image, in place
-func autoCrop(sourceFpath string) error {
+func autoCrop(sourceFpath string, tmpDirpath string) (string, error) {
 	// Generate a random suffix to avoid conflicts when running in parallel
 	randomBytes := make([]byte, 8)
 	rand.Read(randomBytes)
 	randomSuffix := hex.EncodeToString(randomBytes)
 
-	destFpath := fmt.Sprintf("/tmp/%s-%s", randomSuffix, filepath.Base(sourceFpath))
+	destFpath := fmt.Sprintf("%s/%s-%s", tmpDirpath, randomSuffix, filepath.Base(sourceFpath))
 	// fmt.Println("Auto-cropping", sourceFpath, "->", destFpath)
 	output, err := exec.Command(
 		"bash", "-c", fmt.Sprintf("/usr/bin/convert %s -trim +repage %s 2>&1", sourceFpath, destFpath),
 	).Output()
 	if err != nil {
-		return fmt.Errorf("auto-crop failed for %s: (%v) - %s", sourceFpath, err, strings.Trim(string(output), "\n"))
+		return "", fmt.Errorf("auto-crop failed for %s: (%v) - %s", sourceFpath, err, strings.Trim(string(output), "\n"))
 	}
 
-	srcFile, err := os.Open(destFpath)
-	if err != nil {
-		return fmt.Errorf("failed to open cropped file %s: (%v)", destFpath, err)
-	}
-	defer srcFile.Close()
-
-	destFile, err := os.Create(sourceFpath)
-	if err != nil {
-		return fmt.Errorf("failed to open source file %s for writing: (%v)", sourceFpath, err)
-	}
-	defer destFile.Close()
-
-	_, err = io.Copy(destFile, srcFile)
-	if err != nil {
-		return fmt.Errorf("failed to copy cropped data to %s: (%v)", sourceFpath, err)
-	}
-
-	// Clean up the temporary file
-	os.Remove(destFpath)
-	return nil
+	return destFpath, nil
 }
 
 func countLineLeftPadding(line string) int {
@@ -138,10 +118,10 @@ func padLeft(cowfile []byte, n int) []string {
 	return converted
 }
 
-func ConvertPngToCow(sourceDirpath string, sourceFpath string, destDirpath string, extraPadding int) (string, error) {
+func ConvertPngToCow(sourceDirpath string, sourceFpath string, tmpDirpath string, destDirpath string, extraPadding int) (string, error) {
 
 	// Trim the whitespace from the edges of the images. This helps with the conversion
-	err := autoCrop(sourceFpath)
+	tmpFpath, err := autoCrop(sourceFpath, tmpDirpath)
 	if err != nil {
 		// If autoCrop fails, still try to convert the original image
 		Failures = append(Failures, string(err.Error()))
@@ -149,15 +129,15 @@ func ConvertPngToCow(sourceDirpath string, sourceFpath string, destDirpath strin
 	}
 
 	// Some conversions are failing with something about colour channels
-	output, err := img2xterm(sourceFpath)
+	output, err := img2xterm(tmpFpath)
 	if err != nil {
-		failureMsg := fmt.Sprintf("failed to convert %s: (%v) - %s", sourceFpath, err, strings.Trim(string(output), "\n"))
+		failureMsg := fmt.Sprintf("failed to convert %s: (%v) - %s", tmpFpath, err, strings.Trim(string(output), "\n"))
 		Failures = append(Failures, failureMsg)
 		return "", errors.New(failureMsg)
 	}
 
 	if len(output) == 0 {
-		failureMsg := fmt.Sprintf("failed to convert %s: no output", sourceFpath)
+		failureMsg := fmt.Sprintf("failed to convert %s: no output", tmpFpath)
 		Failures = append(Failures, failureMsg)
 		return "", errors.New(failureMsg)
 	}
