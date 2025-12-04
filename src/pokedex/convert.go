@@ -46,8 +46,7 @@ func autoCrop(sourceFpath string, tmpDirpath string) (string, error) {
 	rand.Read(randomBytes)
 	randomSuffix := hex.EncodeToString(randomBytes)
 
-	destFpath := fmt.Sprintf("%s/%s-%s", tmpDirpath, randomSuffix, filepath.Base(sourceFpath))
-	// fmt.Println("Auto-cropping", sourceFpath, "->", destFpath)
+	destFpath := filepath.Join(tmpDirpath, fmt.Sprintf("%s-%s", randomSuffix, filepath.Base(sourceFpath)))
 	output, err := exec.Command(
 		"bash", "-c", fmt.Sprintf("/usr/bin/convert %s -trim +repage %s 2>&1", sourceFpath, destFpath),
 	).Output()
