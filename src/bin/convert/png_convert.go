@@ -22,12 +22,13 @@ var (
 )
 
 type CowBuildArgs struct {
-	FromDir  string
-	TmpDir   string
-	ToDir    string
-	SkipDirs []string
-	Padding  int
-	Debug    bool
+	FromDir        string
+	TmpDir         string
+	ToDir          string
+	SkipDirs       []string
+	SkipDuplicates bool
+	Padding        int
+	Debug          bool
 }
 
 func parseArgs() CowBuildArgs {
@@ -35,11 +36,12 @@ func parseArgs() CowBuildArgs {
 	tmpDir := flag.String("tmpDir", "/tmp/convert/", "temporary directory for intermediate files")
 	toDir := flag.String("to", ".", "to dir")
 	skipDirs := flag.String("skip", "'[\"resources\"]'", "JSON array of dir patterns to skip converting")
+	skipDuplicates := flag.Bool("skipDuplicates", false, "whether to skip duplicate images")
 	padding := flag.Int("padding", 2, "the number of spaces to pad from the left")
 
 	flag.Parse()
 
-	args := CowBuildArgs{FromDir: *fromDir, TmpDir: *tmpDir, ToDir: *toDir, Padding: *padding, Debug: DEBUG}
+	args := CowBuildArgs{FromDir: *fromDir, TmpDir: *tmpDir, ToDir: *toDir, SkipDuplicates: *skipDuplicates, Padding: *padding, Debug: DEBUG}
 	json.Unmarshal([]byte(*skipDirs), &args.SkipDirs)
 
 	if args.Debug {
@@ -53,12 +55,12 @@ func worker(args CowBuildArgs, jobs <-chan string, pbar *progressbar.ProgressBar
 
 	for f := range jobs {
 		data, err := pokedex.ConvertPngToCow(args.FromDir, f, args.TmpDir, args.ToDir, args.Padding)
-		pbar.Add(1)
 
 		if err != nil {
 			mu.Lock()
 			*nFailures++
 			mu.Unlock()
+			pbar.Add(1)
 			continue
 		}
 
@@ -66,11 +68,15 @@ func worker(args CowBuildArgs, jobs <-chan string, pbar *progressbar.ProgressBar
 		mu.Lock()
 		if _, found := dataSet[data]; found {
 			if args.Debug {
-				fmt.Println("Skipping duplicate data for", f)
+				fmt.Print("\r\x1b[J") // clear the progress bar before printing debug log
+				fmt.Println("Detected duplicate:", f)
 			}
 			*nDuplicates++
-			mu.Unlock()
-			continue
+			if args.SkipDuplicates {
+				mu.Unlock()
+				pbar.Add(1)
+				continue
+			}
 		}
 		dataSet[data] = struct{}{}
 		mu.Unlock()
@@ -84,6 +90,7 @@ func worker(args CowBuildArgs, jobs <-chan string, pbar *progressbar.ProgressBar
 		destFpath := filepath.Join(destDirpath, strings.ReplaceAll(filepath.Base(f), ".png", ".cow"))
 
 		pokedex.WriteToCowfile(data, destDirpath, destFpath)
+		pbar.Add(1)
 	}
 }
 
@@ -119,19 +126,26 @@ func main() {
 		wg.Add(1)
 		go worker(args, jobs, &pbar, dataSet, &nDuplicates, &nFailures, &mu, &wg)
 	}
-
-	// Wait for all workers to finish
 	wg.Wait()
-	fmt.Println("\nFinished converting", len(fpaths), "pokesprite PNGs -> cowfiles")
-	fmt.Println("(skipped", nDuplicates, "duplicates and", nFailures, "failures)")
 
-	// wait for progress bar to finish
-	time.Sleep(100 * time.Millisecond)
+	pbar.Finish()
+	time.Sleep(100 * time.Millisecond) // wait a moment to let the progress bar finish cleanly
 
 	if args.Debug && len(pokedex.Failures) > 0 {
 		fmt.Println("failures:")
 		for _, f := range pokedex.Failures {
 			fmt.Println(" -", f)
 		}
+	}
+
+	totalSucceeded := len(fpaths) - nFailures
+	if args.SkipDuplicates {
+		totalSucceeded -= nDuplicates
+	}
+	fmt.Printf("\n- converted %d/%d PNGs -> ANSI\n", totalSucceeded, len(fpaths))
+	if args.SkipDuplicates {
+		fmt.Printf("- skipped %d duplicates\n- noticed %d failures\n\n", nDuplicates, nFailures)
+	} else {
+		fmt.Printf("- ignored %d duplicates\n- noticed %d failures\n\n", nDuplicates, nFailures)
 	}
 }

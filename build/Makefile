@@ -26,27 +26,32 @@ build/docker:
 		--build-arg DEBUG=$(DEBUG) \
 		..
 
+build/docker-convert:
+	@$(echo) -e "\e[48;5;30m> Building docker image $(DOCKER_IMAGE)-convert\e[0m"
+	@docker build \
+		--platform linux/amd64 \
+		-f Dockerfile.convert \
+		-t $(DOCKER_REPO)/pokesay-convert:$(DOCKER_TAG) \
+		--build-arg DEBUG=$(DEBUG) \
+		..
+
 build/cows:
 	@$(echo) -e "\e[48;5;30m> Building cows\e[0m"
-	@rm -rf cows.tar.gz cows/
-	@mkdir -p cows/
+	@rm -rf $(PWD)/cows && mkdir -p $(PWD)/cows
 	@docker run --rm \
 		--platform linux/amd64 \
 		-v $(PWD)/../:/usr/local/src \
-		-v $(PWD)/pokesprite:/tmp/original/pokesprite \
+		-v $(PWD)/pokesprite-ansi:/tmp/original/cows \
 		-v $(PWD)/cows:/tmp/cows \
+		-e DEBUG=$(DEBUG) \
 		-u u \
 		$(DOCKER_IMAGE) \
 		  build/scripts/build_cowfiles.sh
-	@tar -czf cows.tar.gz ./cows
-	@du -sh cows.tar.gz
 
 # generate embedded bin files for category/metadata/the actual pokemon
 build/assets:
-	@$(echo) -e "\e[48;5;30m> Building assets\e[0m"
+	@$(echo) -e "\n\e[48;5;30m> Building assets\e[0m"
 	@mkdir -p $(PWD)/assets
-	@rm -rf $(PWD)/cows/
-	@tar -xzf cows.tar.gz
 	@docker run --rm \
 		-v $(PWD)/../:/usr/local/src \
 		-v $(PWD)/cows:/tmp/cows \
@@ -58,7 +63,7 @@ build/assets:
 	@tree -L 1 $(PWD)/assets/
 
 build/bin:
-	@$(echo) -e "\e[48;5;30m> Building binaries\e[0m"
+	@$(echo) -e "\n\e[48;5;30m> Building binaries\e[0m"
 	@mkdir -p $(PWD)/../dist/bin/ $(PWD)/../dist/packages/ $(PWD)/../dist/tarballs/
 	@docker run --rm \
 		-v $(PWD)/../:/usr/local/src \
@@ -72,7 +77,7 @@ build/bin:
 	@tree $(PWD)/../dist/
 
 build/deb:
-	@$(echo) -e "\e[48;5;30m> Building DEB packages\e[0m"
+	@$(echo) -e "\n\e[48;5;30m> Building DEB packages\e[0m"
 	@docker run --rm \
 		-v $(PWD)/../:/usr/local/src \
 		-e VERSION=$(VERSION) \
@@ -82,7 +87,7 @@ build/deb:
 		  bash -c "/usr/local/src/build/scripts/build_packages.sh deb"
 
 build/arch:
-	@$(echo) -e "\e[48;5;30m> Building ARCH packages\e[0m"
+	@$(echo) -e "\n\e[48;5;30m> Building ARCH packages\e[0m"
 	@docker run --rm\
 		-v $(PWD)/../:/usr/local/src \
 		-e VERSION=$(VERSION) \
@@ -92,11 +97,11 @@ build/arch:
 		  bash -c "useradd u -m && VERSION=$(VERSION) /usr/local/src/build/scripts/build_packages.sh arch"
 
 build/packages: build/deb build/arch
-	@$(echo) -e "\e[48;5;30m> Built packages:\e[0m"
+	@$(echo) -e "\n\e[48;5;30m> Built packages:\e[0m"
 	@tree $(PWD)/../dist/
 
 test:
-	@$(echo) -e "\e[48;5;30m> Running tests\e[0m"
+	@$(echo) -e "\n\e[48;5;30m> Running tests\e[0m"
 	@docker run --rm \
 		-v $(PWD)/../:/usr/local/src \
 		--platform linux/amd64 \
@@ -105,5 +110,5 @@ test:
 			$(DOCKER_IMAGE) \
 			gotestsum --format dots
 
-.PHONY: all clean build/docker build/cows build/assets build/bin test
+.PHONY: all clean build/docker build/docker-convert build/cows build/assets build/bin test
 .PHONY: build/deb build/arch build/packages
