@@ -1,13 +1,12 @@
-FROM golang:1.24
+FROM golang:1.24-alpine
 
 WORKDIR /usr/local/src
 
-ENV DEBIAN_FRONTEND=noninteractive
-RUN apt update \
-    && apt upgrade -y \
-    && apt install -y --no-install-recommends jq tree
+RUN apk update \
+    && apk upgrade \
+    && apk add --no-cache jq tree bash dpkg
 
-RUN useradd u -m
+RUN adduser -D u
 
 ADD go.* /usr/local/src/
 ADD src/ /usr/local/src/src/
