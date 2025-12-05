@@ -65,14 +65,14 @@ function tarball() {
     rm -rf pokesay.1 pokesay-* usr/
 }
 
-build darwin  amd64
-build darwin  arm64
 build linux   amd64
-build windows amd64 .exe
-build android arm64
+
+build darwin  amd64 &
+build darwin  arm64 &
+build windows amd64 .exe &
+build android arm64 &
+tarball linux amd64 & # just create a tarball for the linux/amd64 (used for AUR package)
 wait
 
-# just create a tarball for the linux/amd64 (used for AUR package)
-tarball linux amd64
 
 rm -f pokesay.1
