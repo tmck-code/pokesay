@@ -50,7 +50,7 @@ build/cows:
 
 # generate embedded bin files for category/metadata/the actual pokemon
 build/assets:
-	@$(echo) -e "\n\e[48;5;30m> Building assets\e[0m"
+	@$(echo) -e "\n\e[1;30m\e[3m\e[1;43m=>> Building assets\e[0m"
 	@mkdir -p $(PWD)/assets
 	@docker run --rm \
 		-v $(PWD)/../:/usr/local/src \
